@@ -1,19 +1,6 @@
-<!-- GFM-TOC -->
-* [1. 有序数组的 Two Sum](#1-有序数组的-two-sum)
-* [2. 两数平方和](#2-两数平方和)
-* [3. 反转字符串中的元音字符](#3-反转字符串中的元音字符)
-* [4. 回文字符串](#4-回文字符串)
-* [5. 归并两个有序数组](#5-归并两个有序数组)
-* [6. 判断链表是否存在环](#6-判断链表是否存在环)
-* [7. 最长子序列](#7-最长子序列)
-<!-- GFM-TOC -->
+# 1. 有序数组的两数之和
 
-
-双指针主要用于遍历数组，两个指针指向不同的元素，从而协同完成任务。
-
-# 1. 有序数组的 Two Sum
-
-167\. Two Sum II - Input array is sorted (Easy)
+167\. Two Sum II - Input array is sorted / 两数之和 II - 输入有序数组(Easy)
 
 [Leetcode](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/) / [力扣](https://leetcode-cn.com/problems/two-sum-ii-input-array-is-sorted/description/)
 
@@ -34,23 +21,23 @@ Output: index1=1, index2=2
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/437cb54c-5970-4ba9-b2ef-2541f7d6c81e.gif" width="200px"> </div><br>
 
-```java
-public int[] twoSum(int[] numbers, int target) {
-    if (numbers == null) return null;
-    int i = 0, j = numbers.length - 1;
-    while (i < j) {
-        int sum = numbers[i] + numbers[j];
-        if (sum == target) {
-            return new int[]{i + 1, j + 1};
-        } else if (sum < target) {
-            i++;
-        } else {
-            j--;
+```C++
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        if(nums.empty()) return {};
+        
+        int i = 0, j = nums.size() - 1;
+        while(nums[i] + nums[j] != target && i < j) {
+            if(nums[i] + nums[j] < target) i++;
+            else j--;
         }
+        return {i + 1, j + 1};
     }
-    return null;
-}
+};
 ```
+
+
 
 # 2. 两数平方和
 
@@ -66,6 +53,8 @@ Explanation: 1 * 1 + 2 * 2 = 5
 
 题目描述：判断一个非负整数是否为两个整数的平方和。
 
+**题解**：
+
 可以看成是在元素为 0\~target 的有序数组中查找两个数，使得这两个数的平方和为 target，如果能找到，则返回 true，表示 target 是两个整数的平方和。
 
 本题和 167\. Two Sum II - Input array is sorted 类似，只有一个明显区别：一个是和为 target，一个是平方和为 target。本题同样可以使用双指针得到两个数，使其平方和为 target。
@@ -74,25 +63,42 @@ Explanation: 1 * 1 + 2 * 2 = 5
 
 因为最多只需要遍历一次 0\~sqrt(target)，所以时间复杂度为 O(sqrt(target))。又因为只使用了两个额外的变量，因此空间复杂度为 O(1)。
 
-```java
- public boolean judgeSquareSum(int target) {
-     if (target < 0) return false;
-     int i = 0, j = (int) Math.sqrt(target);
-     while (i <= j) {
-         int powSum = i * i + j * j;
-         if (powSum == target) {
-             return true;
-         } else if (powSum > target) {
-             j--;
-         } else {
-             i++;
-         }
-     }
-     return false;
- }
+```C++
+class Solution {
+public:
+    bool judgeSquareSum(int c) {
+        if(c < 0) return false;
+        long i = 0, j = sqrt(c);
+        while(i <= j) {
+            long sum = i*i + j*j;
+            if(sum == c) return true;
+            if(sum > c) j--;
+            else i++;
+        }
+        return false;
+    }
+};
 ```
 
-# 3. 反转字符串中的元音字符
+另一种写法：使用for循环控制 i，while循环控制 j
+
+```C++
+class Solution {
+public:
+    bool judgeSquareSum(int c) {
+        if(c < 0) return false;
+        for(long i = 0, j = sqrt(c); i <= j; i++) {
+            while(j >= 0 && i*i + j*j > c) j--;
+            if(i*i + j*j == c) return true;
+        }
+        return false;
+    }
+};
+```
+
+
+
+# 3. 反转字符串中的元音字符✏️
 
 345\. Reverse Vowels of a String (Easy)
 
@@ -113,7 +119,7 @@ Given s = "leetcode", return "leotcede".
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/ef25ff7c-0f63-420d-8b30-eafbeea35d11.gif" width="400px"> </div><br>
 
-```java
+```C++
 private final static HashSet<Character> vowels = new HashSet<>(
         Arrays.asList('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'));
 
@@ -137,9 +143,11 @@ public String reverseVowels(String s) {
 }
 ```
 
+
+
 # 4. 回文字符串
 
-680\. Valid Palindrome II (Easy)
+680\. Valid Palindrome II / 验证回文字符串 II (Easy)
 
 [Leetcode](https://leetcode.com/problems/valid-palindrome-ii/description/) / [力扣](https://leetcode-cn.com/problems/valid-palindrome-ii/description/)
 
@@ -150,6 +158,8 @@ Explanation: You could delete the character 'c'.
 ```
 
 题目描述：可以删除一个字符，判断是否能构成回文字符串。
+
+**题解**：
 
 所谓的回文字符串，是指具有左右对称特点的字符串，例如 "abcba" 就是一个回文字符串。
 
@@ -165,27 +175,56 @@ Explanation: You could delete the character 'c'.
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/db5f30a7-8bfa-4ecc-ab5d-747c77818964.gif" width="300px"> </div><br>
 
-```java
-public boolean validPalindrome(String s) {
-    for (int i = 0, j = s.length() - 1; i < j; i++, j--) {
-        if (s.charAt(i) != s.charAt(j)) {
-            return isPalindrome(s, i, j - 1) || isPalindrome(s, i + 1, j);
-        }
-    }
-    return true;
-}
+写法1：使用两种模板，for 和 while
 
-private boolean isPalindrome(String s, int i, int j) {
-    while (i < j) {
-        if (s.charAt(i++) != s.charAt(j--)) {
-            return false;
+```C++
+class Solution {
+public:
+    bool validPalindrome(string s) {
+        for(int i = 0, j = s.size() - 1; i < j; i++, j--) {
+            if(s[i] != s[j]) { // 不删元素的话，不是回文，删除元素再判断
+                return Palindrome(s, i, j - 1) || Palindrome(s, i + 1, j); // 删除一个字符判断是否是回文
+            }
         }
+        return true;
     }
-    return true;
-}
+
+    bool Palindrome(string s, int i, int j) {
+        while(i < j) {
+            if(s[i] != s[j]) return false;
+            i++; j--;
+        }
+        return true;
+    }
+};
 ```
 
-# 5. 归并两个有序数组
+写法2：使用一种模板，while
+
+```C++
+class Solution1 {
+public:
+    bool validPalindrome(string s) {
+        int i = 0, j = s.size() - 1;
+        while (i < j) {
+            if (s[i] != s[j]) return isValid(s, i, j - 1) || isValid(s, i + 1, j);
+            ++i; --j;
+        }
+        return true;
+    }
+    bool isValid(string s, int i, int j) {
+        while (i < j) {
+            if (s[i] != s[j]) return false;
+            ++i; --j;
+        }
+        return true;
+    }
+};
+```
+
+
+
+# 5. 归并两个有序数组✏️
 
 88\. Merge Sorted Array (Easy)
 
@@ -203,7 +242,7 @@ Output: [1,2,2,3,5,6]
 
 需要从尾开始遍历，否则在 nums1 上归并得到的值会覆盖还未进行归并比较的值。
 
-```java
+```C++
 public void merge(int[] nums1, int m, int[] nums2, int n) {
     int index1 = m - 1, index2 = n - 1;
     int indexMerge = m + n - 1;
@@ -221,6 +260,8 @@ public void merge(int[] nums1, int m, int[] nums2, int n) {
 }
 ```
 
+
+
 # 6. 判断链表是否存在环
 
 141\. Linked List Cycle (Easy)
@@ -229,22 +270,22 @@ public void merge(int[] nums1, int m, int[] nums2, int n) {
 
 使用双指针，一个指针每次移动一个节点，一个指针每次移动两个节点，如果存在环，那么这两个指针一定会相遇。
 
-```java
-public boolean hasCycle(ListNode head) {
-    if (head == null) {
+```C++
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        ListNode *fast = head, *slow = head;
+        while(fast && fast->next) {
+            fast = fast->next->next;
+            slow = slow->next;
+            if(fast == slow) return true;
+        }
         return false;
     }
-    ListNode l1 = head, l2 = head.next;
-    while (l1 != null && l2 != null && l2.next != null) {
-        if (l1 == l2) {
-            return true;
-        }
-        l1 = l1.next;
-        l2 = l2.next.next;
-    }
-    return false;
-}
+};
 ```
+
+
 
 # 7. 最长子序列
 
@@ -262,38 +303,173 @@ Output:
 
 题目描述：删除 s 中的一些字符，使得它构成字符串列表 d 中的一个字符串，找出能构成的最长字符串。如果有多个相同长度的结果，返回字典序的最小字符串。
 
+**题解**：
+
 通过删除字符串 s 中的一个字符能得到字符串 t，可以认为 t 是 s 的子序列，我们可以使用双指针来判断一个字符串是否为另一个字符串的子序列。
 
-```java
-public String findLongestWord(String s, List<String> d) {
-    String longestWord = "";
-    for (String target : d) {
-        int l1 = longestWord.length(), l2 = target.length();
-        if (l1 > l2 || (l1 == l2 && longestWord.compareTo(target) < 0)) {
-            continue;
-        }
-        if (isSubstr(s, target)) {
-            longestWord = target;
-        }
-    }
-    return longestWord;
-}
+指针i指向字符串 s，指针 j 指向可能为子序列的字符串 ds，i 指针始终右移一位，当 i，j 指向的字符相等时 j 右移一位。若 ds 为 s 的子序列，则 j 最终指向 '\0' 位置，否则指向ds中某个字符。
 
-private boolean isSubstr(String s, String target) {
-    int i = 0, j = 0;
-    while (i < s.length() && j < target.length()) {
-        if (s.charAt(i) == target.charAt(j)) {
-            j++;
+```C++
+class Solution {
+public:
+    string findLongestWord(string s, vector<string>& d) {
+        string res = "";
+        for(auto ds : d) {
+            if(isSubStr(s, ds)) {
+                // 选长度大的，若长度相等，选字典序小的
+                if(ds.size() > res.size() || (ds.size() == res.size() && ds < res))
+                    res = ds;
+            }
         }
-        i++;
+        return res;
     }
-    return j == target.length();
-}
+
+    bool isSubStr(string s, string ds) {
+        int i = 0, j = 0;
+        while(i < s.size() && j < ds.size()) {
+            if(s[i] == ds[j]) j++;
+            i++;
+        }
+        return j == ds.size();
+    }
+};
 ```
 
 
 
+# 8. 无重复最长子串
+
+[Leetcode 3. 无重复字符的最长子串](https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/)
+
+题目描述：给定一个字符串，请你找出其中不含有重复字符的 **最长子串** 的长度。
+
+```
+输入: "abcabcbb"
+输出: 3 
+```
+
+**题解**：
+
+使用双指针，或称之为滑动窗口。i 指针每次右移一位，当 i 指针指向的字符在区间中出现两次时，j 指针右移直到 i 指针指向的字符在区间中仅出现一次。
+
+方法1：字符的种类有限，可使用数组模拟哈希表，存储字符出现的次数，速度很快。
+
+- 写法1：每次直接插入，即在判断之前插入，因而需判断某字符是否出现了两次。
+- 写法2：在while循环后插入，即在判断之后插入，那么只需判断某字符是否已出现过一次。
+
+```C++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+
+        int cnt[256] = {0}; // 注意初始化
+        int res = 0;
+        for(int i = 0, j = 0; i < n; i++) { // 扩大区间
+            cnt[s[i]]++; // 扩大区间，出现次数加1
+            while(cnt[s[i]] > 1) { // 出现两次
+                cnt[s[j]]--; // 缩小区间，出现次数减1
+                j++; // 缩小区间
+            }
+            res = max(res, i - j + 1);
+        }
+        return res;
+    }
+};
+
+// 写法2
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+
+        int cnt[256] = {0};
+        int res = 0;
+        for(int i = 0, j = 0; i < n; i++) {
+            while(cnt[s[i]] > 0) {
+                cnt[s[j]]--;
+                j++;
+            }
+            cnt[s[i]]++;
+            res = max(res, i - j + 1);
+        }
+        return res;
+    }
+};
+```
+
+方法2：使用哈希表unordered_map存储出现的字符，速度较慢。注意unordered_map不能存储重复的数据，即仅能判断一个字符当前出现的次数是否为0或1，因而需将插入代码放到while循环之后，如果出现了重复的字符，那么下次判断时，此字符出现的次数为1。
+
+```C++
+class Solution1 {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+
+        unordered_set<char> us;
+        int res = 0;
+        for(int i = 0, j = 0; i < n; i++) {
+            while(us.count(s[i]) > 0) {
+                us.erase(s[j]);
+                j++;
+            }
+            us.insert(s[i]);
+
+            res = max(res, i - j + 1);
+        }
+
+        return res;
+    }
+};
+```
+
+方法3：若想保存每个字符出现的次数，可以使用unordered_map，不推荐
+
+```C++
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+
+        unordered_map<char, int> umap;
+        int res = 0;
+        for(int i = 0, j = 0; i < n; i++) {
+            umap[s[i]]++;
+            while(umap[s[i]] > 1) {
+                umap[s[j]]--;
+                j++;
+            }
+            res = max(res, i - j + 1);
+        }
+
+        return res;
+    }
+};
+```
 
 
 
-<div align="center"><img width="320px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/公众号二维码-2.png"></img></div>
+# 9. 移动零
+
+[Leetcode 283. 移动零 (Easy)](https://leetcode-cn.com/problems/move-zeroes/)
+
+```
+Input: [0,1,0,3,12]
+Output: [1,3,12,0,0]
+```
+
+**题解**：
+
+使用快慢指针，快指针遍历数组每个元素，遇到非0元素则与慢指针交换，并且慢指针后移一位，这样做的结果是：慢指针之前的所有元素都是非零的，慢指针始终指向0
+
+```C++
+class Solution {
+public:
+    void moveZeroes(vector<int>& nums) {
+        for(int i = 0, j = 0; i < nums.size(); i++) { // i为快指针，j为慢指针
+            if(nums[i] != 0) swap(nums[i], nums[j++]);
+        }
+    }
+};
+```
+

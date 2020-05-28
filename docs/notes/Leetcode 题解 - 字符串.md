@@ -1,15 +1,3 @@
-<!-- GFM-TOC -->
-* [1. 字符串循环移位包含](#1-字符串循环移位包含)
-* [2. 字符串循环移位](#2-字符串循环移位)
-* [3. 字符串中单词的翻转](#3-字符串中单词的翻转)
-* [4. 两个字符串包含的字符是否完全相同](#4-两个字符串包含的字符是否完全相同)
-* [5. 计算一组字符集合可以组成的回文字符串的最大长度](#5-计算一组字符集合可以组成的回文字符串的最大长度)
-* [6. 字符串同构](#6-字符串同构)
-* [7. 回文子字符串个数](#7-回文子字符串个数)
-* [8. 判断一个整数是否是回文数](#8-判断一个整数是否是回文数)
-* [9. 统计二进制字符串中连续 1 和连续 0 数量相同的子字符串个数](#9-统计二进制字符串中连续-1-和连续-0-数量相同的子字符串个数)
-<!-- GFM-TOC -->
-
 
 # 1. 字符串循环移位包含
 
@@ -24,6 +12,8 @@ Return : true
 
 s1 进行循环移位的结果是 s1s1 的子字符串，因此只要判断 s2 是否是 s1s1 的子字符串即可。
 
+
+
 # 2. 字符串循环移位
 
 [编程之美 2.17](#)
@@ -37,6 +27,8 @@ Return "123abcd"
 
 将 abcd123 中的 abcd 和 123 单独翻转，得到 dcba321，然后对整个字符串进行翻转，得到 123abcd。
 
+
+
 # 3. 字符串中单词的翻转
 
 [程序员代码面试指南](#)
@@ -48,9 +40,11 @@ Return "student a am I"
 
 将每个单词翻转，然后将整个字符串翻转。
 
+
+
 # 4. 两个字符串包含的字符是否完全相同
 
-242\. Valid Anagram (Easy)
+242\. Valid Anagram / 有效的字母异位词 (Easy)
 
 [Leetcode](https://leetcode.com/problems/valid-anagram/description/) / [力扣](https://leetcode-cn.com/problems/valid-anagram/description/)
 
@@ -63,27 +57,31 @@ s = "rat", t = "car", return false.
 
 由于本题的字符串只包含 26 个小写字符，因此可以使用长度为 26 的整型数组对字符串出现的字符进行统计，不再使用 HashMap。
 
-```java
-public boolean isAnagram(String s, String t) {
-    int[] cnts = new int[26];
-    for (char c : s.toCharArray()) {
-        cnts[c - 'a']++;
-    }
-    for (char c : t.toCharArray()) {
-        cnts[c - 'a']--;
-    }
-    for (int cnt : cnts) {
-        if (cnt != 0) {
-            return false;
+```C++
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        vector<int> hash(26, 0);
+        for(int i = 0; i < s.size(); i++)
+            hash[s[i] - 'a']++;
+
+        for(int i = 0; i < t.size(); i++)
+            hash[t[i] - 'a']--;
+
+        for(int i = 0; i < 26; i++) {
+            if(hash[i] != 0)
+                return false;
         }
+        return true;
     }
-    return true;
-}
+};
 ```
+
+
 
 # 5. 计算一组字符集合可以组成的回文字符串的最大长度
 
-409\. Longest Palindrome (Easy)
+409\. Longest Palindrome / 最长回文串 (Easy)
 
 [Leetcode](https://leetcode.com/problems/longest-palindrome/description/) / [力扣](https://leetcode-cn.com/problems/longest-palindrome/description/)
 
@@ -97,24 +95,56 @@ Explanation : One longest palindrome that can be built is "dccaccd", whose lengt
 
 因为回文字符串最中间的那个字符可以单独出现，所以如果有单独的字符就把它放到最中间。
 
-```java
-public int longestPalindrome(String s) {
-    int[] cnts = new int[256];
-    for (char c : s.toCharArray()) {
-        cnts[c]++;
+
+
+**题解**：
+
+写法1：使用哈希表
+
+```C++
+class Solution {
+public:
+    int longestPalindrome(string s) {
+        unordered_map<char, int> hash;
+        for(auto c : s) 
+            hash[c]++;
+        
+        int cnt = 0; // 回文对数
+        int flag = 0; // 是否有单个字符
+        for(auto it : hash) {
+            cnt += it.second / 2; // 统计回文对数
+            if(!flag && (it.second % 2) == 1) // 是否有单个字符
+                flag = 1;
+        }
+        return cnt*2 + flag; // 单个字符数量仅统计一次
     }
-    int palindrome = 0;
-    for (int cnt : cnts) {
-        palindrome += (cnt / 2) * 2;
-    }
-    if (palindrome < s.length()) {
-        palindrome++;   // 这个条件下 s 中一定有单个未使用的字符存在，可以把这个字符放到回文的最中间
-    }
-    return palindrome;
-}
+};
 ```
 
-# 6. 字符串同构
+
+
+写法2：使用数组代替哈希表
+
+```C++
+class Solution {
+public:
+    int longestPalindrome(string s) {
+        vector<int> hash(256, 0);
+        for(auto c : s)
+            hash[c]++;
+        
+        int cnt = 0; // 回文对数
+        for(auto it : hash)
+            cnt += it / 2; // 统计回文对数
+
+        return cnt*2 < s.size() ?  cnt*2 + 1 : cnt*2; // 有落单字符则长度+1
+    }
+};
+```
+
+
+
+# 6. 字符串同构✏️
 
 205\. Isomorphic Strings (Easy)
 
@@ -235,10 +265,3 @@ public int countBinarySubstrings(String s) {
     return count;
 }
 ```
-
-
-
-
-
-
-<div align="center"><img width="320px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/公众号二维码-2.png"></img></div>

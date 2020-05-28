@@ -1,18 +1,3 @@
-<!-- GFM-TOC -->
-* [1. 把数组中的 0 移到末尾](#1-把数组中的-0-移到末尾)
-* [2. 改变矩阵维度](#2-改变矩阵维度)
-* [3. 找出数组中最长的连续 1](#3-找出数组中最长的连续-1)
-* [4. 有序矩阵查找](#4-有序矩阵查找)
-* [5. 有序矩阵的 Kth Element](#5-有序矩阵的-kth-element)
-* [6. 一个数组元素在 [1, n] 之间，其中一个数被替换为另一个数，找出重复的数和丢失的数](#6-一个数组元素在-[1,-n]-之间，其中一个数被替换为另一个数，找出重复的数和丢失的数)
-* [7. 找出数组中重复的数，数组值在 [1, n] 之间](#7-找出数组中重复的数，数组值在-[1,-n]-之间)
-* [8. 数组相邻差值的个数](#8-数组相邻差值的个数)
-* [9. 数组的度](#9-数组的度)
-* [10. 对角元素相等的矩阵](#10-对角元素相等的矩阵)
-* [11. 嵌套数组](#11-嵌套数组)
-* [12. 分隔数组](#12-分隔数组)
-<!-- GFM-TOC -->
-
 
 # 1. 把数组中的 0 移到末尾
 
@@ -189,6 +174,8 @@ class Tuple implements Comparable<Tuple> {
 }
 ```
 
+
+
 # 6. 一个数组元素在 [1, n] 之间，其中一个数被替换为另一个数，找出重复的数和丢失的数
 
 645\. Set Mismatch (Easy)
@@ -231,49 +218,13 @@ private void swap(int[] nums, int i, int j) {
 }
 ```
 
-# 7. 找出数组中重复的数，数组值在 [1, n] 之间
 
-287\. Find the Duplicate Number (Medium)
 
-[Leetcode](https://leetcode.com/problems/find-the-duplicate-number/description/) / [力扣](https://leetcode-cn.com/problems/find-the-duplicate-number/description/)
+# 7. 
 
-要求不能修改数组，也不能使用额外的空间。
 
-二分查找解法：
 
-```java
-public int findDuplicate(int[] nums) {
-     int l = 1, h = nums.length - 1;
-     while (l <= h) {
-         int mid = l + (h - l) / 2;
-         int cnt = 0;
-         for (int i = 0; i < nums.length; i++) {
-             if (nums[i] <= mid) cnt++;
-         }
-         if (cnt > mid) h = mid - 1;
-         else l = mid + 1;
-     }
-     return l;
-}
-```
 
-双指针解法，类似于有环链表中找出环的入口：
-
-```java
-public int findDuplicate(int[] nums) {
-    int slow = nums[0], fast = nums[nums[0]];
-    while (slow != fast) {
-        slow = nums[slow];
-        fast = nums[nums[fast]];
-    }
-    fast = 0;
-    while (slow != fast) {
-        slow = nums[slow];
-        fast = nums[fast];
-    }
-    return slow;
-}
-```
 
 # 8. 数组相邻差值的个数
 
@@ -402,7 +353,7 @@ One of the longest S[K]:
 S[0] = {A[0], A[5], A[6], A[2]} = {5, 6, 2, 0}
 ```
 
-题目描述：S[i] 表示一个集合，集合的第一个元素是 A[i]，第二个元素是 A[A[i]]，如此嵌套下去。求最大的 S[i]。
+此题与 [Leetcode 136. 只出现一次的数字](https://leetcode-cn.com/problems/single-number/) 类似（题解见数组与矩阵部分），但此题已排序，并且限制不同。
 
 ```java
 public int arrayNesting(int[] nums) {
@@ -453,7 +404,214 @@ public int maxChunksToSorted(int[] arr) {
 
 
 
+# 13. 除自身以外数组的乘积
+
+238\. Product of Array Except Self (Medium)
+
+[Leetcode](https://leetcode.com/problems/product-of-array-except-self/description/) / [力扣](https://leetcode-cn.com/problems/product-of-array-except-self/description/)
+
+```html
+For example, given [1,2,3,4], return [24,12,8,6].
+```
+
+给定一个数组，创建一个新数组，新数组的每个元素为原始数组中除了该位置上的元素之外所有元素的乘积。
+
+要求时间复杂度为 O(N)，并且不能使用除法。
 
 
 
-<div align="center"><img width="320px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/公众号二维码-2.png"></img></div>
+**题解**：
+
+方法1：
+
+使用两个数组分别存储左侧乘积与右侧乘积，左右乘积存储到结果数组。时间复杂度O(n)，空间复杂度O(n)。
+
+对于某一个数字，如果我们知道其前面所有数字的乘积，同时也知道后面所有的数乘积，那么二者相乘就是我们要的结果，所以我们只要分别创建出这两个数组即可，分别从数组的两个方向遍历就可以分别创建出乘积累积数组。
+
+```C++
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> l(n), r(n), res(n);
+
+        l[0] = 1;
+        for(int i = 1; i < n; i++) // 计算左侧乘积数组
+            l[i] = nums[i - 1] * l[i - 1];
+
+        r[n - 1] = 1;
+        for(int i = n - 2; i >= 0; i--) // 计算右侧乘积数组
+            r[i] = nums[i + 1] * r[i + 1];
+
+        for(int i = 0; i < n; i++) // 计算其他元素乘积
+            res[i] = l[i] * r[i];
+
+        return res;
+    }
+};
+```
+
+
+
+方法2：
+
+空间优化，仅使用结果数组，先存储左侧元素乘积，再存储左右元素乘积，借助变量累乘获得左侧元素乘积和右侧元素乘积。时间复杂度O(n)，空间复杂度O(1)。
+
+由于最终的结果都是要乘到结果 res 中，所以可以不用单独的数组来保存乘积，而是直接累积到结果 res 中，我们先从前面遍历一遍，将乘积的累积存入结果 res 中，然后从后面开始遍历。用到一个临时变量 k，初始化为1，从左到右遍历是存储各位置左侧元素的乘积，并将这些左侧元素乘积存储在res中，从右向左遍历是存储各位置右侧元素的乘积，与res中对应位置元素相乘，即为左侧元素乘积乘以右侧元素乘积。
+
+```C++
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> res(n);
+
+        int k = 1;
+        for(int i = 0; i < n; i++) { // 从左向右累乘，直接存到结果数组
+            res[i] = k; // k为该数左侧的乘积
+            k *= nums[i]; // 此时数组存储的是左侧元素的乘积
+        }
+
+        k = 1;
+        for(int i = n - 1; i >= 0; i--) { // 从右向左累乘，直接存到结果数组
+            res[i] *= k; // k为该数右侧的乘积
+            k *= nums[i]; // 此时数组等于左边的元素*右边的元素
+        }
+        return res;
+    }
+};
+```
+
+
+
+# 14. 数组中只出现一次的数字
+
+[Leetcode 136. 只出现一次的数字 (Easy)](https://leetcode-cn.com/problems/single-number/)
+
+**题解**：
+
+此题与 [Leetcode 540. 有序数组中的单一元素](https://leetcode-cn.com/problems/single-element-in-a-sorted-array/) 类似（题解见二分），但此题未排序，并且限制条件不同。
+
+
+
+方法1：使用哈希表，但空间复杂度可能大于O(1)
+
+遍历数组中的每个数字，若当前数字已经在 HashSet 中了，则将 HashSet 中的该数字移除，否则就加入HashSet。这相当于两两抵消了，最终凡是出现两次的数字都被移除了 HashSet，唯一剩下的那个就是单独数字了。
+
+```C++
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        unordered_set<int> st;
+        for(auto num : nums)
+            if(st.count(num)) st.erase(num);
+            else st.insert(num);
+        
+        return *st.begin();
+    }
+};
+```
+
+
+
+方法2：排序后使用二分查找，时间复杂度O(nlogn + logn)
+
+```C++
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int l = 0, r = nums.size() - 1;
+        while(l < r) {
+            int mid = (l + r) / 2;
+            if(mid % 2 == 1) mid--; // 保证 l/r/m 都在偶数位，使得查找区间大小一直都是奇数
+            if(nums[mid] != nums[mid + 1]) r = mid;
+            else l = mid + 2;
+        }
+        // while(l < r) {
+        //     int mid = l + r >> 1;
+        //     if(nums[mid] != nums[mid^1]) r = mid;
+        //     else l = mid + 1;
+        // }
+        return nums[l];
+    }
+};
+```
+
+
+
+方法3：位运算，时间复杂度O(1)
+
+由于数字在计算机是以二进制存储的，每位上都是0或1，**如果我们把两个相同的数字异或，0与0 '异或' 是0，1与1 '异或' 也是0，那么我们会得到0**。根据这个特点，我们把数组中所有的数字都 '异或' 起来，则每对相同的数字都会得0，然后最后剩下来的数字就是那个只有1次的数字。
+
+```C++
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int res = 0;
+        for (auto num : nums) res ^= num;
+        return res;
+    }
+};
+```
+
+
+
+# 15. 数组中缺失的数字
+
+
+
+**题解**：
+
+方法1：使用负号标记
+
+对于每个数字nums[i]，如果其对应的nums[nums[i] - 1]是正数，我们就赋值为其相反数，如果已经是负数了，就不变了，那么最后我们只要把留下的正数对应的位置加入结果res中即可。使用负号做标记的好处是，其绝对值仍然是原来的数。
+
+```C++
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> res;
+
+        for(int i = 0; i < n; i++) {
+            int idx = abs(nums[i]) - 1; // nums[i]对应的索引位置为nums[i]-1
+            if(nums[idx] > 0) nums[idx] *= -1; // 标记此位置为负数，表示已有对应值
+        }
+
+        for(int i = 0; i < n; i++) {
+            if(nums[i] > 0)
+                res.push_back(i + 1);
+        }
+        return res;
+    }
+};
+```
+
+方法2：加上数组长度n做标记
+
+在nums[nums[i]-1]位置累加数组长度n，注意nums[i]-1有可能越界，所以我们需要对n取余，最后要找出缺失的数只需要看nums[i]的值是否小于等于n即可。
+
+例如最后遍历完nums[i]数组为[12, 19, 18, 15, 8, 2, 11, 9]，我们发现有两个数字8和2小于等于n，那么就可以通过i+1来得到正确的结果5和6了
+
+```C++
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int n = nums.size();
+        vector<int> res;
+
+        for(int i = 0; i < n; i++) {
+            int idx = (nums[i] - 1) % n; // nums[i]对应的索引位置为nums[i]-1
+            if(nums[idx] <= n) nums[idx] += n; // 此位置加n，表示已有对应值
+        }
+
+        for(int i = 0; i < n; i++) {
+            if(nums[i] <= n)
+                res.push_back(i + 1);
+        }
+        return res;
+    }
+};
+```
+

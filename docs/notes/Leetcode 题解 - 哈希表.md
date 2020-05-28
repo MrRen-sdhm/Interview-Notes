@@ -1,43 +1,66 @@
-<!-- GFM-TOC -->
-* [1. 数组中两个数的和为给定值](#1-数组中两个数的和为给定值)
-* [2. 判断数组是否含有重复元素](#2-判断数组是否含有重复元素)
-* [3. 最长和谐序列](#3-最长和谐序列)
-* [4. 最长连续序列](#4-最长连续序列)
-<!-- GFM-TOC -->
-
 
 哈希表使用 O(N) 空间复杂度存储数据，并且以 O(1) 时间复杂度求解问题。
 
-- Java 中的   **HashSet**   用于存储一个集合，可以查找元素是否在集合中。如果元素有穷，并且范围不大，那么可以用一个布尔数组来存储一个元素是否存在。例如对于只有小写字符的元素，就可以用一个长度为 26 的布尔数组来存储一个字符集合，使得空间复杂度降低为 O(1)。
+- C++中的   **unordered_set**   用于存储一个集合，可以查找元素是否在集合中。如果元素有穷，并且范围不大，那么可以用一个布尔数组来存储一个元素是否存在。例如对于只有小写字符的元素，就可以用一个长度为 26 的布尔数组来存储一个字符集合，使得空间复杂度降低为 O(1)。
 
- Java 中的   **HashMap**   主要用于映射关系，从而把两个元素联系起来。HashMap 也可以用来对元素进行计数统计，此时键为元素，值为计数。和 HashSet 类似，如果元素有穷并且范围不大，可以用整型数组来进行统计。在对一个内容进行压缩或者其它转换时，利用 HashMap 可以把原始内容和转换后的内容联系起来。例如在一个简化 url 的系统中 [Leetcdoe : 535. Encode and Decode TinyURL (Medium)
+- C++中的   **unordered_map**   主要用于映射关系，从而把两个元素联系起来。HashMap 也可以用来对元素进行计数统计，此时键为元素，值为计数。和 HashSet 类似，如果元素有穷并且范围不大，可以用整型数组来进行统计。在对一个内容进行压缩或者其它转换时，利用 HashMap 可以把原始内容和转换后的内容联系起来。例如在一个简化 url 的系统中 [Leetcdoe : 535. Encode and Decode TinyURL (Medium)
 
-[Leetcode](https://leetcode.com/problems/encode-and-decode-tinyurl/description/)，利用 HashMap 就可以存储精简后的 url 到原始 url 的映射，使得不仅可以显示简化的 url，也可以根据简化的 url 得到原始 url 从而定位到正确的资源�) / [力扣](https://leetcode-cn.com/problems/encode-and-decode-tinyurl/description/)，利用 HashMap 就可以存储精简后的 url 到原始 url 的映射，使得不仅可以显示简化的 url，也可以根据简化的 url 得到原始 url 从而定位到正确的资源�)
+[Leetcode](https://leetcode.com/problems/encode-and-decode-tinyurl/description/)，利用 unordered_map 就可以存储精简后的 url 到原始 url 的映射，使得不仅可以显示简化的 url，也可以根据简化的 url 得到原始 url 从而定位到正确的资源) / [力扣](https://leetcode-cn.com/problems/encode-and-decode-tinyurl/description/)，利用 HashMap 就可以存储精简后的 url 到原始 url 的映射，使得不仅可以显示简化的 url，也可以根据简化的 url 得到原始 url 从而定位到正确的资源)
+
 
 
 # 1. 数组中两个数的和为给定值
 
-1\. Two Sum (Easy)
+1\. Two Sum / 两数之和 (Easy)
 
 [Leetcode](https://leetcode.com/problems/two-sum/description/) / [力扣](https://leetcode-cn.com/problems/two-sum/description/)
 
 可以先对数组进行排序，然后使用双指针方法或者二分查找方法。这样做的时间复杂度为 O(NlogN)，空间复杂度为 O(1)。
 
-用 HashMap 存储数组元素和索引的映射，在访问到 nums[i] 时，判断 HashMap 中是否存在 target - nums[i]，如果存在说明 target - nums[i] 所在的索引和 i 就是要找的两个数。该方法的时间复杂度为 O(N)，空间复杂度为 O(N)，使用空间来换取时间。
+用哈希表存储数组元素和索引的映射，在访问到 nums[i] 时，判断哈希表中是否存在 target - nums[i]，如果存在说明 target - nums[i] 所在的索引和 i 就是要找的两个数。该方法的时间复杂度为 O(N)，空间复杂度为 O(N)，使用空间来换取时间。
 
-```java
-public int[] twoSum(int[] nums, int target) {
-    HashMap<Integer, Integer> indexForNum = new HashMap<>();
-    for (int i = 0; i < nums.length; i++) {
-        if (indexForNum.containsKey(target - nums[i])) {
-            return new int[]{indexForNum.get(target - nums[i]), i};
-        } else {
-            indexForNum.put(nums[i], i);
+方法1：两遍哈希，先将所有数字及其下标存入哈希表，再逐个遍历数字，并在哈希表中查找对应的数
+
+```C++
+// 两遍哈希
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> memo; // 键为数，值为此数在数组中的下标
+
+        for(int i = 0; i < nums.size(); i++) {
+            memo[nums[i]] = i; // 将各数添加到哈希表
         }
+
+        for(int i = 0; i < nums.size(); i++) {
+            if(memo.count(target - nums[i]) && memo[target - nums[i]] != i) // 存在，并且不是当前值
+                return {i, memo[target - nums[i]]};
+        }
+        return {};
     }
-    return null;
-}
+};
 ```
+
+方法2：一遍哈希，存入哈希表的过程中就查找哈希表中是否有对应的数，注意返回值的顺序
+
+```C++
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> memo; // 键为数，值为此数在数组中的下标
+
+        for(int i = 0; i < nums.size(); i++) {
+            if(memo.count(target - nums[i])) // 存在另一个数
+                return {memo[target - nums[i]], i};
+            memo[nums[i]] = i; // 将各数添加到哈希表
+        }
+        return {};
+    }
+};
+
+```
+
+
 
 # 2. 判断数组是否含有重复元素
 
@@ -54,6 +77,8 @@ public boolean containsDuplicate(int[] nums) {
     return set.size() < nums.length;
 }
 ```
+
+
 
 # 3. 最长和谐序列
 
@@ -84,6 +109,8 @@ public int findLHS(int[] nums) {
     return longest;
 }
 ```
+
+
 
 # 4. 最长连续序列
 
@@ -133,8 +160,3 @@ private int maxCount(Map<Integer, Integer> countForNum) {
 ```
 
 
-
-
-
-
-<div align="center"><img width="320px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/公众号二维码-2.png"></img></div>

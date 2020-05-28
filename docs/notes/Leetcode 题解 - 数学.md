@@ -1,34 +1,9 @@
-<!-- GFM-TOC -->
-* [素数分解](#素数分解)
-* [整除](#整除)
-* [最大公约数最小公倍数](#最大公约数最小公倍数)
-    * [1. 生成素数序列](#1-生成素数序列)
-    * [2. 最大公约数](#2-最大公约数)
-    * [3. 使用位操作和减法求解最大公约数](#3-使用位操作和减法求解最大公约数)
-* [进制转换](#进制转换)
-    * [1. 7 进制](#1-7-进制)
-    * [2. 16 进制](#2-16-进制)
-    * [3. 26 进制](#3-26-进制)
-* [阶乘](#阶乘)
-    * [1. 统计阶乘尾部有多少个 0](#1-统计阶乘尾部有多少个-0)
-* [字符串加法减法](#字符串加法减法)
-    * [1. 二进制加法](#1-二进制加法)
-    * [2. 字符串加法](#2-字符串加法)
-* [相遇问题](#相遇问题)
-    * [1. 改变数组元素使所有的数组元素都相等](#1-改变数组元素使所有的数组元素都相等)
-* [多数投票问题](#多数投票问题)
-    * [1. 数组中出现次数多于 n / 2 的元素](#1-数组中出现次数多于-n--2-的元素)
-* [其它](#其它)
-    * [1. 平方数](#1-平方数)
-    * [2. 3 的 n 次方](#2-3-的-n-次方)
-    * [3. 乘积数组](#3-乘积数组)
-    * [4. 找出数组中的乘积最大的三个数](#4-找出数组中的乘积最大的三个数)
-<!-- GFM-TOC -->
-
 
 # 素数分解
 
 每一个数都可以分解成素数的乘积，例如 84 = 2<sup>2</sup> \* 3<sup>1</sup> \* 5<sup>0</sup> \* 7<sup>1</sup> \* 11<sup>0</sup> \* 13<sup>0</sup> \* 17<sup>0</sup> \* …
+
+
 
 # 整除
 
@@ -38,37 +13,120 @@
 
 如果 x 整除 y（y mod x == 0），则对于所有 i，mi <= ni。
 
+
+
 # 最大公约数最小公倍数
 
 x 和 y 的最大公约数为：gcd(x,y) =  2<sup>min(m0,n0)</sup> \* 3<sup>min(m1,n1)</sup> \* 5<sup>min(m2,n2)</sup> \* ...
 
 x 和 y 的最小公倍数为：lcm(x,y) =  2<sup>max(m0,n0)</sup> \* 3<sup>max(m1,n1)</sup> \* 5<sup>max(m2,n2)</sup> \* ...
 
+
+
 ## 1. 生成素数序列
 
-204\. Count Primes (Easy)
+204\. Count Primes / 计数质数 (Easy)
+
+求**小于**非负整数n的质数个数
 
 [Leetcode](https://leetcode.com/problems/count-primes/description/) / [力扣](https://leetcode-cn.com/problems/count-primes/description/)
 
-埃拉托斯特尼筛法在每次找到一个素数时，将能被素数整除的数排除掉。
+题解：
+
+方法1：埃氏筛法
+
+埃拉托斯特尼筛法在每次找到一个素数时，将能被素数整除的数排除掉。需要注意的是，此题求的是**小于**n的质数
+
+![File:Sieve of Eratosthenes animation.gif](https://upload.wikimedia.org/wikipedia/commons/b/b9/Sieve_of_Eratosthenes_animation.gif)
 
 ```java
-public int countPrimes(int n) {
-    boolean[] notPrimes = new boolean[n + 1];
-    int count = 0;
-    for (int i = 2; i < n; i++) {
-        if (notPrimes[i]) {
-            continue;
+class Solution {
+public:
+    int countPrimes(int n) {
+        int cnt = 0;
+        vector<bool> st(n, false);
+
+        for (int i = 2; i < n; i ++ ) { // <n
+            if (st[i]) continue;
+            cnt++;
+            for (int j = i + i; j < n; j += i) // 筛掉倍数
+                st[j] = true;
         }
-        count++;
-        // 从 i * i 开始，因为如果 k < i，那么 k * i 在之前就已经被去除过了
-        for (long j = (long) (i) * i; j < n; j += i) {
-            notPrimes[(int) j] = true;
-        }
+        return cnt;
     }
-    return count;
-}
+};
 ```
+
+有一点可以优化：j 从 i * i 开始筛，因为如果 k < i，那么 k * i 在之前就已经被筛过了
+
+```C++
+class Solution {
+public:
+    int countPrimes(int n) {
+        int cnt = 0;
+        vector<bool> st(n, false);
+
+        for (int i = 2; i < n; i ++ ) { // <n
+            if (st[i]) continue;
+            cnt++;
+            // j 从 i * i 开始筛，因为如果 k < i，那么 k * i 在之前就已经被筛过了
+            for (long j = (long)i * i; j < n; j += i) // 筛掉倍数
+                st[j] = true;
+        }
+        return cnt;
+    }
+};
+```
+
+还有一点可以优化：就像素数判定的优化一样，外层循环中 i 可以只枚举到 sqrt(i)，但是**个数的统计需要单独循环**。
+
+```C++
+class Solution {
+public:
+    int countPrimes(int n) {
+        n -= 1; // 小于n的质数个数，转换为小于等于n-1的质数个数
+        vector<bool> st(n, false);
+
+        for (int i = 2; i <= n / i; i++) { // i*i < n
+            if (st[i]) continue;
+            for (long j = (long)i * i; j <= n; j += i) // 筛掉倍数
+                st[j] = true;
+        }
+
+        int cnt = 0;
+        for (int i = 2; i <= n; i++) // 统计质数个数
+            if(!st[i]) cnt++;
+
+        return cnt;
+    }
+};
+```
+
+
+
+方法2：线性筛法，更适用于求所有素数，而不仅仅是求素数个数
+
+```C++
+class Solution {
+public:
+    int countPrimes(int n) {
+        vector<int> primes(n, 0);
+        vector<bool> st(n, false);
+        int cnt = 0;
+
+        for (int i = 2; i < n; i++) { // <n
+            if (!st[i]) primes[cnt++] = i;
+            for (int j = 0; primes[j] <= n / i; j++) {
+                st[primes[j] * i] = true;
+                if (i % primes[j] == 0) break; // primes[j]一定是i的最小质因子
+            }
+        }
+        return cnt;
+    }
+};
+```
+
+
 
 ## 2. 最大公约数
 
@@ -85,6 +143,8 @@ int lcm(int a, int b) {
     return a * b / gcd(a, b);
 }
 ```
+
+
 
 ## 3. 使用位操作和减法求解最大公约数
 
@@ -119,6 +179,8 @@ public int gcd(int a, int b) {
     }
 }
 ```
+
+
 
 # 进制转换
 
@@ -155,6 +217,8 @@ public String convertToBase7(int num) {
 }
 ```
 
+
+
 ## 2. 16 进制
 
 405\. Convert a Number to Hexadecimal (Easy)
@@ -190,6 +254,8 @@ public String toHex(int num) {
 }
 ```
 
+
+
 ## 3. 26 进制
 
 168\. Excel Sheet Column Title (Easy)
@@ -218,6 +284,8 @@ public String convertToTitle(int n) {
 }
 ```
 
+
+
 # 阶乘
 
 ## 1. 统计阶乘尾部有多少个 0
@@ -237,6 +305,8 @@ public int trailingZeroes(int n) {
 ```
 
 如果统计的是 N! 的二进制表示中最低位 1 的位置，只要统计有多少个 2 即可，该题目出自 [编程之美：2.2](#) 。和求解有多少个 5 一样，2 的个数为 N/2 + N/2<sup>2</sup> + N/2<sup>3</sup> + ...
+
+
 
 # 字符串加法减法
 
@@ -270,6 +340,8 @@ public String addBinary(String a, String b) {
 }
 ```
 
+
+
 ## 2. 字符串加法
 
 415\. Add Strings (Easy)
@@ -291,6 +363,8 @@ public String addStrings(String num1, String num2) {
     return str.reverse().toString();
 }
 ```
+
+
 
 # 相遇问题
 
@@ -390,35 +464,71 @@ private void swap(int[] nums, int i, int j) {
 }
 ```
 
+
+
 # 多数投票问题
 
 ## 1. 数组中出现次数多于 n / 2 的元素
 
-169\. Majority Element (Easy)
+169\. Majority Element /多数元素 (Easy)
 
 [Leetcode](https://leetcode.com/problems/majority-element/description/) / [力扣](https://leetcode-cn.com/problems/majority-element/description/)
 
+**题解**：
+
+方法1：时间复杂度O(nlogn)，空间复杂度O(logn)，使用堆排空间复杂度可降到O(1)
+
 先对数组排序，最中间那个数出现次数一定多于 n / 2。
 
-```java
-public int majorityElement(int[] nums) {
-    Arrays.sort(nums);
-    return nums[nums.length / 2];
-}
-```
-
-可以利用 Boyer-Moore Majority Vote Algorithm 来解决这个问题，使得时间复杂度为 O(N)。可以这么理解该算法：使用 cnt 来统计一个元素出现的次数，当遍历到的元素和统计元素不相等时，令 cnt--。如果前面查找了 i 个元素，且 cnt == 0，说明前 i 个元素没有 majority，或者有 majority，但是出现的次数少于 i / 2，因为如果多于 i / 2 的话 cnt 就一定不会为 0。此时剩下的 n - i 个元素中，majority 的数目依然多于 (n - i) / 2，因此继续查找就能找出 majority。
-
-```java
-public int majorityElement(int[] nums) {
-    int cnt = 0, majority = nums[0];
-    for (int num : nums) {
-        majority = (cnt == 0) ? num : majority;
-        cnt = (majority == num) ? cnt + 1 : cnt - 1;
+```C++
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        return nums[nums.size() / 2];
     }
-    return majority;
-}
+};
 ```
+
+方法2：
+
+使用哈希表，时间复杂度O(n)，空间复杂度O(n)
+
+```C++
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        unordered_map<int, int> ump;
+        for(int num :nums) {
+            if(++ump[num] > nums.size() / 2) return num;
+        }
+        return -1;
+    }
+};
+```
+
+方法3：时间复杂度O(n)，空间复杂度O(1)
+
+可以利用摩尔投票法来解决这个问题。可以这么理解该算法：使用 cnt 来统计一个元素出现的次数，当遍历到的元素和统计元素不相等时，令 cnt--。如果前面查找了 i 个元素，且 cnt == 0，说明前 i 个元素没有 majority，或者有 majority，但是出现的次数少于 i / 2，因为如果多于 i / 2 的话 cnt 就一定不会为 0。此时剩下的 n - i 个元素中，majority 的数目依然多于 (n - i) / 2，因此继续查找就能找出 majority。
+
+总结：选一个数然后统计其出现的次数，规则是下一个数等于这个数则计数加1否则减1，次数减到0则换一个数
+
+```C++
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        int cnt = 0, major;
+        for(int num : nums) {
+            if(cnt == 0) major = num;
+            if(major == num) cnt++;
+            else cnt--;
+        }
+        return major;
+    }
+};
+```
+
+
 
 # 其它
 
@@ -450,6 +560,8 @@ public boolean isPerfectSquare(int num) {
 }
 ```
 
+
+
 ## 2. 3 的 n 次方
 
 326\. Power of Three (Easy)
@@ -462,40 +574,9 @@ public boolean isPowerOfThree(int n) {
 }
 ```
 
-## 3. 乘积数组
 
-238\. Product of Array Except Self (Medium)
 
-[Leetcode](https://leetcode.com/problems/product-of-array-except-self/description/) / [力扣](https://leetcode-cn.com/problems/product-of-array-except-self/description/)
-
-```html
-For example, given [1,2,3,4], return [24,12,8,6].
-```
-
-给定一个数组，创建一个新数组，新数组的每个元素为原始数组中除了该位置上的元素之外所有元素的乘积。
-
-要求时间复杂度为 O(N)，并且不能使用除法。
-
-```java
-public int[] productExceptSelf(int[] nums) {
-    int n = nums.length;
-    int[] products = new int[n];
-    Arrays.fill(products, 1);
-    int left = 1;
-    for (int i = 1; i < n; i++) {
-        left *= nums[i - 1];
-        products[i] *= left;
-    }
-    int right = 1;
-    for (int i = n - 2; i >= 0; i--) {
-        right *= nums[i + 1];
-        products[i] *= right;
-    }
-    return products;
-}
-```
-
-## 4. 找出数组中的乘积最大的三个数
+## 3. 找出数组中的乘积最大的三个数
 
 628\. Maximum Product of Three Numbers (Easy)
 
@@ -531,10 +612,3 @@ public int maximumProduct(int[] nums) {
     return Math.max(max1*max2*max3, max1*min1*min2);
 }
 ```
-
-
-
-
-
-
-<div align="center"><img width="320px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/公众号二维码-2.png"></img></div>
