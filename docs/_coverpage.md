@@ -1,8 +1,8 @@
 <img width="220px" src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/LogoMakr_1J56bI.png">
 
-学习笔记整理 
+- 学习笔记
 
-- ​			by MrRen-sdhm
+- MrRen-sdhm
 
 <!--<span id="busuanzi_container_site_pv">Site View : <span id="busuanzi_value_site_pv">-->
 
