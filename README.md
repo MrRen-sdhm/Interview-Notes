@@ -58,4 +58,6 @@
 
 
 
+### 排版
 
+LaTeX公式支持：[docsify-katex](https://github.com/upupming/docsify-katex)
