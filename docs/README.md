@@ -1,6 +1,6 @@
 - [Github](https://github.com/CyC2018/CS-Notes)
 
-## ✏️ 算法
+## ✏️ 数据结构与算法
 
 - [剑指Offer题解C++版](notes/剑指offer题解C++版.md) </br>
 - [LeetCode题解C++版](notes/Leetcode%20题解%20-%20目录1.md) </br>
@@ -11,7 +11,7 @@
 - [操作系统](notes/计算机操作系统%20-%20目录1.md) </br>
 - [Linux](notes/Linux.md)
 
-## ☁️ 网络
+## ☁️ 计算机网络
 
 - [计算机网络](notes/计算机网络%20-%20目录1.md) </br>
 - [HTTP](notes/HTTP.md) </br>

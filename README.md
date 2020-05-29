@@ -4,7 +4,7 @@
 
 <br>
 
-## :pencil2: 算法
+## :pencil2: 数据结构与算法
 
 - [剑指Offer题解C++版](https://mrren-sdhm.github.io/Interview-Notes/#/notes/剑指offer题解C++版)
 - [LeetCode题解C++版](https://github.com/MrRen-sdhm/CS-Notes/blob/master/notes/Leetcode%20题解%20-%20目录.md)
@@ -16,7 +16,7 @@
 - [操作系统](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机操作系统%20-%20目录.md)
 - [Linux](https://github.com/CyC2018/CS-Notes/blob/master/notes/Linux.md)
 
-## :cloud: 网络 
+## :cloud: 计算机网络 
 
 - [计算机网络](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机网络%20-%20目录.md)
 - [HTTP](https://github.com/CyC2018/CS-Notes/blob/master/notes/HTTP.md)
