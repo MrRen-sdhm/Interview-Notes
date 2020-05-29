@@ -4,7 +4,7 @@
 
 - [剑指Offer题解C++版](notes/剑指offer题解C++版.md) </br>
 - [LeetCode题解C++版](notes/Leetcode%20题解%20-%20目录1.md) </br>
-- [数据结构与算法笔记](https://mrren-sdhm.github.io/Interview-Notes/notes/html/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html) </br>
+- [数据结构与算法笔记](notes/数据结构与算法学习笔记.md) </br>
 
 ## 💻 操作系统
 
