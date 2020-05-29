@@ -6,14 +6,14 @@
 
 ## :pencil2: 算法
 
-- [剑指 Offer 题解](https://mrren-sdhm.github.io/Interview-Notes/#/notes/剑指offer题解C++版)
-- [Leetcode 题解](https://github.com/MrRen-sdhm/CS-Notes/blob/master/notes/Leetcode%20题解%20-%20目录.md)
-- [算法](https://github.com/CyC2018/CS-Notes/blob/master/notes/算法%20-%20目录.md)
-- [笔试面试题库](https://www.nowcoder.com/contestRoom?from=cyc_github)
+- [剑指offer题解C++版](https://mrren-sdhm.github.io/Interview-Notes/#/notes/剑指offer题解C++版)
+- [Leetcode题解C++版](https://github.com/MrRen-sdhm/CS-Notes/blob/master/notes/Leetcode%20题解%20-%20目录.md)
+- [数据结构与算法笔记](https://mrren-sdhm.github.io/Interview-Notes/notes/html/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
+- [牛客网笔试面试题库](https://www.nowcoder.com/contestRoom?from=cyc_github)
 
 ## :computer: 操作系统
 
-- [计算机操作系统](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机操作系统%20-%20目录.md)
+- [操作系统](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机操作系统%20-%20目录.md)
 - [Linux](https://github.com/CyC2018/CS-Notes/blob/master/notes/Linux.md)
 
 ## :cloud: 网络 
