@@ -20,7 +20,7 @@
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/643b6f18-f933-4ac5-aa7a-e304dbd7fe49.gif" width="400px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     bool duplicate(int numbers[], int length, int* duplication) {
@@ -69,7 +69,7 @@ public:
 
 最终两个指针的值即为重复数字！
 
-```C++
+```cpp
 class Solution {
 public:
     int duplicateInArray(vector<int>& nums) {
@@ -114,7 +114,7 @@ Given target = 20, return false.
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/35a8c711-0dc0-4613-95f3-be96c6c6e104.gif" width="400px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     bool Find(int target, vector<vector<int> > array) {
@@ -149,7 +149,7 @@ public:
 
 如果数组元素允许重复，会出现一个特殊的情况：nums[low] == nums[mid] == nums[high]，此时无法确定解在哪个区间，需要切换到顺序查找。例如对于数组 {1,1,1,0,1}，low、mid 和 high 指向的数都为 1，此时无法知道最小数字 0 在哪个区间。
 
-```C++
+```cpp
 // 标准二分查找的变形
 class Solution {
 public:
@@ -237,7 +237,7 @@ public:
 
 若相对位置不变，需使用辅助数组并遍历两次，先放入奇数再放入偶数。时间复杂度约O(2*n)，空间复杂度O(n)
 
-```C++
+```cpp
 class Solution {
 public:
     // 使用双指针，不稳定
@@ -291,7 +291,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/9b4c81a02cd34f76be2659fa0d54342a?tpId=13&tqId=11172&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.
 
-```C++
+```cpp
 class Solution {
 public:
     static vector<int> printMatrix(vector<vector<int> > matrix) {
@@ -344,7 +344,7 @@ public:
 
 **若某数出现次数超过一半，那么两两比较，至少有一次出现相邻两数相等，即使间隔排列，如12322**
 
-```C++
+```cpp
 class Solution {
 public:
     int MoreThanHalfNum_Solution(vector<int>& nums) {
@@ -382,7 +382,7 @@ public:
 
 **注意**：每次快速选择仅能找出第 k 个数，而不能一次性获得前 k 个数
 
-```C++
+```cpp
 vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
         vector<int> res;
         if(input.size() == 0 || k > int(input.size()) || k <= 0)
@@ -427,7 +427,7 @@ C++中 priority_queue 默认即为最大堆
 
 定义最小堆：`priority_queue<int, vector<int>, greater<int>> maxHeap;`
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> GetLeastNumbers_Solution(vector<int> input, int k) {
@@ -452,7 +452,7 @@ public:
 
 方法3：使用红黑树(multiset)，时间复杂度为O(nlogk)，空间复杂度为O(k)，特别适合处理海量数据
 
-```C++
+```cpp
 class Solution {
 public:
     // 使用红黑树来保存最小的k个数
@@ -491,7 +491,7 @@ public:
 
 **题解**：从左至右求和，若和小于0，说明前面序列的和不可能为最大值，置当前值为新的和。最终取连续序列中和最大的那一个。也可通过动态规划的思想分析此问题。
 
-```C++
+```cpp
 class Solution {
 public:
     int FindGreatestSumOfSubArray(vector<int> array) {
@@ -517,7 +517,7 @@ public:
 
 写法1：
 
-```C++
+```cpp
 class Solution {
 public:
     string PrintMinNumber(vector<int> numbers) {
@@ -542,7 +542,7 @@ public:
 
 写法2：
 
-```C++
+```cpp
 class Solution {
 public:
     string printMinNumber(vector<int>& nums) {
@@ -569,7 +569,7 @@ public:
 
 方法1：暴力求解，时间复杂度O(n^2)，空间复杂度O(1)
 
-```C++
+```cpp
 class Solution {
 public:
     int InversePairs_(vector<int> data) {
@@ -591,7 +591,7 @@ public:
 
 <div align="center"> <img src="https://images2017.cnblogs.com/blog/849589/201710/849589-20171015230557043-37375010.gif" width="600px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0;
@@ -633,7 +633,7 @@ public:
 
 **题解**：可以利用数组已排序的特性，设两个指针，分别指向最小值和最大值，若和小于目标和则最小值指针右移，若和大于目标值最大值指针左移
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> FindNumbersWithSum(vector<int> array,int sum) {
@@ -682,7 +682,7 @@ public:
 
 **题解**：本质是在**已排序**的序列中查找和为某数的连续序列。设两个指针，起初指向1和2，两指针构成滑动窗口，若窗口中的和小于目标和，则窗口加宽（右指针右移），若窗口中的和大于目标和，则窗口缩窄（左指针右移）
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int> > FindContinuousSequence(int sum) {
@@ -743,7 +743,7 @@ public:
 
 **题解**：利用二分查找，但查找某数第一次出现和最后一次出现的位置，而不是单纯的判断某个数在不在数组中
 
-```C++
+```cpp
 class Solution {
 public:
     int GetNumberOfK(vector<int> data ,int k) {
@@ -831,7 +831,7 @@ public:
 
 因为C++中list不支持迭代器+n操作，删除元素必须从头查找第n个元素，使用不便，推荐使用vector。
 
-```C++
+```cpp
 //法一：C++实现 list容器+其迭代器实现圆形链表 （约瑟夫环问题）
 class Solution {
 public:
@@ -937,7 +937,7 @@ public:
 
 **题解**：不妨定义C[i] =A[0] x A[1]x ··· xA[i- 1] , D[i]=A[i+ I] x ··· xA [n-2] xA [n-1]。C[i] 可以用自上而下的顺序计算出来，即 C[i] =C[i-1] x A [i-1] 。类似的，D[i]也可以用自下而上的顺序计算出来，即 D[i] =D[i+1] xA[i+1]。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> multiply(const vector<int>& A) {
@@ -980,7 +980,7 @@ public:
 
 注意：结果的保存需放在递归函数的后面，**类似于二叉树的后序遍历**。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> res;
@@ -1002,7 +1002,7 @@ public:
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/9d1deeba-4ae1-41dc-98f4-47d85b9831bc.gif" width="330px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> printListFromTailToHead(ListNode* head) {
@@ -1025,7 +1025,7 @@ public:
 
 方法3：翻转链表后遍历
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> printListFromTailToHead(ListNode* head) {
@@ -1052,7 +1052,7 @@ public:
 
 方法4：正向遍历后存入vector，然后翻转vector即可
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> printListReversingly(ListNode* head) {
@@ -1071,7 +1071,7 @@ public:
 
 方法5：借助vector的insert方法模拟栈（不推荐，代码简单，但是每次插入都要移动整个数组的元素）
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> printListFromTailToHead(ListNode* head) {
@@ -1108,7 +1108,7 @@ public:
 
 综上，如果进行 N 次操作，那么大约需要操作节点的次数为 N-1+N=2N-1，其中 N-1 表示 N-1 个不是尾节点的每个节点以 O(1) 的时间复杂度操作节点的总次数，N 表示 1 个尾节点以 O(N) 的时间复杂度操作节点的总次数。(2N-1)/N ~ 2，因此该算法的平均时间复杂度为 O(1)。
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* deleteNode(ListNode *head, ListNode *tobeDelete) {
@@ -1154,7 +1154,7 @@ public:
 - 若pq指向节点值相等，即pq间有重复元素，q后移到pq指向节点值不等为止，最后将p指向q
 - 若pq指向节点值不等，则p向后移动一位，q下次循环开始时更新为p的下个节点（当然不更新也可以，第二个while会进行q的后移，效果一样）
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* deleteDuplication(ListNode* head) {
@@ -1182,7 +1182,7 @@ public:
 - 是重复节点则跳过与当前节点相同的所有节点，并从第一个与当前节点不同的节点开始递归
 - 不是重复节点则保留当前节点，从下一节点开始递归
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* deleteDuplication(ListNode* pHead)
@@ -1217,7 +1217,7 @@ public:
 
 **需要在快指针移动的同时判断链表长度是否小于 k ！！！**
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
@@ -1243,7 +1243,7 @@ public:
 
 **关键：**
 
-```C++
+```cpp
 if(fast == nullptr) return NULL; // 未移动完K次，快指针已移动到链尾，说明链长不足k
 ```
 
@@ -1259,7 +1259,7 @@ if(fast == nullptr) return NULL; // 未移动完K次，快指针已移动到链�
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/bb7fc182-98c2-4860-8ea3-630e27a5f29f.png" width="500px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* EntryNodeOfLoop(ListNode* pHead)
@@ -1298,7 +1298,7 @@ public:
 
 方法1：指针操作，无需创建新头结点
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* ReverseList(ListNode* pHead) {
@@ -1326,7 +1326,7 @@ public:
 
 链表的操作需要维护后继关系，例如在某个节点 node1 之后插入一个节点 node2，我们可以通过修改后继关系来实现：
 
-```C++
+```cpp
 node3 = node1.next;
 node2.next = node3;
 node1.next = node2;
@@ -1338,7 +1338,7 @@ node1.next = node2;
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/0dae7e93-cfd1-4bd3-97e8-325b032b716f-1572687622947.gif" width="500px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* ReverseList(ListNode* pHead) {
@@ -1360,7 +1360,7 @@ public:
 
 方法3：递归
 
-```C++
+```cpp
  ListNode* ReverseList(ListNode* pHead) {
     if (!pHead || !pHead->next) return head;
     ListNode *next = pHead->next;
@@ -1394,7 +1394,7 @@ public:
 4. 循环以上步骤直到l1或l2为空。
 5. 将剩余的l1或l2接到cur指针后边。
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* Merge(ListNode* l1, ListNode* l2) {
@@ -1420,7 +1420,7 @@ public:
 
 方法2：递归
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* Merge(ListNode* l1, ListNode* l2) {
@@ -1450,7 +1450,7 @@ public:
 
 **题解**：
 
-```C++
+```cpp
 
 ```
 
@@ -1466,7 +1466,7 @@ public:
 
 可以先遍历一次得到两链表的长度差dist，第二次先在长的链表上走dist步，接下来同时遍历两个链表，直到找到它们第一个相同的节点，即为结果。
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
@@ -1518,7 +1518,7 @@ public:
 
 当访问链表 A 的指针访问到链表尾部时，令它从链表 B 的头部重新开始访问链表 B；同样地，当访问链表 B 的指针访问到链表尾部时，令它从链表 A 的头部重新开始访问链表 A。这样就能控制访问 A 和 B 两个链表的指针能同时访问到交点。
 
-```C++
+```cpp
 class Solution {
 public:
     // 此方法循环次数过多，未通过oj，但最简洁
@@ -1546,7 +1546,7 @@ public:
 
 **题解**：元素直接放入栈1，栈2为空时从栈1取出所有元素放入栈2
 
-```C++
+```cpp
 class Solution
 {
 public:
@@ -1584,7 +1584,7 @@ private:
 
 题解：元素直接压入主栈，仅当辅助栈为空或当前值小于等于辅助栈顶时，压入辅助栈。弹出时主栈栈顶元素等于辅助栈栈顶时，弹出辅助栈栈顶。
 
-```C++
+```cpp
 class Solution {
 public:
     stack<int> mstack;
@@ -1620,7 +1620,7 @@ public:
 
 使用双指针i、j，i 负责逐个将压入序列的元素放入辅助栈，压入之后判断栈顶元素是否与弹出序列当前位置 j 指向的元素相等，相等则弹出，j 指针后移继续判断之后的弹出序列是否与压入序列匹配。
 
-```C++
+```cpp
 class Solution {
 public:
     bool IsPopOrder(vector<int> pushV,vector<int> popV) {
@@ -1646,7 +1646,7 @@ public:
 
 **题解**：使用双端队列存储可能最大的元素下标。
 
-```C++
+```cpp
 class Solution {
 public:
     // 使用双端队列存储可能最大的元素下标
@@ -1711,7 +1711,7 @@ public:
 
 C++中使用堆，可利用STL中的[priority_queue](http://c.biancheng.net/view/480.html)
 
-```C++
+```cpp
 class Solution {
     priority_queue<int, vector<int>, less<int> > max; // 最大堆，最大的元素在队列前面， 存储左半边元素
     priority_queue<int, vector<int>, greater<int> > min;  // 最小堆，最大的元素在队列前面，存储右半边元素
@@ -1776,7 +1776,7 @@ public:
 - 右子树节点在先序遍历序列中的范围为[startPre+llen+1,endPre]
 - 右子树节点在中序遍历序列中的范围为[i+1,endIn]
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* reConstructBinaryTree(vector<int> pre,vector<int> vin) {
@@ -1804,7 +1804,7 @@ public:
 
 方法2：使用哈希表保存前序与中序的对应关系，使得查找的时间复杂度降低到O(1)，总的时间复杂度是O(n)
 
-```C++
+```cpp
 class Solution {
 public:
     unordered_map<int,int> pos;
@@ -1845,7 +1845,7 @@ public:
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/094e3ac8-e080-4e94-9f0a-64c25abc695e.gif" width="300px" /> </div>
 
-```C++
+```cpp
 class Solution {
 public:
     TreeLinkNode* GetNext(TreeLinkNode* p)
@@ -1878,7 +1878,7 @@ public:
 
 第二步：找到相等节点后，逐个判断相等节点左右子树中的各节点值是否相等， 递归
 
-```C++
+```cpp
 class Solution {
 public:
     bool HasSubtree(TreeNode* pRoot1, TreeNode* pRoot2)
@@ -1936,7 +1936,7 @@ public:
 
 **题解**：先序遍历二叉树，交换左右子节点即可
 
-```C++
+```cpp
 class Solution {
 public:
     void Mirror(TreeNode *pRoot) {
@@ -1969,7 +1969,7 @@ public:
 
 条件2：左子树的右子节点与右子树的左子节点相等
 
-```C++
+```cpp
 class Solution {
 public:
     bool isSymmetrical(TreeNode* pRoot)
@@ -2003,7 +2003,7 @@ public:
 
 **题解**：使用队列保存将要打印的节点，节点出队列时将其左右子节点加入队列
 
-```C++
+```cpp
 class Solution {
 public:
     // 通用写法，隐含分层思想，使用两个循环
@@ -2062,7 +2062,7 @@ public:
 
 **题解**：要求一行打印一层，因此需要在每层打印完时记录下一层要打印的节点个数
 
-```C++
+```cpp
 class Solution {
 public:    
 	// 简单方法，使用两层循环
@@ -2106,7 +2106,7 @@ public:
 
 **方法1**：使用queue和vector，将每行节点值保存到vector，需要逆序时使用reverse将vector逆序再打印
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int> > Print(TreeNode* pRoot) {
@@ -2146,7 +2146,7 @@ public:
 
 方法2：使用deque，当需要反转时从队尾读取，保存到队头，并且先保存右子节点再保存左子节点
 
-```C++
+```cpp
 class Solution {
 public:
     // 简单方法，使用deque，为了区分打印顺序，使用deque而不是queue
@@ -2199,7 +2199,7 @@ public:
 
 方法3：剑指offer解法，使用两个栈，较繁琐
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int> > Print_(TreeNode* pRoot) {
@@ -2267,7 +2267,7 @@ public:
 
 先划分左子树这一段，再判断右子树这一段是否合法即可，若合法则继续递归判断左子树及右子树是否合法。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> seq;
@@ -2315,7 +2315,7 @@ DFS+回溯
 
 写法1：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> res;
@@ -2340,7 +2340,7 @@ public:
 
 写法2：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> res;
@@ -2371,7 +2371,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/947f6eb80d944a84850b0538bf0ec3a5?tpId=13&tqId=11179&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* Convert(TreeNode* pRootOfTree)
@@ -2412,7 +2412,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/cf7e25aa97c04cc1a68c8f040e71fb84?tpId=13&tqId=11214&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     char* Serialize(TreeNode *root) {   
@@ -2455,7 +2455,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/435fb86331474282a3499955f0a41e8b?tpId=13&tqId=11191&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     // 递归统计左右子树的深度，返回最大深度
@@ -2480,7 +2480,7 @@ public:
 
 后序遍历，并在遍历左右子树的同时，实时记录并比较左右子树的深度
 
-```C++
+```cpp
 class Solution {
 public:
     bool IsBalanced_Solution(TreeNode* pRoot) {
@@ -2518,7 +2518,7 @@ public:
 
 二叉搜索树的中序遍历结果即从小到大依次排列
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* res = nullptr;
@@ -2560,7 +2560,7 @@ public:
 
 由于 i 之前的字符串，在变换之后，长度一定不小于原字符串，所以遍历过程中一定有i <= j，这样可以保证str[j]不会覆盖还未遍历过的str[i]，从而答案是正确的。
 
-```C++
+```cpp
 class Solution {
 public:
     void replaceSpace(char *str,int length) {
@@ -2593,7 +2593,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/45327ae22b7b413ea21df13ee7d6429c?tpId=13&tqId=11205&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
 
-```C++
+```cpp
 class Solution {
 public:
     bool match(char* str, char* pattern)
@@ -2633,7 +2633,7 @@ public:
 - e后面不能接小数点，小数点不能出现两次
 - 不可有不合法字符
 
-```C++
+```cpp
 class Solution {
 public:
     bool isNumeric(char* str) {
@@ -2686,7 +2686,7 @@ public:
 
 写法1：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<bool> used;
@@ -2725,7 +2725,7 @@ public:
 
 写法2：保存路径使用push_back 和 pop_back
 
-```C++
+```cpp
 class Solution {
 public:
     vector<bool> used;
@@ -2764,7 +2764,7 @@ public:
 
 方法2：DFS回溯+剪枝，通过交换省去备忘录和路径记录
 
-```C++
+```cpp
 class Solution {
 public:
     vector<string> res;
@@ -2803,7 +2803,7 @@ public:
 
 最直观的解法是使用 HashMap 对出现次数进行统计，但是考虑到要统计的字符范围有限，因此可以使用char型数组代替 HashMap，从而将空间复杂度由 O(N) 降低为 O(1)。
 
-```C++
+```cpp
 class Solution {
 public:
     int FirstNotRepeatingChar(string str) {
@@ -2835,7 +2835,7 @@ public:
 
 **方法2**：使用数组作为哈希表，统计各字符出现次数，时间复杂度O(n)，空间复杂度O(n)
 
-```C++
+```cpp
 // 使用queue保存出现过的字符，使用数组保存各字符出现的次数，判断队头是否只出现一次
 class Solution
 {
@@ -2895,7 +2895,7 @@ public:
 
 先翻转整个字符串，再分别翻转以空格分割的子字符串即可
 
-```C++
+```cpp
 class Solution {
 public:
     string ReverseSentence(string str) {
@@ -2934,7 +2934,7 @@ public:
 
 以“abcdefg”为例，可以把它分为两部分。由于想把它的前两个字符移到后面，我们就把前两个字符分到第一部分，把后面的所有字符分到第二部分。我们先分别翻转这两部分，于是就得到“bagfedc”。接下来翻转整个字符串，得到的"cdefgab“刚好就是把原始字符串左旋转两位的结果。
 
-```C++
+```cpp
 class Solution {
 public:
     string LeftRotateString(string str, int n) {
@@ -2988,7 +2988,7 @@ public:
 
 最大的正整数值是0x7FFF FFFF，最小的负整数是0x8000 0000
 
-```C++
+```cpp
 class Solution {
 public:
     int StrToInt(string str) {
@@ -3029,7 +3029,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/8ee967e43c2c4ec193b040ea7fbb10b8?tpId=13&tqId=11164&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     // 循环次数等于整数二进制位中1的个数
@@ -3066,7 +3066,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/e02fdb54d7524710a7d664d082bb7811?tpId=13&tqId=11193&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
@@ -3125,7 +3125,7 @@ public:
 
 **题解**：
 
-```C++
+```cpp
 class Solution {
 public:
     int NumberOf1Between1AndN_Solution(int n)
@@ -3150,7 +3150,7 @@ public:
 
 可以看成是一个排序问题，先将数字转换为字符串，在比较两个字符串 S1 和 S2 的大小时，应该比较的是 S1+S2 和 S2+S1 的大小，如果 S1+S2 < S2+S1，那么应该把 S1 排在前面，否则应该把 S2 排在前面。
 
-```C++
+```cpp
 class Solution {
 public:
     string PrintMinNumber(vector<int> numbers) {
@@ -3184,7 +3184,7 @@ public:
 
 假设数组中已经有若下个排好序的且数，并且把已有最大的丑数记作M，下一个丑数肯定是前面某一个丑数乘以2、3或者5的结果。对于乘以2而言，肯定存在某一个丑数T2，排在它之前的每个丑数乘以2得到的结果都会小于已有最大的丑数，在它之后的每个丑数乘以2得到的结果都会太大。我们只需记下这个丑数的位置，同时每次生成新的丑数的时候去更新这个T2即可。对千乘以3和5而言，也存在同样的T3和T5。
 
-```C++
+```cpp
 class Solution {
 public:
     int GetUglyNumber_Solution(int index) {
@@ -3218,7 +3218,7 @@ public:
 
 写法1：计算n次，使用while循环，不需考虑边界，返回pre2
 
-```C++
+```cpp
 class Solution {
 public:
     int Fibonacci(int n) {
@@ -3237,7 +3237,7 @@ public:
 
 写法2：计算n-1次，使用for循环，需要考虑边界，返回pre1
 
-```C++
+```cpp
 class Solution {
 public:
     int Fibonacci(int n) {
@@ -3261,7 +3261,7 @@ public:
 
 写法1：while循环，计算n-1次
 
-```C++
+```cpp
 class Solution {
 public:
     int jumpFloor(int number) {
@@ -3280,7 +3280,7 @@ public:
 
 写法2：for循环，计算n-2次
 
-```C++
+```cpp
 class Solution {
 public:
     int jumpFloor(int number) {
@@ -3303,7 +3303,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/22243d016f6b47f2a6928b4313c85387?tpId=13&tqId=11162&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】一只青蛙一次可以跳上1级台阶，也可以跳上2级……它也可以跳上n级。求该青蛙跳上一个n级的台阶总共有多少种跳法。
 
-```C++
+```cpp
 class Solution {
 public:
     int jumpFloorII(int number) {
@@ -3325,7 +3325,7 @@ public:
 
 **题解**：和跳台阶是一样的
 
-```C++
+```cpp
 class Solution {
 public:
     int rectCover(int number) {
@@ -3342,7 +3342,7 @@ public:
 
 
 
-```C++
+```cpp
 class Solution {
 public:
     int rectCover(int number) {
@@ -3365,7 +3365,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/1a834e5e3e1a4b7ba251417554e07c00?tpId=13&tqId=11165&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     double Power(double base, int exponent) {
@@ -3421,7 +3421,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/c61c6999eecb4b8f88a98f66b273a3cc?tpId=13&tqId=11218&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     bool hasPath(char* matrix, int rows, int cols, char* str)
@@ -3489,7 +3489,7 @@ public:
 
 写法1：通过变量记录路径长度
 
-```C++
+```cpp
 class Solution {
 public:
     int movingCount(int threshold, int rows, int cols)
@@ -3532,7 +3532,7 @@ public:
 
 写法2：通过dfs函数返回路径长度
 
-```C++
+```cpp
 class Solution {
 public:
     int movingCount(int threshold, int rows, int cols)
@@ -3576,7 +3576,7 @@ public:
 
 设置变量res记录路径点个数，若在取出时记录路径点个数则初始化为0，在添加时记录则初始化为1
 
-```C++
+```cpp
 class Solution {
 public:
     int movingCount(int threshold, int rows, int cols)
@@ -3626,7 +3626,7 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/57d85990ba5b440ab888fc72b0751bf8?tpId=13&tqId=33257&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
-```C++
+```cpp
 class Solution {
 public:
     // 动态规划
@@ -3692,7 +3692,7 @@ public:
 
 先排序，再统计0的个数；求0后面各对数字的差，差以0补上，若0不够用则不是顺子；若一对数字相等，不是顺子。
 
-```C++
+```cpp
 class Solution {
 public:
     bool IsContinuous( vector<int> numbers ) {
@@ -3747,7 +3747,7 @@ public:
 
    本题的递归返回条件为 n <= 0，取非后就是 n > 0；递归的主体部分为 sum += Sum_Solution(n - 1)，转换为条件语句后就是 (sum += Sum_Solution(n - 1)) > 0。
 
-```C++
+```cpp
 class Solution {
 public:
     int Sum_Solution(int n) {
@@ -3780,7 +3780,7 @@ public:
 
 第三步重复上述两步， 各位相加 010^1010=1000，进位值为100=(010&1010)<<1。     继续重复上述两步：1000^100 = 1100，进位值为0，跳出循环，1100为最终结果。
 
-```C++
+```cpp
 class Solution {
 public:
     int Add(int num1, int num2)
