@@ -428,7 +428,7 @@ For example, given [1,2,3,4], return [24,12,8,6].
 
 对于某一个数字，如果我们知道其前面所有数字的乘积，同时也知道后面所有的数乘积，那么二者相乘就是我们要的结果，所以我们只要分别创建出这两个数组即可，分别从数组的两个方向遍历就可以分别创建出乘积累积数组。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> productExceptSelf(vector<int>& nums) {
@@ -459,7 +459,7 @@ public:
 
 由于最终的结果都是要乘到结果 res 中，所以可以不用单独的数组来保存乘积，而是直接累积到结果 res 中，我们先从前面遍历一遍，将乘积的累积存入结果 res 中，然后从后面开始遍历。用到一个临时变量 k，初始化为1，从左到右遍历是存储各位置左侧元素的乘积，并将这些左侧元素乘积存储在res中，从右向左遍历是存储各位置右侧元素的乘积，与res中对应位置元素相乘，即为左侧元素乘积乘以右侧元素乘积。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> productExceptSelf(vector<int>& nums) {
@@ -498,7 +498,7 @@ public:
 
 遍历数组中的每个数字，若当前数字已经在 HashSet 中了，则将 HashSet 中的该数字移除，否则就加入HashSet。这相当于两两抵消了，最终凡是出现两次的数字都被移除了 HashSet，唯一剩下的那个就是单独数字了。
 
-```C++
+```cpp
 class Solution {
 public:
     int singleNumber(vector<int>& nums) {
@@ -516,7 +516,7 @@ public:
 
 方法2：排序后使用二分查找，时间复杂度O(nlogn + logn)
 
-```C++
+```cpp
 class Solution {
 public:
     int singleNumber(vector<int>& nums) {
@@ -544,7 +544,7 @@ public:
 
 由于数字在计算机是以二进制存储的，每位上都是0或1，**如果我们把两个相同的数字异或，0与0 '异或' 是0，1与1 '异或' 也是0，那么我们会得到0**。根据这个特点，我们把数组中所有的数字都 '异或' 起来，则每对相同的数字都会得0，然后最后剩下来的数字就是那个只有1次的数字。
 
-```C++
+```cpp
 class Solution {
 public:
     int singleNumber(vector<int>& nums) {
@@ -567,7 +567,7 @@ public:
 
 对于每个数字nums[i]，如果其对应的nums[nums[i] - 1]是正数，我们就赋值为其相反数，如果已经是负数了，就不变了，那么最后我们只要把留下的正数对应的位置加入结果res中即可。使用负号做标记的好处是，其绝对值仍然是原来的数。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> findDisappearedNumbers(vector<int>& nums) {
@@ -594,7 +594,7 @@ public:
 
 例如最后遍历完nums[i]数组为[12, 19, 18, 15, 8, 2, 11, 9]，我们发现有两个数字8和2小于等于n，那么就可以通过i+1来得到正确的结果5和6了
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> findDisappearedNumbers(vector<int>& nums) {

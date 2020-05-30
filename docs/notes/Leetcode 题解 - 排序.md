@@ -40,7 +40,7 @@ Output: 5
 
 方法1：**堆**，时间复杂度 O(NlogK)，空间复杂度 O(K)。
 
-```C++
+```cpp
 class Solution {
 public:
     int findKthLargest(vector<int>& nums, int k) {
@@ -62,7 +62,7 @@ public:
 
 经过快速选择后，原数组中第k个数即为所求，其下标为[k - 1]
 
-```C++
+```cpp
 class Solution {
 public:
     int findKthLargest(vector<int>& nums, int k) {
@@ -97,7 +97,7 @@ public:
 
 方法1：使用大顶堆
 
-```C++
+```cpp
 class Solution {
 public:
     int kthSmallest(vector<vector<int>>& matrix, int k) {
@@ -125,7 +125,7 @@ public:
 
 注意：这里的left mid right是数值，不是索引位置。
 
-```C++
+```cpp
 class Solution {
 public:
     int kthSmallest(vector<vector<int>>& matrix, int k) {
@@ -175,7 +175,7 @@ Given [1,1,1,2,2,3] and k = 2, return [1,2].
 
 把数都放到桶之后，从后向前遍历桶，最先得到的 k 个数就是出现频率最多的的 k 个数。
 
-```C++
+```cpp
 public List<Integer> topKFrequent(int[] nums, int k) {
     Map<Integer, Integer> frequencyForNum = new HashMap<>();
     for (int num : nums) {
@@ -222,7 +222,7 @@ public List<Integer> topKFrequent(int[] nums, int k) {
 
 最坏情况下（每个元素都不同），map 需要存储 n 个键值对，优先队列需要存储 k 个元素，因此，空间复杂度是 O(n)。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> topKFrequent(vector<int>& nums, int k) {
@@ -261,7 +261,7 @@ Explanation:
 So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
 ```
 
-```C++
+```cpp
 public String frequencySort(String s) {
     Map<Character, Integer> frequencyForNum = new HashMap<>();
     for (char c : s.toCharArray())
@@ -325,7 +325,7 @@ Output: [0,0,1,1,2,2]
 
 写法1：while循环，需要使用一个指针指向当前位置。**从右侧交换过来一个数，则还需判断交换过来这个数的大小，因而交换后curr指针不动**。
 
-```C++
+```cpp
 class Solution {
 public:
     void sortColors(vector<int>& nums) {
@@ -343,7 +343,7 @@ public:
 
 写法2：for循环逐个枚举各个位置，若从右侧交换过来一个数。则还需判断交换过来这个数的大小，因而交换后需要 i--，然后当前循环结束 i 会加1，从而 i 保持不变。
 
-```C++
+```cpp
 class Solution {
 public:
     void sortColors(vector<int>& nums) {

@@ -2,13 +2,17 @@
 
 **1、深度优先搜索 DFS**
 
-- 数据结构：使用stack
-- 空间：O(n)​
-- 不具有最短性
-- DFS中有回溯、剪枝
-- 适用于对空间要求比较高，比较复杂的题
+数据结构：使用stack
 
-  典型案例：[排列](#_5-排列)、[N皇后](#_3-N-皇后)
+空间：O(n)​
+
+不具有最短性
+
+DFS中有回溯、剪枝
+
+适用于对空间要求比较高，比较复杂的题
+
+典型案例：[排列](#_5-排列)、[N皇后](#_3-N 皇后)
 
 **2、宽度优先搜索 BFS**
 
@@ -22,37 +26,37 @@
 
 - 适用于找最短路径的题
 
-  典型案例：[迷宫问题](#1-迷宫问题) 、[二进制矩阵中的最短路径](#2-二进制矩阵中的最短路径)
+  典型案例：[迷宫问题](#_1-迷宫问题) 、[二进制矩阵中的最短路径](#_2-二进制矩阵中的最短路径)
 
   代码框架：
 
-    ```C++
-    void BFS()
-    {
-        queue<int> qu; // 定义队列
-        vector<vector<int>> memo(m, vector<int>(n,0)); // 备忘录，用于记录已经访问的位置
+```cpp
+  void BFS()
+  {
+      queue<int> qu; // 定义队列
+      vector<vector<int>> memo(m, vector<int>(n,0)); // 备忘录，用于记录已经访问的位置
 
-        if(condition) return; // 判断边界条件，是否能直接返回结果
+      if(condition) return; // 判断边界条件，是否能直接返回结果
 
-        qu.push(start); // 将起始位置加入到队列中
-        memo[0][0] = 1; // 更新备忘录。
+      qu.push(start); // 将起始位置加入到队列中
+      memo[0][0] = 1; // 更新备忘录。
 
-        while (!qu.empty()) {
-            int cnt = qu.size(); // 获取当前队列中的节点个数
-            while(cnt--) { // 遍历一层
-                auto t = qu.front(); // 取队头
-                qu.pop(); // 队头出队
-                if(condition) { // 判断是否到达终点位置
-                    // 某些输出或返回操作
-                }
-                // 根据某些条件获取下一层所有的节点
-                if(condition) { // 条件判断，过滤掉不符合条件的位置
-                    qu.push(); // 下一层节点入队
-                }
-            }
-        }
-    }
-    ```
+      while (!qu.empty()) {
+          int cnt = qu.size(); // 获取当前队列中的节点个数
+          while(cnt--) { // 遍历一层
+              auto t = qu.front(); // 取队头
+              qu.pop(); // 队头出队
+              if(condition) { // 判断是否到达终点位置
+                  // 某些输出或返回操作
+              }
+              // 根据某些条件获取下一层所有的节点
+              if(condition) { // 条件判断，过滤掉不符合条件的位置
+                  qu.push(); // 下一层节点入队
+              }
+          }
+      }
+  }
+```
 
 深度优先搜索和广度优先搜索广泛运用于树和图中，但是它们的应用远远不止如此。
 
@@ -99,7 +103,7 @@
 
 方法1：广度优先搜索，好处是不会爆栈。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int newColor) {
@@ -141,7 +145,7 @@ public:
 
 ### 1. 迷宫问题
 
-【[nowcoder](https://www.nowcoder.com/questionTerminal/cf24906056f4488c9ddb132f317e03bc?orderByHotValue=0&commentTags=C/C++)】给定一个n*m的二维整数数组，用来表示一个迷宫，数组中只包含0或1，其中0表示可以走的路，1表示不可通过的墙壁。最初，有一个人位于左上角(1, 1)处，已知该人每次可以向**上、下、左、右**任意一个方向移动一个位置。该人从左上角移动至右下角(n, m)处，输出其最短路径，或至少需要移动多少次。
+【[nowcoder](https://www.nowcoder.com/questionTerminal/cf24906056f4488c9ddb132f317e03bc?orderByHotValue=0&commentTags=C/C++)】给定一个n\*m的二维整数数组，用来表示一个迷宫，数组中只包含0或1，其中0表示可以走的路，1表示不可通过的墙壁。最初，有一个人位于左上角(1, 1)处，已知该人每次可以向**上、下、左、右**任意一个方向移动一个位置。该人从左上角移动至右下角(n, m)处，输出其最短路径，或至少需要移动多少次。
 
 PS：牛客的这道题，数据保证有唯一解，不考虑有多解的情况
 
@@ -165,7 +169,7 @@ PS：牛客的这道题，数据保证有唯一解，不考虑有多解的情况
 
 方法1：使用广度优先搜索，从终点往起点搜
 
-```C++
+```cpp
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -230,7 +234,7 @@ int main() {
 
 方法2：使用广度优先搜索，从起点往终点搜
 
-```C++
+```cpp
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -376,7 +380,7 @@ public:
 
 方法2：使用二维数组保存路径上各点离起点的距离，元素全部初始化为-1，可作为备忘录使用，未搜索的点距离值为-1
 
-```C++
+```cpp
 class Solution1 {
 public:
     int shortestPathBinaryMatrix(vector<vector<int>>& grid) {
@@ -439,7 +443,7 @@ return 2 because 13 = 4 + 9.
 
 本题也可以用动态规划求解，在之后动态规划部分中会再次出现。
 
-```C++
+```cpp
 class Solution {
 public:
     int numSquares(int n) {
@@ -514,7 +518,7 @@ Explanation: The endWord "cog" is not in wordList, therefore no possible transfo
 
 方法1：双向BFS，按层遍历，使用unordered_set存储备忘录（**通用双向BFS**）
 
-```C++
+```cpp
 class Solution {
 public:
     int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
@@ -572,7 +576,7 @@ public:
 
 方法2：双向BFS，按层遍历，使用unordered_set存储备忘录，优化字符串检查
 
-```C++
+```cpp
 class Solution {
 public:
     int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
@@ -625,7 +629,7 @@ public:
 
 方法3：使用普通的BFS，未优化字符串检查，会超时（使用unordered_map保存距离，并作为备忘录），使用方法2的字符串检查优化即可通过所有测试样例
 
-```C++
+```cpp
 class Solution {
 public:
     int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
@@ -681,7 +685,7 @@ public:
 
 **题解**：题目给出了多个`1`，要找出每个`1`到`0`的最近曼哈顿距离。由于`1`到`0`的距离和`0`到`1`的距离一样的，所以可以换个思维：找出每个`0`到`1`的距离。题目可以抽象成多个起始点的BFS，首先把每个源点 0 入队，然后从各个 0 同时开始一圈一圈的向 1 扩散（每个 1 都是被离它最近的 0 扩散到的 ），扩散的时候可以设置二维数组dist来记录距离（即扩散的层次）并同时标志是否访问过。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> updateMatrix(vector<vector<int>>& matrix) {
@@ -758,7 +762,7 @@ public:
 
 方法1：标准DFS写法
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0;
@@ -781,7 +785,7 @@ public:
 
 方法2：递归
 
-```C++
+```cpp
 class Solution {
 public:
     int maxDepth(TreeNode* root) {
@@ -878,7 +882,7 @@ public:
 
 **题解**：连通性模型，求的是最大连通面积，使用BFS、DFS均可
 
-```C++
+```cpp
 // bfs
 class Solution1 {
 public:
@@ -983,7 +987,7 @@ Output: 3
 
 **题解**：和上题区别不大，每次填充一块连通区域，计数加1。可将原网格作为备忘录。
 
-```C++
+```cpp
 // dfs，自建备忘录
 class Solution1 {
 public:
@@ -1139,7 +1143,7 @@ X O X X
 
 方法1：稍繁琐，第一次dfs从四周开始搜O，并标记连通的O；第二次dfs根据标记在中间区域开始搜O，并覆盖O。使用flag标识dfs是否覆盖原board中的O。
 
-```C++
+```cpp
 class Solution {
 public:
     int m, n;   
@@ -1188,7 +1192,7 @@ public:
 
 方法2：其实只需要方法1中的第1次dfs，即标记与四周O连通的O，不需要进行第二次dfs。直接遍历数组，将第一次未标记的O覆盖为X即可，同时省了覆盖标志。代码中重开了数组作为备忘录，当然也可以直接将board中与四周O连通的O标记为其他符号，从而省去备忘录数组。
 
-```C++
+```cpp
 class Solution {
 public:
     int m, n;   
@@ -1310,7 +1314,7 @@ public:
 
 方法2：那么可以从太平洋和大西洋的入口往回搜，标记比入口高的或等高的点即为可到达入口的点，设置两个二维数组分别存储能够到达太平洋和大西洋点，再同时遍历两个数组，找到同时能够到达太平洋和大西洋的点即可。
 
-```C++
+```cpp
 class Solution {
 public:
     int m, n;
@@ -1497,7 +1501,7 @@ return ["255.255.11.135", "255.255.111.35"].
 
 **题解**：通过 DFS 回溯分割 ip 字符串，并进行剪枝。设置变量u扫描 ip 字符串的每个位置，每次移动 i = {1,2,3} 步从而分割出长度为1-3的子串。下一次分割下标从 u + i 开始的子串。当子串个数为4时停止搜索，当 u 移动到字符串末尾即扫描完时保存各子串。长度为3的子串对应的数字不大于255，'0' 开头的子串长度不能超过1，“0”合法，但“01”、“010”不合法。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<string> res;
@@ -1611,7 +1615,7 @@ public:
 
 代码2：利用board作为备忘录，注意标记的撤销方式。
 
-```C++
+```cpp
 class Solution {
 public:
     bool exist(vector<vector<char>>& board, string str) {
@@ -1668,7 +1672,7 @@ public:
 
 🥇方法1：[**子集、排列、组合通用方法**](https://labuladong.github.io/ebook/%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E7%B3%BB%E5%88%97/%E5%AD%90%E9%9B%86%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88.html)。使用vector的pop_back进行撤销，更对称，更容易理解
 
-```C++
+```cpp
 class Solution {
 public:
     vector<bool> used;
@@ -1703,7 +1707,7 @@ public:
 
 方法2：非通用方法排列中path的大小固定，每次逐个填入即可。回溯时无需恢复path。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<bool> used;
@@ -1801,7 +1805,7 @@ public:
 3. 对于相同数，我们人为定序，就可以避免重复计算：我们在dfs时记录一个额外的状态，记录上一个相同数存放的位置 start，我们在枚举当前数时，只枚举 start+1,start+2,…,nstart+1,start+2,…,n 这些位置。
 4. 不要忘记递归前和回溯时，对状态进行更新。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<bool> used;
@@ -1856,13 +1860,13 @@ If n = 4 and k = 2, a solution is:
 ]
 ```
 
-**题解**：可对比[子集问题](### 11. 子集)，相当于保存了子集问题中深度为k的层。下图为子集问题的回溯树，第3行的元素即为k=2时的组合。即在子集问题的基础上，把保存结果的操作放到树的深度为k时即可。详见后面的代码对比。
+**题解**：可对比[子集问题](#_11-子集)，相当于保存了子集问题中深度为k的层。下图为子集问题的回溯树，第3行的元素即为k=2时的组合。即在子集问题的基础上，把保存结果的操作放到树的深度为k时即可。详见后面的代码对比。
 
 <img src="https://pic.leetcode-cn.com/83b914f06fefb895af2f21629087aab8168c1277c8c7b8cdfc4f7e475ee2e651.jpg" alt="img" style="zoom: 50%;" />
 
 [**子集、排列、组合通用方法**](https://labuladong.github.io/ebook/%E9%AB%98%E9%A2%91%E9%9D%A2%E8%AF%95%E7%B3%BB%E5%88%97/%E5%AD%90%E9%9B%86%E6%8E%92%E5%88%97%E7%BB%84%E5%90%88.html)。需要设置一个start变量，**排除已选择的数字**。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>>res;
@@ -1894,7 +1898,7 @@ public:
 - 组合问题仅保存指定层上的数据
 - 相当于组合问题的结果是子集问题的结果的子集
 
-```C++
+```cpp
 // 子集
 class Solution {
 public:
@@ -1958,7 +1962,7 @@ A solution set is:
 
 另外需要注意的是，需保证每个分支的target相同，因而需要恢复现场。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> res;
@@ -2014,7 +2018,7 @@ A solution set is:
 - 为避免使用数组中的重复数字，需要先排序，并设置备忘录，通过剪枝避免使用数组中相同的元素。
 - 同一元素不可使用两次，因而在搜索时从下一元素开始搜
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> res;
@@ -2069,7 +2073,7 @@ Output:
 
 **题解**：这题和组合求和没有多大区别，在path中元素个数为k时保存即可。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> res;
@@ -2165,7 +2169,7 @@ public:
 
 <img src="https://pic.leetcode-cn.com/03408dfe78564b721a065bf3bb34bc4e933f321a6e5e5883f0a5096a88dadb0b-%E8%A7%A3%E6%9E%90.png" alt="解析.png"  />
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> subsets(vector<int>& nums) {
@@ -2265,7 +2269,7 @@ public:
 
 <img src="https://pic.leetcode-cn.com/efbe574e5e6addcd1c9dc5c13a50c6f162a2b14a95d6aed2c394e18287a067fa-image.png" alt="image.png" style="zoom: 33%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     vector<string> res;
@@ -2381,7 +2385,7 @@ private int cubeNum(int i, int j) {
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/7a85e285-e152-4116-b6dc-3fab27ba9437.jpg" width="300px"> </div><br>
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<string>> res;
@@ -2417,7 +2421,7 @@ public:
 
 非class解法1：利用全排列的思想按行枚举，即已分析出每列只能有一个皇后，复杂度O(n!)
 
-```C++
+```cpp
 #include <iostream>
 using namespace std;
 
@@ -2460,7 +2464,7 @@ int main () {
 
 不同搜索顺序时间复杂度不同  所以搜索顺序很重要！
 
-```C++
+```cpp
 #include <iostream>
 using namespace std;
 
@@ -2519,7 +2523,7 @@ int main () {
 
 - 搜索顺序优化：先对数组从大到小排序，使大的元素先相加，这样便可以快速判断当前路径是否合法，从而避免进行冗余的搜索。
 
-```C++
+```cpp
 class Solution {
 public:
     int sum = 0;

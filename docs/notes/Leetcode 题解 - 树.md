@@ -24,7 +24,7 @@
 
 <img src="https://pic.leetcode-cn.com/Figures/104/104_slide_10.png" alt="img" style="zoom: 33%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     int maxDepth(TreeNode* root) {
@@ -38,7 +38,7 @@ public:
 
 方法2：DFS
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0;
@@ -60,7 +60,7 @@ public:
 
 方法3：BFS
 
-```C++
+```cpp
 class Solution {
 public:
     int maxDepth(TreeNode* root) {
@@ -104,7 +104,7 @@ public:
 
 **需要对左子节点或右子节点为空的情况进行处理**。例如：若左子节点为空，则以当前节点为根节点的子树的最小深度为右子树最小深度加1，而不是左右子树深度最小值的最小值加1
 
-```C++
+```cpp
 class Solution {
 public:
     int minDepth(TreeNode* root) {
@@ -129,7 +129,7 @@ public:
 
 方法2：DFS，与求最大深度没什么区别，但返回值需初始化为正无穷
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0x7FFFFFFF;
@@ -170,7 +170,7 @@ public:
 
 **题解：**根据上题求树的高度的递归写法，进行修改即可得到DFS版本的解法
 
-```C++
+```cpp
 class Solution {
 public:
     bool res = true;
@@ -213,7 +213,7 @@ Return 3, which is the length of the path [4,2,1,3] or [5,2,1,3].
 
 <img src="https://pic.leetcode-cn.com/baf2f6ea1ae76ba383eb1753254340f089dac9f03664f93990d6ae54f8560970-image.png" alt="image.png" style="zoom: 25%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     int maxDepthSum;
@@ -247,7 +247,7 @@ public:
 
 <img src="https://pic.leetcode-cn.com/0f91f7cbf5740de86e881eb7427c6c3993f4eca3624ca275d71e21c5e3e2c550-226_2.gif" alt="226_2.gif" style="zoom: 50%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* invertTree(TreeNode* root) {
@@ -264,7 +264,7 @@ public:
 
 <img src="https://pic.leetcode-cn.com/f9e06159617cbf8372b544daee37be70286c3d9b762c016664e225044fc4d479-226_%E8%BF%AD%E4%BB%A3.gif" alt="226_迭代.gif" style="zoom:50%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* invertTree(TreeNode* root) {
@@ -316,7 +316,7 @@ Output:
 
 这里将结果存储到树1中，当然也可以新建一棵树
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
@@ -362,7 +362,7 @@ return true, as there exist a root-to-leaf path 5->4->11->2 which sum is 22.
 
 方法1：递归
 
-```C++
+```cpp
 class Solution {
 public:
     bool hasPathSum(TreeNode* root, int sum) {
@@ -376,7 +376,7 @@ public:
 
 方法2：DFS
 
-```C++
+```cpp
 class Solution {
 public:
     bool res = false;
@@ -432,7 +432,7 @@ Return 3. The paths that sum to 8 are:
 
 方法1：**双递归**，以每个节点为根节点，算一遍路径和为sum的有几条，然后加起来
 
-```C++
+```cpp
 class Solution {
 public:
     int pathSum(TreeNode* root, int sum) { // 递归遍历各个根节点，并统计各节点为根节点的子树
@@ -449,7 +449,7 @@ public:
 
 方法2：先序遍历每个节点，再对每个节点进行DFS（上题<路径总和>中的方法），搜索和为sum的路径
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0;
@@ -527,7 +527,7 @@ Return false.
 
 主函数执行递归先序遍历，判断以 s 树中当前节点开始的树是否与 t 相同、当前节点左子树是否与 t 相同、当前节点右子树是否与 t 相同，有一个相同则 t 为 s 的子树。
 
-```C++
+```cpp
 class Solution {
 public:
     bool isSubtree(TreeNode* s, TreeNode* t) {
@@ -553,7 +553,7 @@ public:
 
 化简：
 
-```C++
+```cpp
 class Solution {
 public:
     bool isSubtree(TreeNode* s, TreeNode* t) {
@@ -593,7 +593,7 @@ public:
 
 可以发现，一棵树的先序遍历结果与其对称树的反向先序遍历结果相同。因而，同时对两树进行先序遍历，一棵正常先序遍历，一棵反向先序遍历，逐个判断遍历到的节点值是否相等即可判断两棵树是否互为镜像。
 
-```C++
+```cpp
 class Solution {
 public:
     bool isSymmetric(TreeNode* root) {
@@ -641,7 +641,7 @@ There are two left leaves in the binary tree, with values 9 and 15 respectively.
 
 紧凑写法：
 
-```C++
+```cpp
 class Solution {
 public:
     int sumOfLeftLeaves(TreeNode* root) {
@@ -655,7 +655,7 @@ public:
 
 容易理解的写法：
 
-```C++
+```cpp
 class Solution {
 public:
     int sumOfLeftLeaves(TreeNode* root) {
@@ -695,7 +695,7 @@ Output : 2
 
 紧凑写法：
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0;
@@ -722,7 +722,7 @@ public:
 
 清晰写法：
 
-```C++
+```cpp
 class Solution {
 public:
     int res = 0;
@@ -791,7 +791,7 @@ Maximum amount of money the thief can rob = 3 + 3 + 1 = 7.
 挑选一个钱数多的方案则
 `int result = max(method1, method2);`
 
-```C++
+```cpp
 class Solution {
 public:
     int rob(TreeNode* root) {
@@ -806,7 +806,7 @@ public:
 
 2、结合动态规划：
 
-```C++
+```cpp
 
 ```
 
@@ -831,7 +831,7 @@ Output: 5
 
 一个节点要么具有 0 个或 2 个子节点，如果有子节点，那么根节点是最小的节点。
 
-```C++
+```cpp
 public int findSecondMinimumValue(TreeNode root) {
     if (root == null) return -1;
     if (root.left == null && root.right == null) return -1;
@@ -859,7 +859,7 @@ public int findSecondMinimumValue(TreeNode root) {
 
 **题解**：使用队列
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
@@ -893,7 +893,7 @@ public:
 
 [Leetcode](https://leetcode.com/problems/average-of-levels-in-binary-tree/description/) / [力扣](https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/description/)
 
-```C++
+```cpp
 class Solution {
 public:
     vector<double> averageOfLevels(TreeNode* root) {
@@ -946,7 +946,7 @@ Output:
 
 方法1：先添加右子节点再添加左子节点，即可保证最后一个出队的为最底层的最左侧节点
 
-```C++
+```cpp
 class Solution {
 public:
     int findBottomLeftValue(TreeNode* root) {
@@ -966,7 +966,7 @@ public:
 
 方法2：设置一个变量来保存每层的最左侧节点，最后此变量保存的即为最后一层的最左侧节点
 
-```C++
+```cpp
 class Solution {
 public:
     int findBottomLeftValue(TreeNode* root) {
@@ -999,7 +999,7 @@ public:
 
 方法1：设置标志位，奇数层翻转结果数组
 
-```C++
+```cpp
 class Solution {
 public:
     vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
@@ -1031,7 +1031,7 @@ public:
 
 方法2：使用双端队列
 
-```C++
+```cpp
 class Solution {
 public:
     // 简单方法，使用deque，为了区分打印顺序，使用deque而不是queue
@@ -1102,7 +1102,7 @@ public:
 
 ① 前序
 
-```C++
+```cpp
 void dfs(TreeNode root) {
     visit(root);
     dfs(root.left);
@@ -1112,7 +1112,7 @@ void dfs(TreeNode root) {
 
 ② 中序
 
-```C++
+```cpp
 void dfs(TreeNode root) {
     dfs(root.left);
     visit(root);
@@ -1122,7 +1122,7 @@ void dfs(TreeNode root) {
 
 ③ 后序
 
-```C++
+```cpp
 void dfs(TreeNode root) {
     dfs(root.left);
     dfs(root.right);
@@ -1142,7 +1142,7 @@ void dfs(TreeNode root) {
 
 迭代写法1：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
@@ -1165,7 +1165,7 @@ public:
 
 迭代写法2：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
@@ -1189,7 +1189,7 @@ public:
 
 递归写法：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> res;
@@ -1218,7 +1218,7 @@ public:
 
 迭代写法：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> postorderTraversal(TreeNode* root) {
@@ -1242,7 +1242,7 @@ public:
 
 递归写法：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> res;
@@ -1289,7 +1289,7 @@ dfs(root.left)
 
 迭代写法1：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> inorderTraversal(TreeNode* root) {
@@ -1314,7 +1314,7 @@ public:
 
 迭代写法2：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> inorderTraversal(TreeNode* root) {
@@ -1339,7 +1339,7 @@ public:
 
 递归写法：
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> res;
@@ -1397,7 +1397,7 @@ Output:
 
 当node.val > R，那么修剪后的二叉树必定出现在节点的左边，因为此节点需要删除，并且比R小的节点只可能在左边。同理当node.val < L，那么修剪后的二叉树出现在节点的右边。否则，我们将会修剪树的两边。
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* trimBST(TreeNode* root, int L, int R) {
@@ -1426,7 +1426,7 @@ public:
 
 BST中序遍历的结果是有序的，存储结果并取出第k个元素即可
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> vec;
@@ -1469,7 +1469,7 @@ Output: The root of a Greater Tree like this:
 
 **题解**：使用**反向中序遍历**，将中序遍历左根右的顺序逆过来，变成右根左的顺序，这样就可以反向计算累加和sum，同时更新结点值。例如按13->5->2的顺序遍历，sum+=13，此时sum = 13，为右子节点更新后的值。sum+=5，此时sum=18，为根节点更新后的值。sum+=2，此时sum=20，为左子节点更新后的值。
 
-```C++
+```cpp
 class Solution {
 public:
     int sum = 0;
@@ -1514,7 +1514,7 @@ For example, the lowest common ancestor (LCA) of nodes 2 and 8 is 6. Another exa
 
 <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200522171044.png" alt="image-20200522171032834" style="zoom: 80%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
@@ -1557,7 +1557,7 @@ Another example is LCA of nodes 5 and 4 is 5, since a node can be a descendant o
 
 - 若p和q同时位于右子树，同样这里有两种情况，一种情况是 right 会返回p和q中较高的那个位置，而 left 会返回空，所以最终返回非空的 right 即可，还有一种情况是会返回p和q的最小父结点，就是说当前结点的右子树中的某个结点才是p和q的最小父结点，会被返回。
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
@@ -1583,7 +1583,7 @@ public:
 
 二叉搜索树，是一种始终满足左<根<右的特性，如果将**二叉搜索树按中序遍历的话，得到的就是一个有序数组**。那么反过来，我们可以得知，**根节点应该是有序数组的中间点**，从中间点分开为左右两个有序数组，在分别找出其中间点作为原中间点的左右两个子节点，这不就是二分查找么。
 
-```C++
+```cpp
 class Solution {
 public:
     TreeNode* sortedArrayToBST(vector<int>& nums) {
@@ -1623,7 +1623,7 @@ One possible answer is: [0,-3,9,-10,null,5], which represents the following heig
 
 **题解**：
 
-```C++
+```cpp
 public TreeNode sortedListToBST(ListNode head) {
     if (head == null) return null;
     if (head.next == null) return new TreeNode(head.val);
@@ -1674,7 +1674,7 @@ Output: True
 
 应该注意到，这一题不能用分别在左右子树两部分来处理这种思想，因为两个待求的节点可能分别在左右子树中。
 
-```C++
+```cpp
 public boolean findTarget(TreeNode root, int k) {
     List<Integer> nums = new ArrayList<>();
     inOrder(root, nums);
@@ -1720,7 +1720,7 @@ Output:
 
 利用二叉查找树的中序遍历为有序的性质，计算中序遍历中临近的两个节点之差的绝对值，取最小值。
 
-```C++
+```cpp
 private int minDiff = Integer.MAX_VALUE;
 private TreeNode preNode = null;
 
@@ -1758,7 +1758,7 @@ return [2].
 
 答案可能不止一个，也就是有多个值出现的次数一样多。
 
-```C++
+```cpp
 private int curCnt = 1;
 private int maxCnt = 1;
 private TreeNode preNode = null;
@@ -1809,7 +1809,7 @@ Trie，又称前缀树或字典树，用于判断字符串是否存在或者是�
 
 [Leetcode](https://leetcode.com/problems/implement-trie-prefix-tree/description/) / [力扣](https://leetcode-cn.com/problems/implement-trie-prefix-tree/description/)
 
-```C++
+```cpp
 class Trie {
 
     private class Node {
@@ -1882,7 +1882,7 @@ Input: insert("app", 2), Output: Null
 Input: sum("ap"), Output: 5
 ```
 
-```C++
+```cpp
 class MapSum {
 
     private class Node {

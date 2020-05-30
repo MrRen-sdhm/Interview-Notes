@@ -9,7 +9,7 @@
  * 准备两个栈，push栈负责接收新元素，pop栈负责返回元素，若pop为空则取元素时将push中所有元素倒入pop
  * 关键点：只有pop栈为空时才能将push栈的元素倒入pop栈，并且必须一次倒完
 
-```C++
+```cpp
 class MyQueue {
 public:
     stack<int> stk, help;
@@ -107,7 +107,7 @@ public:
 
 使用topval变量保存栈顶，pop时将qu中除x外元素pop并push到辅助队列中，最后pop掉qu中的x但不加入辅助队列，此时通过交换还原pop掉x的qu队列。
 
-```C++
+```cpp
 class MyStack {
 public:
     queue<int> qu, help;
@@ -207,7 +207,7 @@ Output : true
 
 **题解**：当前字符不是左括号时，判断是否与栈顶匹配，匹配则取出栈顶否则返回false。注意，不可省略`else return false; // 当前字符与栈顶不匹配，匹配失败`，用于判断`())))`这种情况，每个字符必须合法。
 
-```C++
+```cpp
 class Solution {
 public:
     bool isValid(string s) {
@@ -251,7 +251,7 @@ public:
 
 下一个更大的数，[代码模板](https://labuladong.gitbook.io/algo/shu-ju-jie-gou-xi-lie/dan-tiao-zhan)：
 
-```C++
+```cpp
 vector<int> nextGreaterElement(vector<int>& nums) {
     vector<int> ans(nums.size()); // 存放答案的数组
     stack<int> s;
@@ -295,7 +295,7 @@ Output: [1, 1, 4, 2, 1, 1, 0, 0]
 
 写法1：**通用写法**，逆序入栈
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> dailyTemperatures(vector<int>& T) {
@@ -313,7 +313,7 @@ public:
 
 写法2：顺序
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> dailyTemperatures(vector<int>& T) {
@@ -348,7 +348,7 @@ public:
 
 **题解**：nums1中的元素相当于键，可以忽略数组 nums1，先对将 nums2 中的每一个元素，求出其下一个更大的元素。随后对于将这些答案放入哈希表中，再遍历数组 nums1，并直接找出答案。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> nextGreaterElement(vector<int>& nums1, vector<int>& nums2) {
@@ -390,7 +390,7 @@ The second 1's next greater number needs to search circularly, which is also 2.
 
 写法1：通用写法
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> nextGreaterElements(vector<int>& nums) {
@@ -410,7 +410,7 @@ public:
 
 写法2：遍历两倍的数组，然后还是坐标 i 对 n 取余，取出数字，如果此时栈不为空，且栈顶元素小于当前数字，说明当前数字就是栈顶元素的右边第一个较大数，那么建立二者的映射，并且去除当前栈顶元素，最后如果 i 小于n，则把 i 压入栈。因为res的长度必须是 n，超过 n 的部分我们只是为了给之前栈中的数字找较大值，所以不能压入栈。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> nextGreaterElements(vector<int>& nums) {
@@ -451,7 +451,7 @@ public:
 
 方法1：数组模拟双端队列
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
@@ -474,7 +474,7 @@ public:
 
 方法2：使用deque
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {

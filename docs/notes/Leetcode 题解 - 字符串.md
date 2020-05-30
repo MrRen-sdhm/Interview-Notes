@@ -57,7 +57,7 @@ s = "rat", t = "car", return false.
 
 由于本题的字符串只包含 26 个小写字符，因此可以使用长度为 26 的整型数组对字符串出现的字符进行统计，不再使用 HashMap。
 
-```C++
+```cpp
 class Solution {
 public:
     bool isAnagram(string s, string t) {
@@ -101,7 +101,7 @@ Explanation : One longest palindrome that can be built is "dccaccd", whose lengt
 
 写法1：使用哈希表
 
-```C++
+```cpp
 class Solution {
 public:
     int longestPalindrome(string s) {
@@ -125,7 +125,7 @@ public:
 
 写法2：使用数组代替哈希表
 
-```C++
+```cpp
 class Solution {
 public:
     int longestPalindrome(string s) {

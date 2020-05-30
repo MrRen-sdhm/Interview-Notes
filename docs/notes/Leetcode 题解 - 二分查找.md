@@ -19,7 +19,7 @@
   - 模板bsearch_1会返回第一个比目标数字的位置
 - 循环退出后，`l`一定等于`r`，最终结果取`l`或者`r`没有区别
 
-```C++
+```cpp
 bool check(int x) {/* ... */} // 检查x是否满足某种性质
 
 // 区间[l, r]被划分成[l, mid]和[mid + 1, r]时使用：
@@ -44,7 +44,7 @@ int bsearch_2(int l, int r) {
 
 使用方法：
 
-```C++
+```cpp
 #include <iostream>
 
 using namespace std;
@@ -81,7 +81,7 @@ int main() {
 
 ## 模板2：浮点数二分模板
 
-```C++
+```cpp
 bool check(double x) {/* ... */} // 检查x是否满足某种性质
 
 double bsearch_3(double l, double r)
@@ -98,7 +98,7 @@ double bsearch_3(double l, double r)
 
 使用方法：
 
-```C++
+```cpp
 #include <iostream>
 using namespace std;
 
@@ -141,7 +141,7 @@ Explanation: The square root of 8 is 2.82842..., and since we want to return an 
 
 对于 x = 8，它的开方是 2.82842...，最后应该返回 2 而不是 3。在循环条件为 `r - l > 1e-6` 并且循环退出时，r 总是比 l 小 1，也就是说 r = 2，l = 3，因此最后的返回值应该为 r 而不是 l。
 
-```C++
+```cpp
 class Solution {
 public:
     int mySqrt(int x) {
@@ -179,7 +179,7 @@ Output: [-1,-1]
 
 方法1：使用上述两个模板即可轻松解决
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> searchRange(vector<int>& nums, int target) {
@@ -216,7 +216,7 @@ public:
 
 方法2：可用二分查找找出第一个位置和最后一个位置，但是寻找的方法有所不同，需要实现两个二分查找。我们将寻找  target 最后一个位置，转换成寻找 target+1 第一个位置，再往前移动一个位置。这样我们只需要实现一个二分查找代码即可。
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> searchRange(vector<int>& nums, int target) {
@@ -271,7 +271,7 @@ Output: "c"
 
 这里找**第一个大于目标值**的字符，因而检测条件为`letters[mid] > target`，且不加等号，若当前值大于目标值，并将 r 设为 mid 从而**切除当前值右侧更大的值**
 
-```C++
+```cpp
 class Solution {
 public:
     char nextGreatestLetter(vector<char>& letters, char target) {
@@ -293,7 +293,7 @@ public:
 
 若修改为**找第一个小于目标值**的字符，则检测条件为`letters[mid] < target`，且不加等号，即当前值小于目标值，并将 l 设为 mid 从而**切除当前值左侧更小的值**
 
-```C++
+```cpp
         int l = 0, r = n - 1;
         while(l < r) {
             int mid = l + r + 1 >> 1;
@@ -318,7 +318,7 @@ public:
 
 可以看出，区间划分为[l, mid] 和 [mid + 1, r] 因而使用二分模板1即可。
 
-```C++
+```cpp
 public int firstBadVersion(int n) {
     int l = 1, h = n;
     while (l < h) {
@@ -348,7 +348,7 @@ Output: 1
 
 **题解**：若数组没有旋转或者旋转点在左半段的时候，中间值是一定小于右边界值的，所以要去左半边继续搜索，反之则去右半段查找。
 
-```C++
+```cpp
 class Solution {
 public:
     int findMin(vector<int>& nums) {
@@ -396,7 +396,7 @@ Output: 2
 
 **核心**：保证查找区间中元素个数为奇数，这样限制后，若nums[mid] != nums[mid + 1]那么落单数一定在左侧否则一定在右侧。
 
-```C++
+```cpp
 class Solution {
 public:
     int singleNonDuplicate(vector<int>& nums) {
@@ -419,7 +419,7 @@ public:
 
 **技巧：异或1运算可以将坐标两两归为一对，比如0和1，2和3，4和5等等**。异或1可以直接找到一对中的另一个数字，比如对于2，亦或1就是3，对于3，亦或1就是2。如果你和你的小伙伴相等了，说明落单数在右边，如果不等，说明在左边。
 
-```C++
+```cpp
 class Solution {
 public:
     int singleNonDuplicate(vector<int>& nums) {
@@ -460,7 +460,7 @@ Output: 2
 
 最终两个指针的值即为重复数字！
 
-```C++
+```cpp
 class Solution {
 public:
     int findDuplicate(vector<int>& nums) {
@@ -492,7 +492,7 @@ public:
 
 <img src="C:/Users/sdhm/AppData/Roaming/Typora/typora-user-images/image-20200523171128636.png" alt="image-20200523171128636" style="zoom:67%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     int findDuplicate(vector<int>& nums) {

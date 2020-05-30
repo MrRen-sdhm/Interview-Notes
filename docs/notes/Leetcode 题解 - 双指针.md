@@ -21,7 +21,7 @@ Output: index1=1, index2=2
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/437cb54c-5970-4ba9-b2ef-2541f7d6c81e.gif" width="200px"> </div><br>
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
@@ -63,7 +63,7 @@ Explanation: 1 * 1 + 2 * 2 = 5
 
 因为最多只需要遍历一次 0\~sqrt(target)，所以时间复杂度为 O(sqrt(target))。又因为只使用了两个额外的变量，因此空间复杂度为 O(1)。
 
-```C++
+```cpp
 class Solution {
 public:
     bool judgeSquareSum(int c) {
@@ -82,7 +82,7 @@ public:
 
 另一种写法：使用for循环控制 i，while循环控制 j
 
-```C++
+```cpp
 class Solution {
 public:
     bool judgeSquareSum(int c) {
@@ -119,7 +119,7 @@ Given s = "leetcode", return "leotcede".
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/ef25ff7c-0f63-420d-8b30-eafbeea35d11.gif" width="400px"> </div><br>
 
-```C++
+```cpp
 private final static HashSet<Character> vowels = new HashSet<>(
         Arrays.asList('a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'));
 
@@ -177,7 +177,7 @@ Explanation: You could delete the character 'c'.
 
 写法1：使用两种模板，for 和 while
 
-```C++
+```cpp
 class Solution {
 public:
     bool validPalindrome(string s) {
@@ -201,7 +201,7 @@ public:
 
 写法2：使用一种模板，while
 
-```C++
+```cpp
 class Solution1 {
 public:
     bool validPalindrome(string s) {
@@ -242,7 +242,7 @@ Output: [1,2,2,3,5,6]
 
 需要从尾开始遍历，否则在 nums1 上归并得到的值会覆盖还未进行归并比较的值。
 
-```C++
+```cpp
 public void merge(int[] nums1, int m, int[] nums2, int n) {
     int index1 = m - 1, index2 = n - 1;
     int indexMerge = m + n - 1;
@@ -270,7 +270,7 @@ public void merge(int[] nums1, int m, int[] nums2, int n) {
 
 使用双指针，一个指针每次移动一个节点，一个指针每次移动两个节点，如果存在环，那么这两个指针一定会相遇。
 
-```C++
+```cpp
 class Solution {
 public:
     bool hasCycle(ListNode *head) {
@@ -309,7 +309,7 @@ Output:
 
 指针i指向字符串 s，指针 j 指向可能为子序列的字符串 ds，i 指针始终右移一位，当 i，j 指向的字符相等时 j 右移一位。若 ds 为 s 的子序列，则 j 最终指向 '\0' 位置，否则指向ds中某个字符。
 
-```C++
+```cpp
 class Solution {
 public:
     string findLongestWord(string s, vector<string>& d) {
@@ -357,7 +357,7 @@ public:
 - 写法1：每次直接插入，即在判断之前插入，因而需判断某字符是否出现了两次。
 - 写法2：在while循环后插入，即在判断之后插入，那么只需判断某字符是否已出现过一次。
 
-```C++
+```cpp
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
@@ -400,7 +400,7 @@ public:
 
 方法2：使用哈希表unordered_map存储出现的字符，速度较慢。注意unordered_map不能存储重复的数据，即仅能判断一个字符当前出现的次数是否为0或1，因而需将插入代码放到while循环之后，如果出现了重复的字符，那么下次判断时，此字符出现的次数为1。
 
-```C++
+```cpp
 class Solution1 {
 public:
     int lengthOfLongestSubstring(string s) {
@@ -425,7 +425,7 @@ public:
 
 方法3：若想保存每个字符出现的次数，可以使用unordered_map，不推荐
 
-```C++
+```cpp
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
@@ -462,7 +462,7 @@ Output: [1,3,12,0,0]
 
 使用快慢指针，快指针遍历数组每个元素，遇到非0元素则与慢指针交换，并且慢指针后移一位，这样做的结果是：慢指针之前的所有元素都是非零的，慢指针始终指向0
 
-```C++
+```cpp
 class Solution {
 public:
     void moveZeroes(vector<int>& nums) {

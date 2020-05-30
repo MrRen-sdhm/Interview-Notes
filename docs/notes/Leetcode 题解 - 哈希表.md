@@ -21,7 +21,7 @@
 
 方法1：两遍哈希，先将所有数字及其下标存入哈希表，再逐个遍历数字，并在哈希表中查找对应的数
 
-```C++
+```cpp
 // 两遍哈希
 class Solution {
 public:
@@ -43,7 +43,7 @@ public:
 
 方法2：一遍哈希，存入哈希表的过程中就查找哈希表中是否有对应的数，注意返回值的顺序
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {

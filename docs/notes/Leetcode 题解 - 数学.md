@@ -59,7 +59,7 @@ public:
 
 有一点可以优化：j 从 i * i 开始筛，因为如果 k < i，那么 k * i 在之前就已经被筛过了
 
-```C++
+```cpp
 class Solution {
 public:
     int countPrimes(int n) {
@@ -80,7 +80,7 @@ public:
 
 还有一点可以优化：就像素数判定的优化一样，外层循环中 i 可以只枚举到 sqrt(i)，但是**个数的统计需要单独循环**。
 
-```C++
+```cpp
 class Solution {
 public:
     int countPrimes(int n) {
@@ -106,7 +106,7 @@ public:
 
 方法2：线性筛法，更适用于求所有素数，而不仅仅是求素数个数
 
-```C++
+```cpp
 class Solution {
 public:
     int countPrimes(int n) {
@@ -480,7 +480,7 @@ private void swap(int[] nums, int i, int j) {
 
 先对数组排序，最中间那个数出现次数一定多于 n / 2。
 
-```C++
+```cpp
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {
@@ -494,7 +494,7 @@ public:
 
 使用哈希表，时间复杂度O(n)，空间复杂度O(n)
 
-```C++
+```cpp
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {
@@ -513,7 +513,7 @@ public:
 
 总结：选一个数然后统计其出现的次数，规则是下一个数等于这个数则计数加1否则减1，次数减到0则换一个数
 
-```C++
+```cpp
 class Solution {
 public:
     int majorityElement(vector<int>& nums) {

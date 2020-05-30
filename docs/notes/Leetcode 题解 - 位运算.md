@@ -123,7 +123,7 @@ The above arrows point to positions where the corresponding bits are different.
 
 方法1：按位分别取出两个数对应位上的数，然后判断是否相等即可，判断不等也可换成异或
 
-```C++
+```cpp
 class Solution {
 public:
     int hammingDistance(int x, int y) {
@@ -139,7 +139,7 @@ public:
 
 方法2：先进行异或运算，然后再统计1的个数。统计1的可数可使用 z&(z-1) 去除 z 位级表示最低的那一位。
 
-```C++
+```cpp
 class Solution {
 public:
     int hammingDistance(int x, int y) {
@@ -491,7 +491,7 @@ public int maxProduct(String[] words) {
 
 **题解**：n&-n能够得到n中的最后一位1，每次减去最后一位1，最终n减到0，减了多少次就有多少个1
 
-```C++
+```cpp
 class Solution {
 public:
     int hammingWeight(uint32_t n) {
@@ -515,7 +515,7 @@ public:
 
 方法1：基本做法
 
-```C++
+```cpp
 class Solution {
 public:
     vector<int> countBits(int num) {

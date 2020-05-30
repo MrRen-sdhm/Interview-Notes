@@ -39,7 +39,7 @@ B:    b1 → b2 → b3        e1 → e2
 
 如果不存在交点，那么 a + b = b + a，以下实现代码中 l1 和 l2 会同时为 null，从而退出循环。
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
@@ -70,7 +70,7 @@ public:
 
 方法1：指针操作
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {
@@ -89,7 +89,7 @@ public:
 
 方法2：递归
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {
@@ -106,7 +106,7 @@ public:
 
 方法3：头插法
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* reverseList(ListNode* head) {
@@ -135,7 +135,7 @@ public:
 
 递归：
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
@@ -154,7 +154,7 @@ public:
 
 迭代：
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
@@ -201,7 +201,7 @@ public:
 
 因为我们知道要删除的节点不是列表的末尾，所以我们可以保证这种方法是可行的
 
-```C++
+```cpp
 class Solution {
 public:
     void deleteNode(ListNode* node) {
@@ -226,7 +226,7 @@ After removing the second node from the end, the linked list becomes 1->2->3->5.
 
 **题解**：首先快指针先向前走N步，如果此时快指针指向空，说明N为链表的长度，则需要移除的为首元素，那么此时返回 head->next 即可；如果快指针未指向空，再继续往下走，此时慢指针也跟着走，直到快指针指向最后一个元素时停止，此时慢指针指向要移除元素的**前一个元素**，再修改指针跳过需要移除的元素即可
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
@@ -265,7 +265,7 @@ Given 1->1->2->3->3, return 1->2->3.
 
 遍历链表，每个结点和其后面的结点比较，如果结点值相同了，只要将前面结点的 next 指针跳过紧挨着的相同值的结点，指向后面一个结点。这样遍历下来，所有重复的结点都会被跳过，留下的链表就是没有重复项的了。
 
-```C++
+```cpp
 class Solution1 {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
@@ -286,7 +286,7 @@ public:
 
 首先判断是否至少有两个结点，若不是的话，直接返回 head。否则对 head->next 调用递归函数，并赋值给 head->next。这里可能比较晕，先看后面一句，返回的时候，head 结点先跟其身后的结点进行比较，如果值相同，那么返回后面的一个结点，当前的 head 结点就被跳过了，而如果不同的话，还是返回 head 结点。可以发现了，进行实质上的删除操作是在最后一句进行了，再来看第二句，对 head 后面的结点调用递归函数，那么就应该 suppose 返回来的链表就已经没有重复项了，此时接到 head 结点后面，在第三句的时候再来检查一下 head 是否又 duplicate 了，实际上递归一直走到了末尾结点，再不断的回溯回来，进行删除重复结点
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* deleteDuplicates(ListNode* head) {
@@ -325,7 +325,7 @@ Given 1->2->3->4, you should return the list as 2->1->4->3.
 - 然后将当前节点的下一个节点指向第二个节点
 - 最后更新当前节点为第二个节点的下一个节点，即原来的第一个节点
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* swapPairs(ListNode* head) {
@@ -351,7 +351,7 @@ public:
 
 利用回溯的思想，递归遍历到链表末尾，然后先交换末尾两个，然后依次往前交换
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* swapPairs(ListNode* head) {
@@ -400,7 +400,7 @@ Explanation: 342 + 465 = 807.
 
     
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
@@ -450,7 +450,7 @@ Output: 7 -> 8 -> 0 -> 7
 
 写法1：
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
@@ -490,7 +490,7 @@ public:
 
 写法2：处理最后一位的代码也可放到while循环中，若 carry != 0 说明需要处理最后一位的进位问题，符合while循环的处理逻辑，可放入while循环中处理。
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
@@ -532,7 +532,7 @@ public:
 
 切成两半，把后半段反转，然后比较两半是否相等。
 
-```C++
+```cpp
 public boolean isPalindrome(ListNode head) {
     if (head == null || head.next == null) return true;
     ListNode slow = head, fast = head.next;
@@ -591,7 +591,7 @@ The input has been split into consecutive parts with size difference at most 1, 
 
 题目描述：把链表分隔成 k 部分，每部分的长度都应该尽可能相同，排在前面的长度应该大于等于后面的。
 
-```C++
+```cpp
 public ListNode[] splitListToParts(ListNode root, int k) {
     int N = 0;
     ListNode cur = root;
@@ -631,7 +631,7 @@ Given 1->2->3->4->5->NULL,
 return 1->3->5->2->4->NULL.
 ```
 
-```C++
+```cpp
 public ListNode oddEvenList(ListNode head) {
     if (head == null) {
         return head;
@@ -668,7 +668,7 @@ public ListNode oddEvenList(ListNode head) {
 - 在递归排序左右链表后进行链表的拼接，中间链表无需排序
 - **中间链表不一定存在**，因而在第一次拼接后，仍需从左侧链表的头结点开始寻找当前链表的尾节点
 
-```C++
+```cpp
 class Solution {
 public:
     ListNode* sortList(ListNode* head) {
@@ -707,7 +707,7 @@ public:
 
 面试时为了更加严谨，最好释放申请的空间
 
-```C++
+```cpp
         // 释放空间
         auto p = left->next;
         delete left, delete right, delete mid; // 释放申请的空间
@@ -735,7 +735,7 @@ public:
 - 迭代合并链表时需要创建虚拟头结点，**返回真实头结点**dummy->next。
 - 因为创建了虚拟头结点，合并时只需要指针操作即可完成排序，因而不像数组归排中需要额外的长度为n的数组来存储合并结果，省去了O(n)的空间，但递归调用仍需O(logn)的空间，因而空间复杂度为O(logn)
 
-```C++
+```cpp
 // 写法1
 class Solution {
 public:
@@ -814,7 +814,7 @@ public:
 
 [方法3](https://www.acwing.com/solution/LeetCode/content/408/)：自底向上归并排序-非递归，稳定，时间复杂度O(nlogn)，空间复杂度O(1)
 
-```C++
+```cpp
 
 ```
 

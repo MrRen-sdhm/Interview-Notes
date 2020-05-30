@@ -20,7 +20,7 @@
 
 考虑到 dp[i] 只与 dp[i - 1] 和 dp[i - 2] 有关，因此可以只用两个变量来存储 dp[i - 1] 和 dp[i - 2]，使得原来的 O(N) 空间复杂度优化为 O(1) 复杂度。
 
-```C++
+```cpp
 class Solution {
 public:
     int climbStairs(int n) {
@@ -54,7 +54,7 @@ public:
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/2de794ca-aa7b-48f3-a556-a0e2708cb976.jpg" width="350px"> </div><br>
 选择 dp[–1] = dp[0] = 0 为初始情况，可简化代码。
 
-```C++
+```cpp
 class Solution {
 public:
     int rob(vector<int>& nums) {
@@ -85,7 +85,7 @@ public:
 2、在不偷窃最后一个房子的情况下（即 nums[:n-1]），最大金额是 p2
 综合偷窃最大金额： 为以上两种情况的较大值，即 max(p1,p2)。
 
-```C++
+```cpp
 class Solution {
 public:
     int rob(vector<int>& nums) {
@@ -145,7 +145,7 @@ public:
 
 需注意三个问题：1、每行边界左右的两个位置要初始化为正无穷  2、显式初始化第一行后，从第二行开始计算dp数组 3、从第一行第一列开始枚举，因而第`[i, j]`个数字在输入数组中为`triangle[i - 1][j - 1]`
 
-```C++
+```cpp
 class Solution {
 public:
     int minimumTotal(vector<vector<int>>& triangle) {
@@ -167,7 +167,7 @@ public:
 
 需注意两个问题：1、从第一行第一列开始枚举，并且会枚举到`i+1`及`j+1` 因而dp数组需要多初始化2位  2、从第1行第一列开始枚举，因而第`[i, j]`个数字在输入数组中为`triangle[i - 1][j - 1]`
 
-```C++
+```cpp
 class Solution {
 public:
     int minimumTotal(vector<vector<int>>& triangle) {
@@ -189,7 +189,7 @@ public:
 
 dp数组的计算为从下至上，状态转移方程与下一行的右侧有关，因而**第二层循环需要逆序**
 
-```C++
+```cpp
 class Solution {
 public:
     int minimumTotal(vector<vector<int>>& triangle) {
@@ -234,7 +234,7 @@ Given the above grid map, return 7. Because the path 1→3→1→1→1 minimizes
 
 方法1：二维动态规划
 
-```C++
+```cpp
 class Solution1 {
 public:
     int minPathSum(vector<vector<int>>& grid) {
@@ -264,7 +264,7 @@ public:
 
 方法2：一维动态规划
 
-```C++
+```cpp
 class Solution {
 public:
     int minPathSum(vector<vector<int>>& grid) {
@@ -329,7 +329,7 @@ public:
 
 也可以直接用数学公式求解，这是一个组合问题。机器人总共移动的次数 S=m+n-2，向下移动的次数 D=m-1，那么问题可以看成从 S 中取出 D 个位置的组合数量，这个问题的解为 C(S, D)。
 
-```C++
+```cpp
 int uniquePaths(int m, int n) {
     int S = m + n - 2;  // 总共的移动次数
     int D = m - 1;      // 向下的移动次数
@@ -351,7 +351,7 @@ int uniquePaths(int m, int n) {
 
 **[题解](https://leetcode-cn.com/problems/unique-paths-ii/solution/bu-tong-lu-jing-ii-by-leetcode/)**：相比上一题的区别在于障碍，因而初始化时就要考虑第一行和第一列中是否有障碍物。若某一位置有障碍物，则此位置的路径长度置为0，以免对后面的路径产生贡献。
 
-```C++
+```cpp
 class Solution {
 public:
     int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
@@ -408,7 +408,7 @@ sumRange(0, 5) -> -3
 
 求区间 i \~ j 的和，可以转换为 sum[j + 1] - sum[i]，其中 sum[i] 为 0 \~ i - 1 的和，实际上就是利用前缀和求区间和。
 
-```C++
+```cpp
 class NumArray {
 public:
     vector<int> sum; // 前缀和数组
@@ -466,7 +466,7 @@ dp[4] = dp[3] + 1 = 3
 
 因为递增子区间不一定以最后一个元素为结尾，可以是任意一个元素结尾，因此需要返回 dp 数组累加的结果。
 
-```C++
+```cpp
 class Solution {
 public:
     int numberOfArithmeticSlices(vector<int>& A) {
@@ -626,7 +626,7 @@ public int numDecodings(String s) {
 - 边界条件：只有 a[i] 一个数时，以 a[i] 结尾的上升子序列的长度为1
 - 转态数量为n，状态转移的计算量为O(n)，因而时间复杂度为O(n^2^)
 
-```C++
+```cpp
 class Solution {
 public:
     int lengthOfLIS(vector<int>& nums) {
@@ -725,7 +725,7 @@ Explanation: The longest chain is [1,2] -> [3,4]
 - 首先需要对各个数对按照**首元素**排序，然后枚举各个数对，判断其前面是否有可以连接的数对，取连接后可以达到的最大值；
 - 以pairs[i] 结尾的最长链长度至少是1，因而dp数组全部初始化为1
 
-```C++
+```cpp
 class Solution {
 public:
     int findLongestChain(vector<vector<int>>& pairs) {
@@ -751,7 +751,7 @@ public:
 
 首先对链对数组进行排序，按链对的**尾元素**进行排序，小的放前面。用一个变量end来记录当前比较到的尾元素的值，初始化为最小值，然后遍历的时候，如果当前链对的首元素大于end，那么cnt自增1，end更新为当前链对的尾元素。排序后的解法类似于[Leetcode 435.无重叠区间](https://leetcode-cn.com/problems/non-overlapping-intervals/)
 
-```C++
+```cpp
 class Solution {
 public:
     int findLongestChain(vector<vector<int>>& pairs) {
@@ -814,7 +814,7 @@ up[i] = max(up[i], down[j] + 1)，down[i] = max(down[i], up[j] + 1)
 
 最终取上升摆动序列和下降摆动序列长度中的最大值
 
-```C++
+```cpp
 class Solution {
 public:
     int wiggleMaxLength(vector<int>& nums) {
@@ -841,7 +841,7 @@ public:
 
 DP 过程中更新 up[i] 和 down[i]，其实只需要 up[i-1] 和 down[i-1]。因此，可以通过只记录最后一个元素的值而不使用数组来节省空间，同时也将时间复杂度降到O(n)。
 
-```C++
+```cpp
 class Solution {
 public:
     int wiggleMaxLength(vector<int>& nums) {
@@ -890,7 +890,7 @@ public:
 
 [Leetcode](https://leetcode.com/problems/longest-common-subsequence/) / [力扣](https://leetcode-cn.com/problems/longest-common-subsequence/)
 
-```C++
+```cpp
 class Solution {
 public:
     int longestCommonSubsequence(string text1, string text2) {
@@ -931,7 +931,7 @@ Leetcode 1027.最长等差数列
 
 TODO：代码不完全正确，测试[1, 4, 2, 5, 3]时，输出应为5，而Leetcode预期结果为3，下面的代码输出也为3。牛客网的测试用例正确 - [牛客OJ](https://www.nowcoder.com/questionTerminal/4031f5a3723542e78a45b490c84c62b2)
 
-```C++
+```cpp
 class Solution {
 public:
     int longestArithSeqLength(vector<int>& A) {
@@ -956,7 +956,7 @@ public:
 
 方法2：使用vector来保存每一列，即每种公差对应的数列长度，需要先原数组进行排序（下面的解法未通过所有测试用例）
 
-```C++
+```cpp
 class Solution {
 public:
     int longestArithSeqLength(vector<int>& nums) {
@@ -997,7 +997,7 @@ public:
 
 `dp[0][..] = dp[..][0] = 0`，因为没有物品或者背包没有空间的时候，能装的最大价值就是 0。**代码中从物品数量为1、背包容量为1开始枚举到物品数量为N、背包容量为W，最后结果为`dp[N][W]`。**
 
-```C++
+```cpp
 // W 为背包总重量
 // N 为物品数量
 // weights 数组存储 N 个物品的重量
@@ -1030,7 +1030,7 @@ int knapsack(int W, int N, vector<int>& weights, vector<int>& values) {
 
 将初始化语句改为：
 
-```C++
+```cpp
         vector<vector<int>> dp(N + 1, vector<int>(W + 1, 0x80000000));
         for(int i = 0; i < N + 1; ++i)
             dp[i][0] = 0;
@@ -1046,7 +1046,7 @@ vector<int> values = {4, 2, 3};
 
 结果：
 
-```C++
+```cpp
 // 不要求恰好装满
 0 4 4 4
 2 4 6 6
@@ -1072,7 +1072,7 @@ result = 5
 - 最小路径和的状态转移方程为：`dp[i][j] = min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j]`，即当前值与上一行当前位置及**当前行左侧**位置的值有关，上一行当前位置的值可以再次使用，当前行左侧的值是刚算出来的，因而从左往右遍历并更新dp数组即可。
 - 此题的状态转移方程为`dp[i][j] = max(dp[i-1][j], dp[i-1][j-w] + v)`，即当前值与上一行当前位置及**上一行左侧**位置的值有关，若当前行左侧位置的值先算，则上一行当前位置左边的值会被覆盖，所以要先算当前行右侧的值，即从右到左遍历更新dp数组。
 
-```C++
+```cpp
 int knapsack(int W, int N, vector<int>& weights, vector<int>& values) {
     vector<int> dp(W + 1, 0);
     for (int i = 1; i <= N; i++) {
@@ -1190,7 +1190,7 @@ private int computeArraySum(int[] nums) {
 
 二维动规：`dp[i][j] = max(dp[i-1][j], dp[i-1][j-num] + num)`
 
-```C++
+```cpp
 vector<vector<int>> dp(n + 1, vector<int>(sum/2 + 1, 0));
 for(int i = 1; i <= n; ++i) {
     int num = nums[i -1];
@@ -1207,7 +1207,7 @@ cout << sum - 2*dp[n][sum/2];
 
 一维动规：因为当前元素仅与上一行左侧元素有关，因而可使用滚动数组。`dp[j] = max(dp[j], dp[j-num] + num)`
 
-```C++
+```cpp
 vector<int> dp(sum/2 + 1, 0);
 for(int i = 1; i <= n; ++i) {
     int num = nums[i -1];
@@ -1371,7 +1371,7 @@ return -1.
 
 子问题数目为 O(n)，处理一个子问题的时间为 O(k)，所以总的时间复杂度是 O(kn)
 
-```C++
+```cpp
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
@@ -1546,7 +1546,7 @@ public int combinationSum4(int[] nums, int target) {
 
 空间优化的解法：
 
-```C++
+```cpp
 int knapsack(int W, int N, vector<int>& weights, vector<int>& values) {
     vector<int> dp(W + 1, 0);
     for (int i = 1; i <= N; i++) {
@@ -1574,7 +1574,7 @@ int knapsack(int W, int N, vector<int>& weights, vector<int>& values) {
 
 具体到每一天，看看总共有几种可能的「状态」，再找出每个「状态」对应的「选择」。我们要穷举所有「状态」，穷举的目的是根据对应的「选择」更新状态。
 
-```C++
+```cpp
 for 状态1 in 状态1的所有取值：
     for 状态2 in 状态2的所有取值：
         for ...
@@ -1585,7 +1585,7 @@ for 状态1 in 状态1的所有取值：
 
 **「状态」有三个**，**第一个是天数，第二个是允许交易的最大次数，第三个是当前的持有状态**（即之前说的 rest 的状态，我们不妨用 1 表示持有，0 表示没有持有）。然后我们用一个三维数组就可以装下这几种状态的全部组合：
 
-```C++
+```cpp
 dp[i][k][0 or 1]
 0 <= i <= n-1, 1 <= k <= K
 n 为天数，大 K 为最多交易数
@@ -1609,7 +1609,7 @@ for 0 <= i < n:
 
 通过这个图可以很清楚地看到，每种状态（0 和 1）是如何转移而来的。根据这个图，可以写出**状态转移方程**：
 
-```C++
+```cpp
 dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1] + prices[i])
               max(   选择 rest  ,             选择 sell      )
 
@@ -1631,7 +1631,7 @@ dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])
 
 **base case的定义**：
 
-```C++
+```cpp
 dp[-1][k][0] = 0
 解释：因为 i 是从 0 开始的，所以 i = -1 意味着还没有开始，这时候的利润当然是 0 。
 dp[-1][k][1] = -infinity
@@ -1676,7 +1676,7 @@ dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])
 
 找出给定数组中两个数字之间的最大差值（即，最大利润）。此外，第二个数字（卖出价格）必须大于第一个数字（买入价格）。对于每组 i 和 j（其中 j > i）我们需要找出 max(prices[j] - prices[i])。
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1699,7 +1699,7 @@ public:
 
 <img src="https://pic.leetcode-cn.com/cc4ef55d97cfef6f9215285c7573027c4b265c31101dd54e8555a7021c95c927-file_1555699418271" alt="Profit Graph" style="zoom:67%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1760,7 +1760,7 @@ public:
 
 **这里也可以直接套用框架**：
 
-```C++
+```cpp
 dp[i][1][0] = max(dp[i-1][1][0], dp[i-1][1][1] + prices[i]) // k = 1
 dp[i][1][1] = max(dp[i-1][1][1], dp[i-1][0][0] - prices[i]) // k = 1
             = max(dp[i-1][1][1], -prices[i])
@@ -1774,7 +1774,7 @@ dp[i][1] = max(dp[i-1][1], -prices[i])
 
 
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1799,7 +1799,7 @@ public:
 
 可以发现，`dp[i][0]`与`dp[i-1][0]`及`dp[i-1][1]`有关，而`dp[i][1]`仅与`dp[i-1][1]`有关，即更新`dp[i][0]`需要上一行的当前位置和右侧位置，更新`dp[i][1]`需要上一行的当前位置。若仅适用2个变量来存储两列的数据，也是可行的，当更新第一列数据时用到之前的两列数据，第一列数据被修改；而更新第二列数据时正好不需要第一列数据，即之前更新第一列数据不会对第二列的数据更新产生影响。因而使用两个变量来存储状态是可行的，即省略dp数组的第一维是可行的。
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1840,7 +1840,7 @@ public:
 
 如果 k 为正无穷，那么就可以认为 k 和 k - 1 是一样的。可以这样改写框架：
 
-```C++
+```cpp
 dp[i][k][0] = max(dp[i-1][k][0], dp[i-1][k][1] + prices[i])
 dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])
             = max(dp[i-1][k][1], dp[i-1][k][0] - prices[i]) // k = k-1
@@ -1852,7 +1852,7 @@ dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
 
 
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1877,7 +1877,7 @@ public:
 
 当前行的值仅与前一行左侧或右侧的值有关，即新状态只和之前相邻的一个状态有关
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1916,7 +1916,7 @@ public:
 
 在上一题状态转移方程的基础上进行修改：
 
-```C++
+```cpp
 dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
 dp[i][1] = max(dp[i-1][1], dp[i-2][0] - prices[i])
 解释：第 i 天选择 buy 的时候，要从 i-2 的状态转移，而不是 i-1 。
@@ -1924,7 +1924,7 @@ dp[i][1] = max(dp[i-1][1], dp[i-2][0] - prices[i])
 
 
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -1955,7 +1955,7 @@ public:
 
 相比上一题的空间优化，计算当前行右侧的数据需要获取上上一行左侧的数据，需要增加一个变量来存储。
 
-```C++
+```cpp
 // 过渡写法
 class Solution {
 public:
@@ -2002,7 +2002,7 @@ public:
 
 <img src="https://pic.leetcode-cn.com/6dba5214e21684d0383521aaf820b66191106473b9e8a07faaa394e5136b5f47-image.png" alt="image.png" style="zoom: 33%;" />
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -2027,7 +2027,7 @@ public:
 
 新状态`dp[i][0]`及`dp[i][1]`与之前的相邻状态有关，`dp[i][2]`与前前一状态有关，需要使用一个变量单独保存前前一状态。此时可以看出，此方法化简后和前面的方法1如出一辙。
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -2076,7 +2076,7 @@ The total profit is ((8 - 1) - 2) + ((9 - 4) - 2) = 8.
 
 每次交易要支付手续费，只要把手续费从利润中减去即可。在购入股票时减去费用即可。
 
-```C++
+```cpp
 dp[i][0] = max(dp[i-1][0], dp[i-1][1] + prices[i])
 dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i] - fee)
 解释：相当于买入股票的价格升高了。
@@ -2085,7 +2085,7 @@ dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i] - fee)
 
 
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices, int fee) {
@@ -2108,7 +2108,7 @@ public:
 
 空间优化
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices, int fee) {
@@ -2139,7 +2139,7 @@ public:
 
 套用模板
 
-```C++
+```cpp
 base case：
 dp[-1][k][0] = dp[i][0][0] = 0
 dp[-1][k][1] = dp[i][0][1] = -infinity
@@ -2153,7 +2153,7 @@ dp[i][k][1] = max(dp[i-1][k][1], dp[i-1][k-1][0] - prices[i])
 
 i = 0的base case 此时有四个，可根据状态转移方程推导得到
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(vector<int>& prices) {
@@ -2226,7 +2226,7 @@ public:
 
 修改代码如下：
 
-```C++
+```cpp
 class Solution {
 public:
     int maxProfit(int k, vector<int>& prices) {
