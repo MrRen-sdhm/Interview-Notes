@@ -1,10 +1,10 @@
-- [Github](https://github.com/CyC2018/CS-Notes)
+- [Github](https://github.com/MrRen-sdhm/Interview-Notes)
 
 ## ✏️ 数据结构与算法
 
 - [剑指Offer题解C++版](notes/剑指offer题解C++版.md) </br>
 - [LeetCode题解C++版](notes/Leetcode%20题解%20-%20目录1.md) </br>
-- [数据结构与算法笔记](notes/数据结构与算法学习笔记.md) </br>
+- [数据结构与算法笔记](notes/数据结构与算法学习笔记.md)
 
 ## 💻 操作系统
 
@@ -19,8 +19,8 @@
 
 ## 🎨 面向对象
 
-- [设计模式](notes/设计模式.md) </br>
-- [面向对象思想](notes/面向对象思想.md)
+- [面向对象思想](notes/面向对象思想.md) </br>
+- [设计模式](notes/设计模式.md)
 
 ## 💾 数据库
 
