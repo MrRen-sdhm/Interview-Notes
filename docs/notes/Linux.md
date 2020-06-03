@@ -77,6 +77,8 @@
 - 硬链接与软链接；
 - 进程管理相关，僵尸进程与孤儿进程，SIGCHLD 。
 
+
+
 # 一、常用操作以及概念
 
 ## 快捷键
@@ -84,6 +86,8 @@
 - Tab：命令和文件名补全；
 - Ctrl+C：中断正在运行的程序；
 - Ctrl+D：结束键盘输入（End Of File，EOF）
+
+
 
 ## 求助
 
@@ -111,6 +115,8 @@ info 与 man 类似，但是 info 将文档分成一个个页面，每个页面�
 
 /usr/share/doc 存放着软件的一整套说明文件。
 
+
+
 ## 关机
 
 ### 1. who
@@ -131,6 +137,8 @@ info 与 man 类似，但是 info 将文档分成一个个页面，每个页面�
 -c ： 取消已经在进行的 shutdown
 ```
 
+
+
 ## PATH
 
 可以在环境变量 PATH 中声明可执行文件的路径，路径之间用 : 分隔。
@@ -139,9 +147,13 @@ info 与 man 类似，但是 info 将文档分成一个个页面，每个页面�
 /usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/home/dmtsai/.local/bin:/home/dmtsai/bin
 ```
 
+
+
 ## sudo
 
 sudo 允许一般用户使用 root 可执行的命令，不过只有在 /etc/sudoers 配置文件中添加的用户才能使用该指令。
+
+
 
 ## 包管理工具
 
@@ -149,6 +161,8 @@ RPM 和 DPKG 为最常见的两类软件包管理工具：
 
 - RPM 全称为 Redhat Package Manager，最早由 Red Hat 公司制定实施，随后被 GNU 开源操作系统接受并成为许多 Linux 系统的既定软件标准。YUM 基于 RPM，具有依赖管理和软件升级功能。
 - 与 RPM 竞争的是基于 Debian 操作系统的 DEB 软件包管理工具 DPKG，全称为 Debian Package，功能方面与 RPM 相似。
+
+
 
 ## 发行版
 
@@ -158,6 +172,8 @@ Linux 发行版是 Linux 内核及各种应用软件的集成版本。
 | :--: | :--: | :--: |
 | RPM | Red Hat | Fedora / CentOS |
 | DPKG | Ubuntu | Debian |
+
+
 
 ## VIM 三个模式
 
@@ -180,6 +196,8 @@ Linux 发行版是 Linux 内核及各种应用软件的集成版本。
 | :wq | 写入磁盘后离开 |
 | :wq!| 强制写入磁盘后离开 |
 
+
+
 ## GNU
 
 GNU 计划，译为革奴计划，它的目标是创建一套完全自由的操作系统，称为 GNU，其内容软件完全以 GPL 方式发布。其中 GPL 全称为 GNU 通用公共许可协议（GNU General Public License），包含了以下内容：
@@ -188,10 +206,14 @@ GNU 计划，译为革奴计划，它的目标是创建一套完全自由的操�
 - 再复制的自由；
 - 改进此程序，并公开发布改进的自由。
 
+
+
 ## 开源协议
 
 - [Choose an open source license](https://choosealicense.com/)
 - [如何选择开源许可证？](http://www.ruanyifeng.com/blog/2011/05/how_to_choose_free_software_licenses.html)
+
+
 
 # 二、磁盘
 
@@ -230,6 +252,8 @@ Linux 中每个硬件都被当做一个文件，包括磁盘。磁盘以磁盘�
 
 其中文件名后面的序号的确定与系统检测到磁盘的顺序有关，而与磁盘所插入的插槽位置无关。
 
+
+
 # 三、分区
 
 ## 分区表
@@ -256,6 +280,8 @@ MBR 不支持 2.2 TB 以上的硬盘，GPT 则最多支持到 2<sup>33</sup> TB 
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/GUID_Partition_Table_Scheme.svg.png" width="400"/> </div><br>
 
+
+
 ## 开机检测程序
 
 ### 1. BIOS
@@ -278,11 +304,15 @@ BIOS 是开机的时候计算机执行的第一个程序，这个程序知道可
 
 BIOS 不可以读取 GPT 分区表，而 UEFI 可以。
 
+
+
 # 四、文件系统
 
 ## 分区与文件系统
 
 对分区进行格式化是为了在分区上建立文件系统。一个分区通常只能格式化为一个文件系统，但是磁盘阵列等技术可以将一个分区格式化为多个文件系统。
+
+
 
 ## 组成
 
@@ -298,6 +328,8 @@ BIOS 不可以读取 GPT 分区表，而 UEFI 可以。
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/BSD_disk.png" width="800"/> </div><br>
 
+
+
 ## 文件读取
 
 对于 Ext2 文件系统，当要读取一个文件的内容时，先在 inode 中查找文件内容所在的所有 block，然后把所有 block 的内容读出来。
@@ -307,6 +339,8 @@ BIOS 不可以读取 GPT 分区表，而 UEFI 可以。
 而对于 FAT 文件系统，它没有 inode，每个 block 中存储着下一个 block 的编号。
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/5b718e86-7102-4bb6-8ca5-d1dd791530c5.png" width="500px"> </div><br>
+
+
 
 ## 磁盘碎片
 
@@ -322,6 +356,8 @@ BIOS 不可以读取 GPT 分区表，而 UEFI 可以。
 | 最大文件系统 | 2TB | 8TB | 16TB |
 
 一个 block 只能被一个文件所使用，未使用的部分直接浪费了。因此如果需要存储大量的小文件，那么最好选用比较小的 block。
+
+
 
 ## inode
 
@@ -345,11 +381,15 @@ inode 中记录了文件内容所在的 block 编号，但是每个 block 非常
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/inode_with_signatures.jpg" width="600"/> </div><br>
 
+
+
 ## 目录
 
 建立一个目录时，会分配一个 inode 与至少一个 block。block 记录的内容是目录下所有文件的 inode 编号以及文件名。
 
 可以看到文件的 inode 本身不记录文件名，文件名记录在目录中，因此新增文件、删除文件、更改文件名这些操作与目录的写权限有关。
+
+
 
 ## 日志
 
@@ -357,9 +397,13 @@ inode 中记录了文件内容所在的 block 编号，但是每个 block 非常
 
 ext3/ext4 文件系统引入了日志功能，可以利用日志来修复文件系统。
 
+
+
 ## 挂载
 
 挂载利用目录作为文件系统的进入点，也就是说，进入目录之后就可以读取文件系统的数据。
+
+
 
 ## 目录配置
 
@@ -370,6 +414,8 @@ ext3/ext4 文件系统引入了日志功能，可以利用日志来修复文件�
 - /var (variable)：存放系统或程序运行过程中的数据文件。
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/linux-filesystem.png" width=""/> </div><br>
+
+
 
 # 五、文件
 
@@ -400,6 +446,8 @@ ext3/ext4 文件系统引入了日志功能，可以利用日志来修复文件�
 - modification time (mtime)：文件的内容更新就会更新；
 - status time (ctime)：文件的状态（权限、属性）更新就会更新；
 - access time (atime)：读取文件时就会更新。
+
+
 
 ## 文件与目录的基本操作
 
@@ -488,12 +536,21 @@ cp [-adfilprsu] source destination
 -f ： force 强制的意思，如果目标文件已经存在，不会询问而直接覆盖
 ```
 
-## 修改权限
+
+
+## 文件目录权限
+
+### 修改权限
 
 可以将一组权限用数字来表示，此时一组权限的 3 个位当做二进制数字的位，从左到右每个位的权值为 4、2、1，即每个权限对应的数字权值为 r : 4、w : 2、x : 1。
 
+#### 1. chmod
+
+用于修改文件/目录的可读/可写/可执行权限
+
 ```html
 # chmod [-R] xyz dirname/filename
+-R : 修改目录及目录下所有文件的权限
 ```
 
 示例：将 .bashrc 文件的权限修改为 -rwxr-xr--。
@@ -521,18 +578,68 @@ cp [-adfilprsu] source destination
 # chmod a+w .bashrc
 ```
 
-## 默认权限
+### 默认权限
 
 - 文件默认权限：文件默认没有可执行权限，因此为 666，也就是 -rw-rw-rw- 。
 - 目录默认权限：目录必须要能够进入，也就是必须拥有可执行权限，因此为 777 ，也就是 drwxrwxrwx。
 
 可以通过 umask 设置或者查看默认权限，通常以掩码的形式来表示，例如 002 表示其它用户的权限去除了一个 2 的权限，也就是写权限，因此建立新文件时默认的权限为 -rw-rw-r--。
 
-## 目录的权限
+注意：新建文件是默认没有x权限（比如：防止木马病毒攻击）
+
+### 目录的权限
 
 文件名不是存储在一个文件的内容中，而是存储在一个文件所在的目录中。因此，拥有文件的 w 权限并不能对文件名进行修改。
 
 目录存储文件列表，一个目录的权限也就是对其文件列表的权限。因此，目录的 r 权限表示可以读取文件列表；w 权限表示可以修改文件列表，具体来说，就是添加删除文件，对文件名进行修改；x 权限可以让该目录成为工作目录，x 权限是 r 和 w 权限的基础，如果不能使一个目录成为工作目录，也就没办法读取文件列表以及对文件列表进行修改了。
+
+### 文件权与目录权限对比
+
+| 代表字符 |   权限   |  对文件的含义  |       对目录的含义       |
+| :------: | :------: | :------------: | :----------------------: |
+|    r     |  读权限  | 可查看文件内容 |    可列出目录中的内容    |
+|    w     |  写权限  | 可修改文件内容 | 可在目录中创建、删除文件 |
+|    x     | 执行权限 |   可执行文件   |        可进入目录        |
+
+注意文件权限与目录权限的区别：若没有一个文件的写权限，但是有其所在目录的写权限，那么此文件也是可以被删除的！对一个文件没有写权限意味着不能修改文件的内容，而其**是否能够被删除是由其所在目录的写权限决定的**。
+
+
+
+## 文件目录所有者
+
+#### 1. chown
+
+用于修改文件或目录的所有者，将文件/目录的所有者改为user，**只有管理员root有权修改文件或目录的所有者**：
+
+```html
+# chown [user] [dirname/filename]
+```
+
+示例：将文件 file 的所有者改为 xiaoming：
+
+```html
+chown xiaoming file
+```
+
+
+
+## 文件目录所属组
+
+#### 1. chgrp
+
+用于修改文件或目录的所属组，将文件/目录的所属组改为group：
+
+```html
+# chgrp [group] [dirname/filename]
+```
+
+示例：将文件 file 的所属组改为 group1：
+
+```html
+chgrp group1 file
+```
+
+
 
 ## 链接
 
@@ -545,13 +652,17 @@ cp [-adfilprsu] source destination
 -f ：如果目标文件存在时，先删除目标文件
 ```
 
-### 1. 实体链接
+### 1. 硬链接（实体链接）
 
 在目录下创建一个条目，记录着文件名与 inode 编号，这个 inode 就是源文件的 inode。
 
-删除任意一个条目，文件还是存在，只要引用数量不为 0。
+**硬链接与源文件有相同的 inode**，因而修改硬链接指向的文件时就是修改了源文件。
 
-有以下限制：不能跨越文件系统、不能对目录进行链接。
+删除任意一个条目，文件还是存在，只要引用数量不为 0。即仅删除硬链接或者是源文件，对应的文件依然存在于磁盘中。
+
+有以下限制：**不能跨越文件系统、不能对目录进行链接**。
+
+硬链接的大小即为其指向文件的大小。
 
 ```html
 # ln /etc/crontab .
@@ -560,19 +671,25 @@ cp [-adfilprsu] source destination
 34474855 -rw-r--r--. 2 root root 451 Jun 10 2014 /etc/crontab
 ```
 
-### 2. 符号链接
+### 2. 软链接（符号链接）
 
 符号链接文件保存着源文件所在的绝对路径，在读取时会定位到源文件上，可以理解为 Windows 的快捷方式。
 
 当源文件被删除了，链接文件就打不开了。
 
-因为记录的是路径，所以可以为目录建立符号链接。
+因为记录的是路径，所以**可以为目录建立符号链接**。
+
+新建的软链接文件的权限全为rwxrwxrwx。
+
+软链接文件的大小仅为一个快捷方式的大小，而不是其指向文件的大小。
 
 ```html
 # ll -i /etc/crontab /root/crontab2
 34474855 -rw-r--r--. 2 root root 451 Jun 10 2014 /etc/crontab
 53745909 lrwxrwxrwx. 1 root root 12 Jun 23 22:31 /root/crontab2 -> /etc/crontab
 ```
+
+
 
 ## 获取文件内容
 
@@ -593,9 +710,13 @@ cp [-adfilprsu] source destination
 
 和 cat 不同的是它可以一页一页查看文件内容，比较适合大文件的查看。
 
+支持单击 f 向前翻页，b 向后翻页。
+
 ### 4. less
 
-和 more 类似，但是多了一个向前翻页的功能。
+和 more 类似，但是可使用上/下键移动到上一行/下一行，还可以使用PageUp/PageDown向前/后翻页。
+
+还可以键入反斜杠`/`后输入要查找的关键字，会将文中所有关键字高亮显示。
 
 ### 5. head
 
@@ -610,9 +731,17 @@ cp [-adfilprsu] source destination
 
 是 head 的反向操作，只是取得是后几行。
 
+```html
+tail [-nf] filename
+-n : 后面接数字，代表显示几行的意思
+-f : 动态显示文件末尾内容
+```
+
 ### 7. od
 
 以字符或者十六进制的形式显示二进制文件。
+
+
 
 ## 指令与文件搜索
 
@@ -688,6 +817,8 @@ example: find . -name "shadow*"
 -perm /mode ：搜索权限包含任一 mode 的文件
 ```
 
+
+
 # 六、压缩与打包
 
 ## 压缩文件名
@@ -705,6 +836,8 @@ Linux 底下有很多压缩文件名，常见的如下：
 |\*.tar.gz | tar 程序打包的文件，经过 gzip 的压缩 |
 |\*.tar.bz2 | tar 程序打包的文件，经过 bzip2 的压缩 |
 |\*.tar.xz | tar 程序打包的文件，经过 xz 的压缩 |
+
+
 
 ## 压缩指令
 
@@ -750,6 +883,8 @@ $ bzip2 [-cdkzv#] filename
 $ xz [-dtlkc#] filename
 ```
 
+
+
 ## 打包
 
 压缩指令只能对一个文件进行压缩，而打包能够将多个文件打包成一个大文件。tar 不仅可以用于打包，也可以使用 gzip、bzip2、xz 将打包文件进行压缩。
@@ -775,6 +910,8 @@ $ tar [-z|-j|-J] [xv] [-f 已有的 tar 文件] [-C 目录]    ==解压缩
 | 查 看 | tar -jtv -f filename.tar.bz2 |
 | 解压缩 | tar -jxv -f filename.tar.bz2 -C 要解压缩的目录 |
 
+
+
 # 七、Bash
 
 可以通过 Shell 请求内核提供服务，Bash 正是 Shell 的一种。
@@ -786,6 +923,8 @@ $ tar [-z|-j|-J] [xv] [-f 已有的 tar 文件] [-C 目录]    ==解压缩
 - 命名别名：例如 ll 是 ls -al 的别名
 - shell scripts
 - 通配符：例如 ls -l /usr/bin/X\* 列出 /usr/bin 下面所有以 X 开头的文件
+
+
 
 ## 变量操作
 
@@ -828,12 +967,16 @@ $ array[2]=b
 $ echo ${array[1]}
 ```
 
+
+
 ## 指令搜索顺序
 
 - 以绝对或相对路径来执行指令，例如 /bin/ls 或者 ./ls ；
 - 由别名找到该指令来执行；
 - 由 Bash 内置的指令来执行；
 - 按 \$PATH 变量指定的搜索路径的顺序找到第一个指令来执行。
+
+
 
 ## 数据流重定向
 
@@ -855,6 +998,8 @@ $ echo ${array[1]}
 $ find /home -name .bashrc > list 2>&1
 ```
 
+
+
 # 八、管道指令
 
 管道是将一个命令的标准输出作为另一个命令的标准输入，在数据需要经过多个步骤的处理之后才能得到我们想要的内容时就可以使用管道。
@@ -864,6 +1009,8 @@ $ find /home -name .bashrc > list 2>&1
 ```bash
 $ ls -al /etc | less
 ```
+
+
 
 ## 提取指令
 
@@ -901,6 +1048,8 @@ declare -x HOSTNAME="study.centos.vbird"
 
 $ export | cut -c 12-
 ```
+
+
 
 ## 排序指令
 
@@ -948,6 +1097,8 @@ $ last | cut -d ' ' -f 1 | sort | uniq -c
 1 wtmp
 ```
 
+
+
 ## 双向输出重定向
 
 输出重定向会将输出内容重定向到文件中，而   **tee**   不仅能够完成这个功能，还能保留屏幕上的输出。也就是说，使用 tee 指令，一个输出会同时传送到文件和屏幕上。
@@ -955,6 +1106,8 @@ $ last | cut -d ' ' -f 1 | sort | uniq -c
 ```html
 $ tee [-a] file
 ```
+
+
 
 ## 字符转换指令
 
@@ -1002,6 +1155,8 @@ $ paste [-d] file1 file2
 -d ：分隔符，默认为 tab
 ```
 
+
+
 ## 分区指令
 
 **split**   将一个文件划分成多个文件。
@@ -1012,6 +1167,8 @@ $ split [-bl] file PREFIX
 -l ：以行数来进行分区。
 - PREFIX ：分区文件的前导名称
 ```
+
+
 
 # 九、正则表达式
 
@@ -1045,6 +1202,8 @@ $ grep -n 'the' regular_express.txt
 $ grep -n 'a\{2,5\}' regular_express.txt
 ```
 
+
+
 ## printf
 
 用于格式化输出。它不属于管道命令，在给 printf 传数据时需要使用 $( ) 形式。
@@ -1055,6 +1214,8 @@ $ printf '%10s %5i %5i %5i %8.2f \n' $(cat printf.txt)
      VBird    75    55    80    70.00
        Ken    60    90    70    73.33
 ```
+
+
 
 ## awk
 
@@ -1110,6 +1271,8 @@ dmtsai lines: 3 columns: 10
 dmtsai lines: 4 columns: 10
 dmtsai lines: 5 columns: 9
 ```
+
+
 
 # 十、进程管理
 
@@ -1167,6 +1330,8 @@ dmtsai lines: 5 columns: 9
 # netstat -anp | grep port
 ```
 
+
+
 ## 进程状态
 
 | 状态 | 说明 |
@@ -1179,6 +1344,8 @@ dmtsai lines: 5 columns: 9
 <br>
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/2bab4127-3e7d-48cc-914e-436be859fb05.png" width="490px"/> </div><br>
+
+
 
 ## SIGCHLD
 
@@ -1205,6 +1372,8 @@ pid_t wait(int *status)
 
 参数 status 用来保存被收集的子进程退出时的一些状态，如果对这个子进程是如何死掉的毫不在意，只想把这个子进程消灭掉，可以设置这个参数为 NULL。
 
+
+
 ## waitpid()
 
 ```c
@@ -1217,6 +1386,8 @@ pid 参数指示一个子进程的 ID，表示只关心这个子进程退出的 
 
 options 参数主要有 WNOHANG 和 WUNTRACED 两个选项，WNOHANG 可以使 waitpid() 调用变成非阻塞的，也就是说它会立即返回，父进程可以继续执行其它任务。
 
+
+
 ## 孤儿进程
 
 一个父进程退出，而它的一个或多个子进程还在运行，那么这些子进程将成为孤儿进程。
@@ -1224,6 +1395,8 @@ options 参数主要有 WNOHANG 和 WUNTRACED 两个选项，WNOHANG 可以使 w
 孤儿进程将被 init 进程（进程号为 1）所收养，并由 init 进程对它们完成状态收集工作。
 
 由于孤儿进程会被 init 进程收养，所以孤儿进程不会对系统造成危害。
+
+
 
 ## 僵尸进程
 
@@ -1234,6 +1407,8 @@ options 参数主要有 WNOHANG 和 WUNTRACED 两个选项，WNOHANG 可以使 w
 系统所能使用的进程号是有限的，如果产生大量僵尸进程，将因为没有可用的进程号而导致系统不能产生新的进程。
 
 要消灭系统中大量的僵尸进程，只需要将其父进程杀死，此时僵尸进程就会变成孤儿进程，从而被 init 进程所收养，这样 init 进程就会释放所有的僵尸进程所占有的资源，从而结束僵尸进程。
+
+
 
 # 参考资料
 
@@ -1255,10 +1430,3 @@ options 参数主要有 WNOHANG 和 WUNTRACED 两个选项，WNOHANG 可以使 w
 - [File system design case studies](https://www.cs.rutgers.edu/\~pxk/416/notes/13-fs-studies.html)
 - [Programming Project #4](https://classes.soe.ucsc.edu/cmps111/Fall08/proj4.shtml)
 - [FILE SYSTEM DESIGN](http://web.cs.ucla.edu/classes/fall14/cs111/scribe/11a/index.html)
-
-
-
-
-
-
-<div align="center"><img width="320px" src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/githubio/公众号二维码-2.png"></img></div>
