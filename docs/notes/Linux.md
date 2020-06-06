@@ -417,7 +417,7 @@ ext3/ext4 文件系统引入了日志功能，可以利用日志来修复文件�
 
 
 
-# 五、文件
+# 五、文件与目录
 
 ## 文件属性
 
@@ -745,41 +745,14 @@ tail [-nf] filename
 
 ## 指令与文件搜索
 
-### 1. which
-
-指令搜索。
-
-```html
-# which [-a] command
--a ：将所有指令列出，而不是只列第一个
-```
-
-### 2. whereis
-
-文件搜索。速度比较快，因为它只搜索几个特定的目录。
-
-```html
-# whereis [-bmsu] dirname/filename
-```
-
-### 3. locate
-
-文件搜索。可以用关键字或者正则表达式进行搜索。
-
-locate 使用 /var/lib/mlocate/ 这个数据库来进行搜索，它存储在内存中，并且每天更新一次，所以无法用 locate 搜索新建的文件。可以使用 updatedb 来立即更新数据库。
-
-```html
-# locate [-ir] keyword
--r：正则表达式
-```
-
-### 4. find
+### 1. find
 
 文件搜索。可以使用文件的属性和权限进行搜索。
 
 ```html
 # find [basedir] [option]
-example: find . -name "shadow*"
+查找指定文件名的文件，区分大小写：  find . -name "shadow*"
+查找指定文件名的文件，不区分大小写: find . -iname "shadow*"
 ```
 
 **① 与时间有关的选项**  
@@ -789,6 +762,10 @@ example: find . -name "shadow*"
 -mtime +n ：列出在 n 天之前 (不含 n 天本身) 修改过内容的文件
 -mtime -n ：列出在 n 天之内 (含 n 天本身) 修改过内容的文件
 -newer file ： 列出比 file 更新的文件
+
+-mmin [n/+n/-n] ：列出在n分钟时/之前/之内修改过内容的文件
+-amin [n/+n/-n] ：列出在n分钟时/之前/之内访问过的文件
+-cmin [n/+n/-n] ：列出在n分钟时/之前/之内修改过属性 (指ls -l列出的属性) 的文件
 ```
 
 +4、4 和 -4 的指示的时间范围如下：
@@ -809,12 +786,52 @@ example: find . -name "shadow*"
 **③ 与文件权限和名称有关的选项**  
 
 ```html
--name filename
+-name filename  ： 不区分大小写
+-iname filename ： 区分大小写
 -size [+-]SIZE：搜寻比 SIZE 还要大 (+) 或小 (-) 的文件。这个 SIZE 的规格有：c: 代表 byte，k: 代表 1024bytes。所以，要找比 50KB 还要大的文件，就是 -size +50k
 -type TYPE
+-inum ：根据i节点查找
 -perm mode  ：搜索权限等于 mode 的文件
 -perm -mode ：搜索权限包含 mode 的文件
 -perm /mode ：搜索权限包含任一 mode 的文件
+```
+
+**组合条件**
+
+```html
+-a 两个条件同时满足
+-o 两个条件满足任意一个即可
+例如查找/etc目录下大于80KB小于100KB的文件：find /etc -size大于80k +80k -a -size -100k
+```
+
+
+
+### 2. which
+
+指令搜索。
+
+```html
+# which [-a] command
+-a ：将所有指令列出，而不是只列第一个
+```
+
+### 3. whereis
+
+文件搜索。速度比较快，因为它只搜索几个特定的目录。
+
+```html
+# whereis [-bmsu] dirname/filename
+```
+
+### 4. locate
+
+文件搜索。可以用关键字或者正则表达式进行搜索。
+
+locate 使用 /var/lib/mlocate/ 这个数据库来进行搜索，它存储在内存中，并且每天更新一次，所以无法用 locate 搜索新建的文件。可以使用 updatedb 来立即更新数据库。
+
+```html
+# locate [-ir] keyword
+-r：正则表达式
 ```
 
 
