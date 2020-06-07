@@ -9,7 +9,8 @@
 ## 💻 操作系统
 
 - [操作系统](notes/计算机操作系统%20-%20目录1.md) </br>
-- [Linux](notes/Linux.md)
+- [Linux基础](notes/Linux.md) </br>
+- [Linux内核](notes/《Linux内核设计与实现》笔记.md)
 
 ## ☁️ 计算机网络
 
@@ -21,6 +22,12 @@
 
 - [面向对象思想](notes/面向对象思想.md) </br>
 - [C++设计模式](notes/设计模式.md)
+
+
+
+## 🎯  嵌入式
+
+
 
 ## 💾 数据库
 
