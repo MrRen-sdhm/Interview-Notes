@@ -1,6 +1,8 @@
-# 剑指offer题解 C++版 ⚔️ ✏️🥇⭐️
+# 剑指offer题解 C++版 ⚔️ ✏️🥇⭐️❌
 
-**参考资料:** [**剑指offer题解-CyC2018**](https://cyc2018.github.io/CS-Notes/#/notes/%E5%89%91%E6%8C%87%20Offer%20%E9%A2%98%E8%A7%A3%20-%20%E7%9B%AE%E5%BD%951)  [**剑指Offer系列刷题笔记汇总**](https://blog.csdn.net/c406495762/article/details/79247243)
+**参考资料:** [**剑指offer题解-CyC2018**](https://cyc2018.github.io/CS-Notes/#/notes/%E5%89%91%E6%8C%87%20Offer%20%E9%A2%98%E8%A7%A3%20-%20%E7%9B%AE%E5%BD%951)
+
+⭐️表示重点题目  ❌表示繁杂的题 🥇表示推荐的解法
 
 
 
@@ -8,7 +10,12 @@
 
 ### 面试题3.1 找出数组中重复的数字⭐️
 
-【[OJ](https://www.nowcoder.com/practice/623a5ac0ea5b4e5f95552655361ae0a8?tpId=13&tqId=11203&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】在一个**长度为n**的数组里的所有数字都在0到n-1的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中任意一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。
+【[OJ](https://www.nowcoder.com/practice/623a5ac0ea5b4e5f95552655361ae0a8?tpId=13&tqId=11203&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWIng](https://www.acwing.com/problem/content/14/)】在一个**长度为n**的数组里的所有数字都在0到n-1的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中任意一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。
+
+```
+给定 nums = [2, 3, 5, 4, 3, 2, 6, 7]。
+返回 2 或 3。
+```
 
 **题解**：要求时间复杂度 O(N)，空间复杂度 O(1)。因此不能使用排序的方法，也不能使用额外的标记数组。
 
@@ -52,7 +59,7 @@ public:
 
 ### 面试题3.2 不修改数组找出重复的数字（核心思想：二分查找）⭐️
 
-【[OJ](https://www.acwing.com/problem/content/15/) / [Leetcode](https://leetcode-cn.com/problems/find-the-duplicate-number/)】给定一个长度为 n+1 的数组`nums`，数组中所有的数均在 1∼n 的范围内，其中 n≥1。
+【[OJ](https://www.acwing.com/problem/content/15/) / [AcWing](https://www.acwing.com/problem/content/15/) / [Leetcode](https://leetcode-cn.com/problems/find-the-duplicate-number/)】给定一个长度为 n+1 的数组`nums`，数组中所有的数均在 1∼n 的范围内，其中 n≥1。
 
 请找出数组中任意一个重复的数，但不能修改输入的数组，要求空间复杂度为O(1)。
 
@@ -94,7 +101,7 @@ public:
 
 ### 面试题4 二维数组中的查找
 
-【[OJ](https://www.nowcoder.com/practice/abc3fe2ce8e146608e868a70efebf62e?tpId=13&tqId=11154&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+【[OJ](https://www.nowcoder.com/practice/abc3fe2ce8e146608e868a70efebf62e?tpId=13&tqId=11154&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/16/)】在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
 
 ```html
 Consider the following matrix:
@@ -487,7 +494,12 @@ public:
 
 ### 面试题42 连续子数组的最大和
 
-【[OJ](https://www.nowcoder.com/practice/459bd355da1549fa8a49e350bf3df484?tpId=13&tqId=11183&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，要求时间复杂度O(n)
+【[OJ](https://www.nowcoder.com/practice/459bd355da1549fa8a49e350bf3df484?tpId=13&tqId=11183&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/50/)】输入一个 **非空** 整型数组，数组里的数可能为正，也可能为负。数组中一个或连续的多个整数组成一个子数组。求所有子数组的和的最大值。要求时间复杂度O(n)
+
+```
+输入：[1, -2, 3, 10, -4, 7, 2, -5]
+输出：18
+```
 
 **题解**：从左至右求和，若和小于0，说明前面序列的和不可能为最大值，置当前值为新的和。最终取连续序列中和最大的那一个。也可通过动态规划的思想分析此问题。
 
@@ -511,7 +523,12 @@ public:
 
 ### 面试题45 把数组排成最小的数（核心思想：利用字符串处理大数）
 
-【[OJ](https://www.nowcoder.com/practice/8fecd3f8ba334add803bf2a06af1b993?tpId=13&tqId=11185&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
+【[OJ](https://www.nowcoder.com/practice/8fecd3f8ba334add803bf2a06af1b993?tpId=13&tqId=11185&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/54/)】输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
+
+```
+输入：[3, 32, 321]
+输出：321323
+```
 
 **题解**：可以看成是一个排序问题，在比较两个字符串 S1 和 S2 的大小时，应该比较的是 S1+S2 和 S2+S1 的大小，如果 S1+S2 < S2+S1，那么应该把 S1 排在前面，否则应该把 S2 排在前面。
 
@@ -627,49 +644,47 @@ public:
 
 
 
-### 面试题57.1 和为S的两个数字（核心思想：双指针）⭐️
+### 面试题57.1 和为S的两个数字（核心思想：双指针/哈希表）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/390da4f7a00f44bea7c2f3d19491311b?tpId=13&tqId=11195&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个递增**排序**的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。
+【[OJ](https://www.nowcoder.com/practice/390da4f7a00f44bea7c2f3d19491311b?tpId=13&tqId=11195&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/71/)】输入一个递增**排序**的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。
 
 **题解**：可以利用数组已排序的特性，设两个指针，分别指向最小值和最大值，若和小于目标和则最小值指针右移，若和大于目标值最大值指针左移
+
+方法1：双指针，时间复杂度O(n)，空间复杂度O(1)；若数组未排序，则复杂度为排序的时间复杂度O(nlogn)，空间复杂度O(logn)
 
 ```cpp
 class Solution {
 public:
-    vector<int> FindNumbersWithSum(vector<int> array,int sum) {
-        if(array.empty())
-            return vector<int>();
-        
-        int left = 0; // 左指针指向较小的数
-        int right = array.size() - 1; // 右指针指向较大的数
-        
-        while(left < right) {
-            long long currSum = array[left] + array[right];
-            
-            if(currSum == sum) {
-                return vector<int> {array[left], array[right]};
-            }else if(currSum > sum) { // 当前和大于目标和，取较小的数加入组合
-                right--;
-            } else left++; // 当前和小于目标和，取较大的数加入组合
+    vector<int> FindNumbersWithSum(vector<int>& array, int sum) {
+        if(array.empty()) return {};
+        //sort(nums.begin(), nums.end());
+        int l = 0, r = array.size() - 1; // 左指针指向较小的数， 右指针指向较大的数
+        while(l < r) {
+            long long cur_sum = array[l] + array[r];
+            if(cur_sum < sum) l++; // 当前和小于目标和，取较大的数加入组合
+            else if(cur_sum > sum) r--; // 当前和大于目标和，取较小的数加入组合
+            else return {array[l], array[r]};
         }
-        
-        return vector<int>();
+        return {};
     }
 };
+```
 
-// 暴力求解
-class Solution_ {
+
+
+方法2：哈希表，**适用于未排序的数组**。插入操作的时间复杂度为O(1)，因而总的时间复杂度O(n)，空间复杂度O(n)
+
+```cpp
+class Solution {
 public:
-    vector<int> FindNumbersWithSum(vector<int> array,int sum) {
-        for(int i = 0; i < array.size(); ++i) {
-            for(int j = i + 1; j < array.size(); ++j) {
-                if(array[i] + array[j] == sum) {
-                    return vector<int> {array[i], array[j]};
-                }
-            }
+    vector<int> FindNumbersWithSum(vector<int>& array, int sum) {
+        if(array.empty()) return {};
+        unordered_set<int> hash;
+        for(int num : array) {
+            if(hash.count(sum - num)) return {sum - num, num}; // 哈希表中有另一半
+            hash.insert(num);
         }
-        
-        return vector<int>();
+        return {};
     }
 };
 ```
@@ -678,58 +693,34 @@ public:
 
 ### 面试题57.2  和为S的连续正数序列（核心思想：双指针）
 
-【[OJ](https://www.nowcoder.com/practice/c451a3fd84b64cb19485dad758a55ebe?tpId=13&tqId=11194&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】小明很喜欢数学,有一天他在做数学作业时,要求计算出9~16的和,他马上就写出了正确答案是100。但是他并不满足于此,他在想究竟有多少种连续的正数序列的和为100(至少包括两个数)。没多久,他就得到另一组连续正数和为100的序列:18,19,20,21,22。现在把问题交给你,你能不能也很快的找出所有和为S的连续正数序列? Good Luck!
+【[OJ](https://www.nowcoder.com/practice/c451a3fd84b64cb19485dad758a55ebe?tpId=13&tqId=11194&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/72/)】输入一个正数s，打印出所有和为s的连续正数序列（至少含有两个数）。例如输入15，由于1+2+3+4+5=4+5+6=7+8= 15，所以结果打印出3个连续序列1～5、4～6和7～8。
 
-**题解**：本质是在**已排序**的序列中查找和为某数的连续序列。设两个指针，起初指向1和2，两指针构成滑动窗口，若窗口中的和小于目标和，则窗口加宽（右指针右移），若窗口中的和大于目标和，则窗口缩窄（左指针右移）
+```
+输入：15
+输出：[[1,2,3,4,5],[4,5,6],[7,8]]
+```
+
+
+
+**题解**：本质是在**已排序**的序列中查找和为某数的连续序列。设两个指针，起初指向1和2，两指针构成滑动窗口，若窗口中的和小于目标和，则窗口加宽（右指针右移），若窗口中的和大于目标和，则窗口缩窄（左指针右移）。注意**单调性**：两个指针仅向右移
 
 ```cpp
 class Solution {
 public:
     vector<vector<int> > FindContinuousSequence(int sum) {
-        vector<vector<int> > res;
-        int left = 1;
-        int right = 2;
-        
-        while(left < right) {
-            int currSum = (left + right)*(right - left + 1)/2; // 求和公式(a0+an)*n/2
-            if(currSum == sum) {
-                vector<int> seq;
-                for(int i = left; i <= right; ++i) {
-                    seq.push_back(i);
-                }
-                res.push_back(seq);
-                ++left; // 找到和为sum的序列了，缩小区间
-            } else if(currSum < sum) { // 和小于目标和，增大区间
-                ++right;
-            } else ++left; // 和大于目标和，缩小区间
-        }
-        
-        return res;
-    }
-};
-
-// 暴力求解
-class Solution_ {
-public:
-    vector<vector<int> > FindContinuousSequence(int sum) {
-        vector<vector<int> > res;
-        for(int i = 1; i <= sum/2; ++i) { // 至少有两个数字，因而单个数字不会大于sum/2
-            int currSum = 0; // 当前序列和
-            int nextNum = i; // 下一个加入的数字
-            vector<int> seq;
-            
-            while(true) {
-                seq.push_back(nextNum);
-                currSum += nextNum; // 求当前序列和
-                nextNum++; // 求下一个数字
-                
-                if(currSum >= sum) // 大于等于目标和，退出
-                    break;
+        int l = 1, r = 2;
+        vector<vector<int>> res;
+        while(l < r) {
+            long long cur_sum = (r + l) * (r - l + 1) / 2; // 求和公式(a0+an)*n/2
+            if(cur_sum == sum) {
+                vector<int> vec;
+                for(int i = l; i <= r; i++) vec.push_back(i);
+                res.push_back(vec);
+                l++; // 找到和为sum的序列了，缩小区间
             }
-            if(currSum == sum) // 求得的和等于目标和
-                res.push_back(seq);
+            else if (cur_sum < sum) r++; // 和小于目标和，扩大区间
+            else l++; // 和大于目标和，缩小区间
         }
-        
         return res;
     }
 };
@@ -821,9 +812,74 @@ public:
 
 
 
+### 面试题53.2 0到n-1中缺失的数字（核心思想：二分查找）
+
+【[AcWing](https://www.acwing.com/problem/content/64/) / [Leetcode](https://leetcode-cn.com/problems/que-shi-de-shu-zi-lcof/)】一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0到n-1之内。在范围0到n-1的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+
+```
+输入：[0,1,2,4]
+输出：3
+```
+
+**题解**：二分查找，时间复杂度O(logn)
+
+这道题目给定的是递增数组，假设数组中第一个缺失的数是 x，那么数组中的数如下所示：
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200602131633.png" alt="缺失数字.png" style="zoom:67%;" />
+
+
+可以看出，数组左边蓝色部分都满足`nums[i] == i`，数组右边橙色部分都不满足`nums[i] == i`，因此可以二分出分界点 x 的值。
+
+```cpp
+class Solution {
+public:
+    int getMissingNumber(vector<int>& nums) {
+        int l = 0, r = nums.size();
+        while(l < r) {
+            int mid = l + r >> 1;
+            int cnt = 0;
+            if(nums[mid] != mid) r = mid;
+            else l = mid + 1;
+        }
+        return l;
+    }
+};
+```
+
+
+
+### 面试题53.3 数组中数值和下标相等的元素
+
+【[AcWing](https://www.acwing.com/problem/content/65/)】假设一个单调递增的数组里的每个元素都是整数并且是唯一的。请编程实现一个函数找出数组中任意一个数值等于其下标的元素。例如，在数组[-3, -1, 1, 3, 5]中，数字3和它的下标相等。如果不存在，则返回-1。
+
+```
+输入：[-3, -1, 1, 3, 5]
+输出：3
+```
+
+**题解**：数值大于下标，说明数值等于下标的元素在左边
+
+```cpp
+class Solution {
+public:
+    int getNumberSameAsIndex(vector<int>& nums) {
+        int l = 0, r = nums.size() - 1;
+        while(l < r) {
+            int mid = l + r >> 1;
+            if(nums[mid] >= mid) r = mid;
+            else l = mid + 1;
+        }
+        if(nums[l] != l) return -1;
+        return l;
+    }
+};
+```
+
+
+
 ### 面试题62 圆圈中最后剩下的数字
 
-【[OJ](https://www.nowcoder.com/practice/f78a359491e64a50bce2d89cff857eb6?tpId=13&tqId=11199&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [力扣](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/)】0,1,,n-1这n个数字排成一个圆圈，从数字0开始，每次从这个圆圈里删除第m个数字。求出这个圆圈里剩下的最后一个数字。
+【[OJ](https://www.nowcoder.com/practice/f78a359491e64a50bce2d89cff857eb6?tpId=13&tqId=11199&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [力扣](https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/) / [AcWIng](https://www.acwing.com/problem/content/78/)】0,1,,n-1这n个数字排成一个圆圈，从数字0开始，每次从这个圆圈里删除第m个数字。求出这个圆圈里剩下的最后一个数字。
 
 例如，0、1、2、3、4这5个数字组成一个圆圈，从数字0开始每次删除第3个数字，则删除的前4个数字依次是2、0、4、1，因此最后剩下的数字是3。
 
@@ -831,8 +887,60 @@ public:
 
 因为C++中list不支持迭代器+n操作，删除元素必须从头查找第n个元素，使用不便，推荐使用vector。
 
+🥇方法1：使用vector模拟，推荐
+
 ```cpp
-//法一：C++实现 list容器+其迭代器实现圆形链表 （约瑟夫环问题）
+class Solution
+{
+public:
+    int LastRemaining_Solution(int n, int m)
+    {
+        if(n < 1||m < 1) return -1;
+         
+        vector<int> nums(n);
+        for(int i = 0; i < n; i++)
+            nums[i] = i;
+        
+        int i = 0;
+        while(nums.size() > 0) {
+            i = (i + m - 1) % nums.size(); // 出队位置索引
+            nums.erase(nums.begin() + i); // 删除出队元素
+        }
+        return nums[i];
+    }
+};
+```
+
+方法2：找出规律, 通项为：f(n,m) = {f(n-1,m) + m} % n。
+
+```cpp
+class Solution
+{
+public:
+    int LastRemaining_Solution(int n, int m) {
+        if(n < 1||m < 1) return -1;
+         
+        int last = 0;
+        for(int i = 2; i <= n; i++){
+            last = (last + m) % i;
+        }
+        return last;
+    }
+};
+
+// 递归写法
+class Solution {
+public:
+    int LastRemaining_Solution(int n, int m) {
+        if (n == 1) return 0;
+        return (LastRemaining_Solution(n - 1, m) + m) % n;
+    }
+};
+```
+
+方法3：C++实现 list容器+其迭代器实现圆形链表 （约瑟夫环问题）
+
+```cpp
 class Solution {
 public:
     int LastRemaining_Solution(int n, int m)
@@ -888,54 +996,24 @@ public:
         return *nums.begin();
     }
 };
-
-//法二：使用vector模拟，推荐
-class Solution
-{
-public:
-    int LastRemaining_Solution(int n, int m)
-    {
-        if(n < 1||m < 1)
-            return -1;
-         
-        vector<int> nums(n);
-        for(int i = 0; i < n; i++)
-            nums[i] = i;
-        
-        int i = 0;
-        while(nums.size() > 0) {
-            i = (i + m - 1) % nums.size(); // 出队位置索引
-            nums.erase(nums.begin() + i); // 删除出队元素
-        }
-        return nums[i];
-    }
-};
-
-//法三：找出规律, 通项为：f(n,m)={f(n-1,m)+m}%n。
-class Solution
-{
-public:
-    int LastRemaining_Solution(int n, int m)
-    {
-        if(n < 1||m < 1)
-            return -1;
-         
-        int last = 0;
-        for(int i = 2; i <= n; i++){
-            last = (last + m) % i;
-        }
-        return last;
-    }
-};
 ```
 
 
 
 ### 面试题66 构建乘积数组
 
-【[OJ](https://www.nowcoder.com/practice/94a4d381a68b47b7a8bed86f2975db46?tpId=13&tqId=11204&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】给定一个数组A[0,1,...,n-1],请构建一个数组B[0,1,...,n-1],其中B中的元素B[i]=A[0]\*A[1]\*...\*A[i-1]\*A[i+1]\*...\*A[n-1]。不能使用除法。（注意：规定B[0] = A[1] \* A[2] \* ... \* A[n-1]，B[n-1] = A[0] \* A[1] \* ...\* A[n-2];）
+【[OJ](https://www.nowcoder.com/practice/94a4d381a68b47b7a8bed86f2975db46?tpId=13&tqId=11204&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/82/)】给定一个数组A[0,1,...,n-1]，请构建一个数组B[0,1,...,n-1]，其中B中的元素B[i]=A[0]\*A[1]\*...\***A[i-1]\*A[i+1]**\*...\*A[n-1]。不能使用除法，使用 O(1) 的空间。（注意：规定B[0] = A[1] \* A[2] \* ... \* A[n-1]，B[n-1] = A[0] \* A[1] \* ...\* A[n-2]）
 
-**题解**：不妨定义C[i] =A[0] x A[1]x ··· xA[i- 1] , D[i]=A[i+ I] x ··· xA [n-2] xA [n-1]。C[i] 可以用自上而下的顺序计算出来，即 C[i] =C[i-1] x A [i-1] 。类似的，D[i]也可以用自下而上的顺序计算出来，即 D[i] =D[i+1] xA[i+1]。
+```
+输入：[1, 2, 3, 4, 5]
+输出：[120, 60, 40, 30, 24]
+```
+
+**题解**：求的是数组 A[0,1,...,n-1] 中除掉 A[i] 后其他元素的乘积。
+
+不妨定义C[i] =A[0] x A[1]x ··· xA[i- 1] , D[i]=A[i+ I] x ··· xA [n-2] xA [n-1]。C[i] 可以用自上而下的顺序计算出来，即 C[i] =C[i-1] x A [i-1] 。类似的，D[i]也可以用自下而上的顺序计算出来，即 D[i] =D[i+1] xA[i+1]。
+
+写法1：
 
 ```cpp
 class Solution {
@@ -962,15 +1040,43 @@ public:
 };
 ```
 
+写法2：
+
+```cpp
+class Solution {
+public:
+    vector<int> multiply(const vector<int>& A) {
+        if(A.empty()) return vector<int>();
+        
+        int n = A.size();
+        vector<int> res(n);
+        for(int i = 0, p = 1; i < n; i++) {
+            res[i] = p;
+            p *= A[i];
+        }
+        for(int i = n - 1, p = 1; i >= 0; i--) {
+            res[i] *= p;
+            p *= A[i];
+        }
+        return res;
+    }
+};
+```
+
 
 
 ## 链表
 
 ### 面试题6 从尾到头打印链表（核心思想：栈）
 
-【[OJ](https://www.nowcoder.com/practice/d0267f7f55b3412ba93bd35cfa8e8035?tpId=13&tqId=11156&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个链表，按链表从尾到头的顺序返回一个ArrayList。
+【[OJ](https://www.nowcoder.com/practice/d0267f7f55b3412ba93bd35cfa8e8035?tpId=13&tqId=11156&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/18/)】输入一个链表，按链表从尾到头的顺序返回一个ArrayList。
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/f5792051-d9b2-4ca4-a234-a4a2de3d5a57.png" width="250px" /> </div>
+
+```
+输入：[1, 2, 3]
+返回：[3, 2, 1]
+```
 
 **题解**：
 
@@ -1090,7 +1196,13 @@ public:
 
 ### 面试题18.1 在O(1)时间内删除链表节点（核心思想：指针操作）⭐️
 
-**题目**：给定单向链表的头指针和一个节点指针，定义一个函数在 0(1) 时间内删除该节点
+【[AcWing](https://www.acwing.com/problem/content/85/)】给定单向链表的头指针和一个节点指针，定义一个函数在 0(1) 时间内删除该节点
+
+```
+输入：链表 1->4->6->8
+      删掉节点：第2个节点即6（头节点为第0个节点）
+输出：新链表 1->4->8
+```
 
 **题解**：
 
@@ -1141,7 +1253,15 @@ public:
 
 ### 面试题18.2 删除链表中重复的节点（核心思想：递归/迭代）⭐️⭐️
 
-【[OJ](https://www.nowcoder.com/practice/fc533c45b73a41b0b44ccba763f866ef?tpId=13&tqId=11209&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+【[OJ](https://www.nowcoder.com/practice/fc533c45b73a41b0b44ccba763f866ef?tpId=13&tqId=11209&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/27/)】在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+
+```
+输入：1->2->3->3->4->4->5
+输出：1->2->5
+
+输入：1->1->1->2->3
+输出：2->3
+```
 
 **题解**：
 
@@ -1209,7 +1329,12 @@ public:
 
 ### 面试题22 链表中倒数第k个结点（核心思想：双指针）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/529d3ae5a407492994ad2a246518148a?tpId=13&tqId=11167&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个链表，输出该链表中倒数第k个结点。
+【[OJ](https://www.nowcoder.com/practice/529d3ae5a407492994ad2a246518148a?tpId=13&tqId=11167&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/32/)】输入一个链表，输出该链表中倒数第k个结点。`k >= 0`;  如果k大于链表长度，则返回 NULL;
+
+```
+输入：链表：1->2->3->4->5 ，k=2
+输出：4
+```
 
 **题解**：设链表的长度为 N。设置两个指针 P1 和 P2，先让 P1 移动 K 个节点，则还有 N - K 个节点可以移动。此时让 P1 和 P2 同时移动，可以知道当 P1 移动到链表结尾时，P2 移动到第 N - K 个节点处，该位置就是倒数第 K 个节点。
 
@@ -1239,8 +1364,6 @@ public:
 };
 ```
 
-
-
 **关键：**
 
 ```cpp
@@ -1249,11 +1372,19 @@ if(fast == nullptr) return NULL; // 未移动完K次，快指针已移动到链�
 
 
 
-
-
 ### 面试题23  链表中环的入口节点（核心思想：双指针）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/253d2c59ec3e4bc68da16833f79a38e4?tpId=13&tqId=11208&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+【[OJ](https://www.nowcoder.com/practice/253d2c59ec3e4bc68da16833f79a38e4?tpId=13&tqId=11208&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/86/)】给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200603165956.png" alt="image-20200603165952310" style="zoom:67%;" />
+
+```
+给定如上所示的链表：
+[1, 2, 3, 4, 5, 6]
+2
+注意，这里的2表示编号是2的节点，节点编号从0开始。所以编号是2的节点就是val等于3的节点。
+则输出环的入口节点3.
+```
 
 **题解**：使用快慢指针，快指针一次走两步，慢指针一次走一步，如果快指针可以一直指到 nullptr，则说明没有环，如果快慢指针相遇则说明有环；如果两指针相遇的时候，将快指针重新指向链表的头结点，但是现在是一次走一步，最终快慢指针一定会相遇，相遇的地方即是入环的节点；[详解](https://cyc2018.github.io/CS-Notes/#/notes/23.%20%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%8E%AF%E7%9A%84%E5%85%A5%E5%8F%A3%E7%BB%93%E7%82%B9)
 
@@ -1287,7 +1418,7 @@ public:
 
 ### 面试题24 反转链表（核心思想：指针操作/递归/迭代）
 
-【[OJ](https://www.nowcoder.com/practice/75e878df47f24fdc9dc3e400ec6058ca?tpId=13&tqId=11168&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个链表，反转链表后，输出新链表的表头。
+【[OJ](https://www.nowcoder.com/practice/75e878df47f24fdc9dc3e400ec6058ca?tpId=13&tqId=11168&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/33/)】输入一个链表，反转链表后，输出新链表的表头。
 
 ```
 输入:1->2->3->4->5->NULL
@@ -1373,9 +1504,75 @@ public:
 
 
 
+附自定义链表节点写法，手撕必备！⭐️⭐️
+
+```cpp
+#include <iostream>
+using namespace std;
+
+struct ListNode {
+    ListNode* next;
+    int val;
+    ListNode(int x) : next(NULL), val(x) {}
+};
+
+ListNode* ReverseList(ListNode *head) {
+    if(!head) return NULL;
+    ListNode* pre = NULL, *next = NULL;
+    while(head) {
+        next = head->next;
+        head->next = pre;
+        pre = head;
+        head = next;
+    }
+    return pre;
+}
+
+ListNode* CreatList() {
+    ListNode *dummy = new ListNode(-1);
+    ListNode *cur = dummy;
+    
+    int val;
+    while(cin >> val)
+    {
+        ListNode *node = new ListNode(val);
+        cur->next = node;
+        cur = cur->next;
+    }
+	return dummy->next;
+}
+
+void TraverseList(ListNode* head) {
+    if(!head) return;
+    ListNode *cur = head;
+    while(cur) {
+        cout << cur->val << ' ';
+        cur = cur->next;
+    }
+}
+
+int main() {
+    // 手动创建链表
+    ListNode *node1 = new ListNode(1);
+    ListNode *node2 = new ListNode(2);
+    ListNode *node3 = new ListNode(3);
+    node1->next = node2;
+    node2->next = node3;
+    node3->next = NULL;
+    
+    ListNode *Head = CreatList(); // 创建链表
+    ListNode *head = ReverseList(Head); // 反转链表
+    TraverseList(head); // 遍历链表
+    
+    return 0;
+}
+```
+
+
+
 ### 面试题25 合并两个排序的链表（核心思想：递归/迭代）⭐️⭐️
 
-【[OJ](https://www.nowcoder.com/practice/d8b6b4358f774294a89de2a6ac4d9337?tpId=13&tqId=11169&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入两个单调递增的链表，输出两个链表合成后的链表，合成后的链表满足单调不减规则。
+【[OJ](https://www.nowcoder.com/practice/d8b6b4358f774294a89de2a6ac4d9337?tpId=13&tqId=11169&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/34/)】输入两个单调递增的链表，输出两个链表合成后的链表，合成后的链表满足单调不减规则。
 
 ```
 输入：1->3->5 , 2->4->5
@@ -1580,9 +1777,11 @@ private:
 
 ### 面试题30 包含min函数的栈（核心思想：双栈）
 
-【[OJ](https://www.nowcoder.com/practice/4c776177d2c04c2494f2555c9fcc1e49?tpId=13&tqId=11173&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数，时间复杂度为O(1)。
+【[OJ](https://www.nowcoder.com/practice/4c776177d2c04c2494f2555c9fcc1e49?tpId=13&tqId=11173&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/90/)】定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数，时间复杂度为O(1)。
 
 题解：元素直接压入主栈，仅当辅助栈为空或当前值小于等于辅助栈顶时，压入辅助栈。弹出时主栈栈顶元素等于辅助栈栈顶时，弹出辅助栈栈顶。
+
+**题解**：
 
 ```cpp
 class Solution {
@@ -1614,7 +1813,13 @@ public:
 
 ### 面试题31 栈的压入、弹出序列（核心思想：双指针/辅助栈）
 
-【[OJ](https://www.nowcoder.com/practice/d77d11405cc7470d82554cb392585106?tpId=13&tqId=11174&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）
+【[OJ](https://www.nowcoder.com/practice/d77d11405cc7470d82554cb392585106?tpId=13&tqId=11174&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/40/)】输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）
+
+```
+输入：[1,2,3,4,5]
+      [4,5,3,2,1]
+输出：true
+```
 
 **题解**：使用一个辅助栈来模拟压入弹出操作，辅助栈中逐个压入push中元素并与pop当前元素比较，若相等则弹出，直至不等，若栈最后为空则弹出序列正确。
 
@@ -1640,63 +1845,37 @@ public:
 
 
 
-### 面试题59.1 滑动窗口的最大值（核心思想：双端队列）
+### 面试题59.1 滑动窗口的最大值（核心思想：双端队列）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/1624bc35a45c42c0bc17d17fa0cba788?tpId=13&tqId=11217&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。
+【[OJ](https://www.nowcoder.com/practice/1624bc35a45c42c0bc17d17fa0cba788?tpId=13&tqId=11217&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/75/)】给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。
 
-**题解**：使用双端队列存储可能最大的元素下标。
+```
+输入：[2, 3, 4, 2, 6, 2, 5, 1] , k=3
+输出: [4, 4, 6, 6, 6, 5]
+```
+
+**题解**：窗口向右滑动的过程实际上就是将处于窗口的第一个数字删除，同时在窗口的末尾添加一个新的数字，这就可以用双向队列来模拟，**每次把尾部的数字弹出，再把新的数字压入到头部**，然后找队列中最大的元素即可。
+
+为了更快地找到最大的元素，我们可以在队列中只保留那些可能成为窗口最大元素的数字，去掉那些不可能成为窗口中最大元素的数字。考虑这样一个情况，如果队列中进来一个较大的数字，那么队列中比这个数更小的数字就不可能再成为窗口中最大的元素了，因为这个大的数字是后进来的，一定会比之前早进入窗口的小的数字要晚离开窗口，那么那些早进入且比较小的数字就“永无出头之日”，所以就可以弹出队列。
+
+于是我们维护一个双向单调队列，**队列放的是可能最大的元素的下标**。我们假设该双端队列的队头是整个队列的最大元素所在下标，至队尾下标代表的元素值依次降低。初始时单调队列为空。随着对数组的遍历过程中，每次插入元素前，首先需要看队头是否还能留在队列中，如果队头下标距离i超过了k，则应该出队。同时需要维护队列的单调性，如果nums[i]大于或等于队尾元素下标所对应的值，则当前队尾再也不可能充当某个滑动窗口的最大值了，故需要队尾出队。始终保持队中元素从队头到队尾单调递减。依次遍历一遍数组，每次队头就是每个滑动窗口的最大值所在下标。
+
+时间复杂度分析：每个元素最多入队出队一次，复杂度为O(n)
 
 ```cpp
 class Solution {
 public:
-    // 使用双端队列存储可能最大的元素下标
-    vector<int> maxInWindows(const vector<int>& num, unsigned int size)
-    {
+    vector<int> maxInWindows(vector<int>& nums, int k) {
+        if(nums.empty()) return vector<int>();
         vector<int> res;
-        deque<int> dq;
-        
-        if(num.size() < size || size <= 0)
-            return  res;
-        
-        for(int i = 0; i < num.size(); ++i){
-            //从后面依次弹出队列中比当前num值小的元素，同时保证队列首元素为当前窗口最大值下标
-            while(dq.size() && num[i] >= num[dq.back()])
-                dq.pop_back();
-            
-            //当前窗口移出队首元素所在的位置，即队首元素坐标对应的num不在窗口中，需要弹出
-            while(dq.size() && i-dq.front()+1 > size)
-                dq.pop_front();
-            
-            dq.push_back(i);//把每次滑动的num下标加入队列
-            
-            if(size && i >= size - 1)//当滑动窗口首地址i大于等于size时才开始写入窗口最大值
-                res.push_back(num[dq.front()]);
+        deque<int> q;
+        for(int i = 0; i < nums.size(); i++) {
+            while(q.size() && q.front() <= i - k) q.pop_front(); // 判断队头是否需要出队
+            while(q.size() && nums[q.back()] <= nums[i]) q.pop_back(); // 维护队列单调性
+            q.push_back(i);
+            if(i >= k - 1) res.push_back(nums[q.front()]); // 取队头作为窗口最大元素
         }
         return res;
-    }
-    
-    // 暴力求解
-    vector<int> maxInWindows_(const vector<int>& num, unsigned int size)
-    {
-        vector<int> res;
-        if(num.size() < size || size <= 0)
-            return  res;
-        
-        for(int i = 0; i <= num.size() - size; ++i) {
-            res.push_back(getMax(num, i, i + size - 1));
-        }
-        
-        return res;
-    }
-    
-    int getMax(vector<int> num , int low, int high) {
-        int max = 0;
-        for(int i = low; i <= high; ++i) {
-            if(num[i] > max)
-                max = num[i];
-        }
-        
-        return max;
     }
 };
 ```
@@ -1999,7 +2178,7 @@ public:
 
 ### 面试题32.1 从上往下打印二叉树
 
-【[OJ](https://www.nowcoder.com/practice/7fe2212963db4790b57431d9ed259701?tpId=13&tqId=11175&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】从上往下打印出二叉树的每个节点，同层节点从左至右打印。
+【[OJ](https://www.nowcoder.com/practice/7fe2212963db4790b57431d9ed259701?tpId=13&tqId=11175&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/41/)】从上往下打印出二叉树的每个节点，同层节点从左至右打印。
 
 **题解**：使用队列保存将要打印的节点，节点出队列时将其左右子节点加入队列
 
@@ -2058,7 +2237,20 @@ public:
 
 ### 面试题32.2 把二叉树打印成多行
 
-【[OJ](https://www.nowcoder.com/practice/445c44d982d04483b04a54f298796288?tpId=13&tqId=11213&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+【[OJ](https://www.nowcoder.com/practice/445c44d982d04483b04a54f298796288?tpId=13&tqId=11213&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWIng](https://www.acwing.com/problem/content/42/)】从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+
+```
+输入如下图所示二叉树[8, 12, 2, null, null, 6, null, 4, null, null, null]
+    8
+   / \
+  12  2
+     /
+    6
+   /
+  4
+
+输出：[[8], [12, 2], [6], [4]]
+```
 
 **题解**：要求一行打印一层，因此需要在每层打印完时记录下一层要打印的节点个数
 
@@ -2100,7 +2292,17 @@ public:
 
 ### 面试题32.3 按之字形顺序打印二叉树
 
-【[OJ](https://www.nowcoder.com/practice/91b69814117f4e8097390d107d2efbe0?tpId=13&tqId=11212&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+【[OJ](https://www.nowcoder.com/practice/91b69814117f4e8097390d107d2efbe0?tpId=13&tqId=11212&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) [AcWing](https://www.acwing.com/problem/content/43/)】请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
+
+```
+输入如下图所示二叉树[8, 12, 2, null, null, 6, 4, null, null, null, null]
+    8
+   / \
+  12  2
+     / \
+    6   4
+输出：[[8], [2, 12], [6, 4]]
+```
 
 **题解**：
 
@@ -2550,7 +2752,12 @@ public:
 
 ### 面试题5 替换空格（核心思想：双指针）
 
-【[OJ](https://www.nowcoder.com/practice/4060ac7e3e404ad1a894ef3e17650423?tpId=13&tqId=11155&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。
+【[OJ](https://www.nowcoder.com/practice/4060ac7e3e404ad1a894ef3e17650423?tpId=13&tqId=11155&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/17/)】请实现一个函数，将一个字符串中的每个空格替换成“%20”。
+
+```
+输入："We are happy."
+输出："We%20are%20happy."
+```
 
 **题解**：使用双指针，时间复杂度O(n)
 
@@ -2664,6 +2871,67 @@ public:
 
 
 
+### 面试题48 最长不含重复字符的子字符串（核心思想：双指针/哈希）⭐️⭐️
+
+【[AcWing](https://www.acwing.com/problem/content/57/) / [Leetcode](https://leetcode-cn.com/problems/zui-chang-bu-han-zhong-fu-zi-fu-de-zi-zi-fu-chuan-lcof/)】请从字符串中找出一个最长的不包含重复字符的子字符串，计算该最长子字符串的长度。假设字符串中只包含从’a’到’z’的字符。
+
+```
+输入："abcabc"
+输出：3
+```
+
+**题解**：
+
+题目中要求答案必须是 子串 的长度，意味着子串内的字符在原字符串中一定是连续的。因此我们可以将答案看作原字符串的一个滑动窗口，并维护窗口内不能有重复字符，同时更新窗口的最大值。
+
+方法1：使用unordered_map，时间复杂度O(2n)
+
+使用**双指针维护一个不含重复字符的字符串**，**通过哈希表判重**（统计各字符个数）。右侧指针每次右移一位尝试扩充不重复字符串，若增加的字符出现两次，则左侧指针移到右指针处，移动过程中将路过的字符从哈希表中移除。如12344，i 指向1，j 指向第二个4，则 i 每次右移一位，将123和第一个4从哈希表移除，此时 ij 均指向第二个4，这时开始下一次字符扩充。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200601153204.gif" style="zoom: 67%;" />
+
+```cpp
+class Solution {
+public:
+    int longestSubstringWithoutDuplication(string s) {
+        unordered_map<char, int> cnt;
+        int res = 0;
+        for(int i = 0, j = 0; j < s.size(); j++) { // 指针ij之间维护一个不重复字符串
+            if(++cnt[s[j]] > 1) { // 将右侧指针指向的字符加入哈希表，若被加入字符的数量超过1
+                while(cnt[s[i]] == 1) cnt[s[i++]]--; // 将i指针后移，移到第一个重复字符处，移除经过的字符
+                cnt[s[i++]]--; // i指针再右移一次，移到第二个重复字符处，即j处
+            }
+            res = max(res, j - i + 1);
+        }
+        return res;
+    }
+};
+```
+
+
+
+方法2：使用数组取代哈希表，时间复杂度O(2n)
+
+因为字符串仅由小写字母组成，使用数组模拟哈希表
+
+```cpp
+class Solution {
+public:
+    int longestSubstringWithoutDuplication(string s) {
+        int cnt[256] = {0}; // 注意初始化
+        int res = 0;
+        for(int i = 0, j = 0; j < s.size(); j++) { // 扩大区间
+            cnt[s[j]]++; // 扩大区间，出现次数加1
+            while(cnt[s[j]] > 1) cnt[s[i++]]--; // 出现两次，缩小区间
+            res = max(res, j - i + 1);
+        }
+        return res;
+    }
+};
+```
+
+
+
 ### 面试题38 字符串的排列（核心思想：DFS&回溯）
 
 【[OJ](https://www.nowcoder.com/practice/fe6b651b66ae47d7acce78ffdd9a96c7?tpId=13&tqId=11180&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/47/)】输入一个字符串,按字典序打印出该字符串中字符的所有排列。例如输入字符串abc,则打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。输入的字符串**可能有重复字符**。
@@ -2674,7 +2942,11 @@ public:
 - 固定b，求后面ac的排列：bac，bca，求好后，c放到第一位置，得到cba
 - 固定c，求后面ba的排列：cba，cab。
 
-
+```
+输入：[1,2,3]
+输出：
+     [[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]
+```
 
 **题解**：
 
@@ -2797,25 +3069,28 @@ public:
 
 
 
-###  面试题50.1 字符串中第一个只出现一次的字符
+###  面试题50.1 字符串中第一个只出现一次的字符（核心思想：哈希表）
 
-【[OJ](https://www.nowcoder.com/practice/1c82e8cf713b4bbeb2a5b31cf5b0417c?tpId=13&tqId=11187&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】在一个字符串(0<=字符串长度<=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.
+【[OJ](https://www.nowcoder.com/practice/1c82e8cf713b4bbeb2a5b31cf5b0417c?tpId=13&tqId=11187&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/59/)】在一个字符串(0<=字符串长度<=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）
 
-最直观的解法是使用 HashMap 对出现次数进行统计，但是考虑到要统计的字符范围有限，因此可以使用char型数组代替 HashMap，从而将空间复杂度由 O(N) 降低为 O(1)。
+```
+输入："abaccdeff"
+输出：'b'
+```
+
+**题解**：
+
+最直观的解法是使用哈希表对出现次数进行统计，但是考虑到要统计的字符范围有限，因此可以使用char型数组代替哈希表，从而将空间复杂度由 O(N) 降低为 O(1)。
 
 ```cpp
 class Solution {
 public:
     int FirstNotRepeatingChar(string str) {
-        if(str.empty())
-            return -1;
+        if(str.empty()) return -1;
         
         char ch[256]={0}; // 使用一字节的char数组保存各字符出现的次数
-        for(int i = 0; i < str.size(); i++) // 统计各字符出现次数
-            ch[str[i]]++;
-        for(int i = 0; i < str.size(); i++) // 遍历次数数组，找到次数为1的位置
-            if(ch[str[i]] == 1)
-                return i;
+        for(auto c : s) ch[str[i]]++;// 统计各字符出现次数
+        for(auto c : s) if(ch[str[i]] == 1) return i; // 遍历次数数组，找到次数为1的位置
         return 0;
     }
 };
@@ -2826,6 +3101,8 @@ public:
 ### 面试题50.2 字符流中第一个不重复的字符
 
 【[OJ](https://www.nowcoder.com/practice/00de97733b8e4f97a3fb5c680ee10720?tpId=13&tqId=11207&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+
+**题解**：
 
 **方法1**：使用queue保存出现过的字符，使用数组保存各字符出现的次数，判断队头是否只出现一次，时间复杂度O(1)，空间复杂度O(n)
 
@@ -2889,39 +3166,61 @@ public:
 
 
 
-### 面试题58.1 翻转单词顺序
+### 面试题58.1 翻转单词顺序（核心思想：双指针）
 
-【[OJ](https://www.nowcoder.com/practice/3194a4f4cf814f63919d0790578d51f3?tpId=13&tqId=11197&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？
+【[OJ](https://www.nowcoder.com/practice/3194a4f4cf814f63919d0790578d51f3?tpId=13&tqId=11197&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/73/)】输入一个英文句子，翻转句子中单词的顺序，但单词内字符的顺序不变。为简单起见，标点符号和普通字母一样处理。例如输入字符串`"I am a student."`，则输出`"student. a am I"`。
+
+```
+输入："I am a student."
+输出："student. a am I"
+```
+
+**题解**：
 
 先翻转整个字符串，再分别翻转以空格分割的子字符串即可
+
+🥇写法1：简洁写法，技巧性较强
 
 ```cpp
 class Solution {
 public:
-    string ReverseSentence(string str) {
-        if(str.empty())
-            return str;
-        
-        Reverse(str, 0, str.size() - 1); // 翻转整个字符串
-        
-        int start = 0; // 记录一段无空格字符串的开始，第一段字符串从0开始
-        for(int i = 0; i < str.size(); ++i) {
-            if(str[i] == ' ') { // 遇到空格
-                Reverse(str, start, i - 1); // 翻转开始与空格之前的字符串
-                start = i + 1; // 下一段字符串开始为空格之后
-            }
-        
-            if(i == str.size() - 1) // 最后一段字符串结尾是str.size() - 1
-                Reverse(str, start, i);
+    string reverseWords(string s) {
+        if(s.empty()) return s;
+        reverse(s.begin(), s.end()); // 先翻转整个字符串
+        for (int i = 0, j = 0; i < s.size(); i ++ ) {
+            j = i; // j从下一个字符串开始找空格
+            while (j < s.size() && s[j] != ' ') j++; // 退出循环时j指向空格
+            reverse(s.begin() + i, s.begin() + j); // 翻转[s[i],s[j])，不包括s[j]
+            i = j; // i指向空格，之后for循环中会i++，下次循环指向空格之后
         }
-    
-        return str;
+        return s;
+    }
+};
+```
+
+
+
+写法2：需要特殊处理最后一段字符串
+
+```cpp
+class Solution {
+public:
+    string reverseWords(string s) {
+        if(s.empty()) return s;
+        reverse(s, 0, s.size() - 1); // 翻转整个字符串
+        for(int i = 0, j = 0; j < s.size(); j++) { // i指向无空格字符串的开始，第一段字符串从0开始，j寻找空格
+            if(s[j] == ' ') { // 遇到空格
+                reverse(s, i, j - 1); // 翻转开始与空格之前的字符串
+                i = j + 1; // 下一段字符串开始为空格之后
+            }
+            if(j == s.size() - 1) // 处理最后一段字符串，因为最后一段字符串的结尾不是空格
+                reverse(s, i, j);
+        }
+        return s;
     }
     
-    void Reverse(string &str, int i, int j) {
-        while(i < j) {
-            swap(str[i++], str[j--]);
-        }
+    void reverse(string &s, int l, int r) {
+        while(l < r) swap(s[l++] , s[r--]);
     }
 };
 ```
@@ -3025,83 +3324,173 @@ public:
 
 ## 位运算
 
-### 面试题15 二进制中1的个数
+### 面试题15 二进制中1的个数（核心思想：位操作）
 
-【[OJ](https://www.nowcoder.com/practice/8ee967e43c2c4ec193b040ea7fbb10b8?tpId=13&tqId=11164&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/8ee967e43c2c4ec193b040ea7fbb10b8?tpId=13&tqId=11164&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/25/)】输入一个32位整数，输出该数二进制表示中1的个数。负数在计算机中用其绝对值的补码来表示。
+
+```
+输入：9
+输出：2
+解释：9的二进制表示是1001，一共有2个1。
+
+输入：-2
+输出：31
+解释：-2在计算机里会被表示成11111111111111111111111111111110，
+      一共有31个1。
+```
+
+**题解**：n & -n可以得到最后一位1，每次减去最后一位1，统计减到零时所减的次数
 
 ```cpp
 class Solution {
 public:
     // 循环次数等于整数二进制位中1的个数
     int  NumberOf1(int n) {
-        int cnt = 0;
+        int res = 0;
         while(n) {
-            cnt++;
-
-            n = n&(n-1);
+            n -= (n & -n);
+            res++;
         }
-
-        return cnt;
+        return res;
     }
-    
-    // 循环次数等于整数二进制位的个数
-    int  NumberOf1_(int n) {
-         int cnt = 0;
-         unsigned int flag = 1;
-         while(n) {
-             if(n&flag)
-                 cnt++;
-             
-             flag = flag << 1;
-         }
-         
-         return cnt;
-     }
 };
 ```
 
 
 
-### 面试题56.1 数组中只出现一次的两个数字
+### 面试题56.1 数组中只出现一次的两个数字（核心思想：位操作）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/e02fdb54d7524710a7d664d082bb7811?tpId=13&tqId=11193&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/e02fdb54d7524710a7d664d082bb7811?tpId=13&tqId=11193&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/69/) / [Leetcode](https://leetcode-cn.com/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-lcof/)】一个整型数组里除了**两个数字**之外，其他的数字都**出现了两次**。请写程序找出这两个只出现一次的数字。你可以假设这两个数字一定存在。
+
+```
+输入：[1,2,3,3,4,4]
+输出：[1,2]
+```
+
+**题解**：
+
+方法1：位运算，时间复杂度O(n)，空间复杂度O(1)
+
+> 如果除了一个数字以外，其他数字都出现了两次，那么如何找到出现一次的数字？
+>
+
+> 答案很简单：全员进行异或操作即可。考虑异或操作的性质：对于两个操作数的每一位，相同结果为 0，不同结果为 1。那么在计算过程中，成对出现的数字的所有位会两两抵消为 0，最终得到的结果就是那个出现了一次的数字。异或满足交换律。
+
+如果我们可以把所有数字分成两组，使得：
+
+1. 两个只出现一次的数字在不同的组中；
+
+2. 相同的数字会被分到相同的组中。
+
+那么对两个组分别进行异或操作，即可得到答案的两个数字。这是解决这个问题的关键。
+
+记这两个只出现了一次的数字为 a 和 b，那么所有数字异或的结果就等于 a 和 b 异或的结果，我们记为 x。如果我们把 x 写成二进制的形式 $x_k x_{k - 1} \cdots x_2 x_1 x_0$ 其中$x_i \in \{ 0, 1 \}$ 我们考虑一下 $x_i=0$ 和 $x_i = 1$的含义是什么？它意味着如果我们把 a 和 b 写成二进制的形式，$a_i$和$b_i$的关系——$x_i=1$表示$a_i$和$b_i$不等，$x_i=1$ 表示 $a_i$ 和 $b_i$ 相等。假如我们任选一个不为 0 的 $x_i$，按照第 $i$ 位给原来的序列分组，如果该位为 0 就分到第一组，否则就分到第二组，这样就能满足以上两个条件：
+
+- 首先，两个相同的数字的对应位都是相同的，所以一个被分到了某一组，另一个必然被分到这一组，所以满足了条件 2。
+- 这个方法在$x_i=1$的时候a和b不被分在同一组，因为$x_i=1$表示$a_i$和$b_i$不相等根据这个方法的定义「如果该位为 0 就分到第一组，否则就分到第二组」可以知道它们被分进了两组，所以满足了条件 1。
+
+在实际操作的过程中，我们拿到序列的异或和 x 之后，对于这个「位」是可以任取的，只要它满足 $x_i = 1$。
+
+**算法**：
+
+- 先对所有数字进行一次异或，得到两个出现一次的数字的异或值 x^y。
+
+- 在异或结果x^y中找到任意为 1 的位。
+
+- 根据这一位对所有的数字进行分组，第k位为1的集合和第k位不是1的集合，其中x y分别在这两个集合，且相同的元素是在同一个集合里面。
+
+- 在每个组内进行异或操作，得到两个数字x、y，即转化为求重复数字中的单个数值的问题。
 
 ```cpp
 class Solution {
 public:
-    void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
-        if(data.size() < 2)
-            return;
-        
-        int resultOr = 0;
-        for(int i = 0; i < data.size(); ++i) {
-            resultOr ^= data[i];
-        }
-        
-        int indexOf1 = FindFirstBit1(resultOr);
-        
-        *num1 = *num2 = 0;
-        for(int j = 0; j < data.size(); ++j) {
-            if(IsBit1(data[j], indexOf1)) {
-                *num1 ^= data[j];
-            } else {
-                *num2 ^= data[j];
-            }
-        }
+    vector<int> findNumsAppearOnce(vector<int>& nums) {
+        int sum = 0; // x^y
+        for(int num : nums) sum ^= num; // 求x^y
+        int k = 0;
+        while(!(sum >> k & 1)) k++; // 找到x^y左侧第一个1
+        int x = 0;
+        for(int num : nums) // 求第k为为1的分组的异或结果，得到x
+            if(num >> k & 1)
+                x ^= num;
+        return {x, sum ^ x}; // y = (x^y)^x
     }
-    
-    int FindFirstBit1(int num) {
-        int indexBit = 0;
-        while(((num & 1) == 0) && (indexBit < 8 * sizeof(int))) {
-            num = num >> 1;
-            ++indexBit;
-        }
-        return indexBit;
+};
+```
+
+
+
+方法2：使用哈希表，时间复杂度O(n)，空间复杂度O(n)
+
+```cpp
+class Solution {
+public:
+    vector<int> findNumsAppearOnce(vector<int>& nums) {
+        unordered_map<int, int> hash;
+        for(auto num : nums) ++hash[num];
+        
+        vector<int> res;
+        for(auto cnt : hash) 
+            if(cnt.second == 1) res.push_back(cnt.first);
+            
+        return res;
     }
-    
-    bool IsBit1(int num, int indexBit) {
-        num = num >> indexBit;
-        return (num & 1);
+};
+```
+
+
+
+### 面试题56.2 数组中唯一只出现一次的数字（核心思想：位运算）
+
+【[AcWing](https://www.acwing.com/problem/content/70/)】在一个数组中除了一个数字只出现**一次**之外，其他数字都出现了**三次**。请找出那个只出现一次的数字。你可以假设满足条件的数字一定存在。
+
+```
+输入：[1,1,1,2,2,2,3,4,4,4]
+输出：3
+```
+
+**题解**：
+
+方法1：
+
+统计所有数中第 i 位为1的个数，i为32位中的某一位，各位上1的个数除以3的余数即为落单数字对应二进制位上的数
+
+```cpp
+class Solution {
+public:
+    int findNumberAppearingOnce(vector<int>& nums) {
+        int ans = 0;
+        for (int i = 31; i >= 0; --i) {
+            int cnt = 0;
+            for (int x: nums) // 统计所有数中第i位为1的个数
+                if (x >> i & 1) cnt ++;
+
+            if (cnt % 3 == 1) // 除以3的余数为那个落单数字对应二进制位上的数
+                ans = (ans * 2) + 1;
+            else
+                ans = ans * 2;
+        }
+        return ans;
+    }
+};
+```
+
+
+
+方法2：
+
+技巧性方法
+
+```cpp
+class Solution {
+public:
+    int findNumberAppearingOnce(vector<int>& nums) {
+        int ones = 0, twos = 0;
+        for (auto x : nums) {
+            ones = (ones ^ x) & ~twos;
+            twos = (twos ^ x) & ~ones;
+        }
+        return ones;
     }
 };
 ```
@@ -3110,7 +3499,7 @@ public:
 
 ## 数学
 
-### 面试题43  1~n整数中1出现的次数（困难）
+### 面试题43  1~n整数中1出现的次数（困难）❌
 
 【[OJ](https://www.nowcoder.com/practice/bd7f978302044eee894445e244c7eee6?tpId=13&tqId=11184&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/51/)】输入一个整数n，求从1到n这n个整数的十进制表示中1出现的次数。
 
@@ -3142,43 +3531,16 @@ public:
 
 
 
-### 面试题45 把数组排成最小的数
-
-【[OJ](https://www.nowcoder.com/practice/8fecd3f8ba334add803bf2a06af1b993?tpId=13&tqId=11185&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
-
-两个int 型的整数拼接起来得 到的数字可能会超出 int 型数字能够表达的范围，从而导致数字溢出。可以用字符串表示数字，这样就能简捷地解决大数问题 。
-
-可以看成是一个排序问题，先将数字转换为字符串，在比较两个字符串 S1 和 S2 的大小时，应该比较的是 S1+S2 和 S2+S1 的大小，如果 S1+S2 < S2+S1，那么应该把 S1 排在前面，否则应该把 S2 排在前面。
-
-```cpp
-class Solution {
-public:
-    string PrintMinNumber(vector<int> numbers) {
-        int len = numbers.size();
-        if(len == 0) return "";
-        
-        sort(numbers.begin(), numbers.end(), cmp); // 根据转换为字符串后的和进行排序
-        
-        string res;
-        for(int i = 0; i < len; i++){
-            res += to_string(numbers[i]);
-        }
-        return res;
-    }
-    
-    static bool cmp(int a, int b){ // 转换为字符串求和并比较
-        string A = to_string(a) + to_string(b);
-        string B = to_string(b) + to_string(a);
-        return A < B;
-    }
-};
-```
-
-
-
 ### 面试题49 丑数
 
-【[OJ](https://www.nowcoder.com/practice/6aa9e04fc3794f68acf8778237ba065b?tpId=13&tqId=11186&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/6aa9e04fc3794f68acf8778237ba065b?tpId=13&tqId=11186&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/58/)】把只包含质因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含质因子7。 习惯上我们把1当做是第一个丑数。求按从小到大的顺序的第N个丑数。
+
+```
+输入：5
+输出：5
+```
+
+**题解**：
 
 所谓一个数 m 是另 一个数 n 的 因子，是指 n 能被 m 整除 也就是 n%m =0 。根据丑数的定义，丑数只能被 2 、3 和 5 整除 。也就是说，如果 一 个数能被 2 整除，就连续除以 2；如果能被 3 整除，就连续除以3；如果能被 5整除，就除以连续 5。如果最后得到的是1，那么这个数就是丑数，否则不是 。
 
@@ -3187,21 +3549,19 @@ public:
 ```cpp
 class Solution {
 public:
-    int GetUglyNumber_Solution(int index) {
-        if (index <= 6)
-            return index;
-        int i2 = 0, i3 = 0, i5 = 0;
-        vector<int> dp(index);
-        dp[0] = 1; // 按顺序保存已经生成的丑数
-        for (int i = 1; i < index; i++) {
-            int next2 = dp[i2] * 2, next3 = dp[i3] * 3, next5 = dp[i5] * 5;
-            dp[i] = min(next2, min(next3, next5)); // 保存下一个可能的丑数中最小的
+    int getUglyNumber(int n) {
+        if(n <= 6) return n;
+        vector<int> q(1, 1); // 第一个丑数为1
+        int i = 0, j = 0, k = 0;
+        while(--n) { // 计算n-1次
+            int t = min(q[i] * 2, min(q[j] * 3, q[k] * 5));
+            q.push_back(t); // 保存下一个可能的丑数中最小的
             // 在已得到的丑数基础上查找下一个丑数
-            if (dp[i] == next2) i2++;
-            if (dp[i] == next3) i3++;
-            if (dp[i] == next5) i5++;
+            if(q[i] * 2 == t) i++;
+            if(q[j] * 3 == t) j++;
+            if(q[k] * 5 == t) k++;
         }
-        return dp[index - 1];
+        return q.back();
     }
 };
 ```
@@ -3479,7 +3839,7 @@ public:
 
 ## 搜索
 
-### 面试题13 机器人的运动范围（核心思想：DFS/BFS）
+### 面试题13 机器人的运动范围（核心思想：DFS/BFS）⭐️⭐️
 
 【[OJ](https://www.nowcoder.com/practice/6e5207314b5241fb83f2329e89fdecc8?tpId=13&tqId=11219&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】地上有一个m行和n列的方格。一个机器人从坐标0,0的格子开始移动，每一次只能向左，右，上，下四个方向移动一格，但是不能进入行坐标和列坐标的数位之和大于k的格子。 例如，当k为18时，机器人能够进入方格（35,37），因为3+5+3+7 = 18。但是，它不能进入方格（35,38），因为3+5+3+8 = 19。请问该机器人能够达到多少个格子？
 
@@ -3622,7 +3982,7 @@ public:
 
 ## 动态规划和贪心
 
-### 面试题14 剪绳子
+### 面试题14 剪绳子（核心思想：贪心）
 
 【[OJ](https://www.nowcoder.com/practice/57d85990ba5b440ab888fc72b0751bf8?tpId=13&tqId=33257&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
 
@@ -3684,6 +4044,127 @@ public:
 
 
 
+### 面试题46 把数字翻译成字符串（核心思想：DP）⭐️⭐️
+
+【[AcWing](https://www.acwing.com/problem/content/55/)】给定一个数字，我们按照如下规则把它翻译为字符串：0翻译成”a”，1翻译成”b”，……，11翻译成”l”，……，25翻译成”z”。
+
+一个数字可能有多个翻译。例如12258有5种不同的翻译，它们分别是”bccfi”、”bwfi”、”bczi”、”mcfi”和”mzi”。请编程实现一个函数用来计算一个数字有多少种不同的翻译方法。
+
+```
+输入："12258"
+输出：5
+```
+
+
+
+**题解**：动规，dp[i]表示前 i 位数字有多少种翻译方法，分两种情况：
+
+- 第 i 位数字作为一组进行翻译，即第 i 位数字不可动，那么翻译方法数为dp[i-1]， 即前 i-1 个数字的翻译方法数
+- 第 i 位和第 i-1 位数字作为一组进行翻译，即第 i 和第 i - 1这两位数字均不可动，那么翻译方法数为dp[i-2]。但第 i-1 和第 i-2 位数字组成的数字需在0\~25之间并且不能以0开头（按题意，01不等于1），即这两位数字在10\~25之间
+
+状态转移方程：
+
+当i和i-1两位数字在10~25之间：`dp[i] = dp[i-1] + dp[i-2]`
+
+否则：`dp[i] = dp[i-1]`
+
+边界：dp[0] = 1 即 没有数字时，翻译方法数为1，为了使得dp[1] = dp[0] = 1。或者将dp数组全部初始化为1
+
+```cpp
+class Solution {
+public:
+    int getTranslationCount(string s) {
+        int n = s.size();
+        vector<int> dp(n + 1, 0); // 也可全部初始化为1，省略后面的dp[0] = 1
+        
+        dp[0] = 1;
+        for(int i = 1; i <= n; i++) {
+            dp[i] = dp[i-1];
+            if(i >= 2) { // 确保s[i-2]合法
+                int t = (s[i-2] - '0') * 10 + s[i-1] - '0'; // i从1开始，第i个数字为s[i-1]
+                if(t >= 10 && t <= 25) dp[i] += dp[i-2];
+            }
+        }
+        return dp[n];
+    }
+};
+```
+
+
+
+### 面试题47 礼物的最大价值（核心思想：DP）⭐️⭐️
+
+【[AcWing](https://www.acwing.com/problem/content/56/)】在一个m×n的棋盘的每一格都放有一个礼物，每个礼物都有一定的价值（价值大于0）。你可以从棋盘的左上角开始拿格子里的礼物，并每次向右或者向下移动一格直到到达棋盘的右下角。给定一个棋盘及其上面的礼物，请计算你最多能拿到多少价值的礼物？
+
+```
+输入：
+[
+  [2,3,1],
+  [1,7,1],
+  [4,6,1]
+]
+输出：19
+解释：沿着路径 2→3→7→6→1 可以得到拿到最大价值礼物。
+```
+
+
+
+**题解**：动规，状态转移方程：`dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1]`
+
+此题用dfs做的话时间复杂度为指数级的，而动规的时间复杂度为O(m*n)
+
+```cpp
+class Solution {
+public:
+    int getMaxValue(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+        for(int i = 1; i <= m; i++) { // 为便于处理i-1,j-1从i,j从1开始
+            for(int j = 1; j <= n; j++) {
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1]; // dp[i][j]对应的格子值为grid[i-1][j-1]
+            }
+        }
+        return dp[m][n];
+    }
+};
+```
+
+
+
+### 面试题63 股票的最大利润（核心思想：贪心）
+
+【[AcWing](https://www.acwing.com/problem/content/79/)】假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖 **一次** 该股票可能获得的利润是多少？
+
+例如一只股票在某些时间节点的价格为[9, 11, 8, 5, 7, 12, 16, 14]。如果我们能在价格为5的时候买入并在价格为16时卖出，则能收获最大的利润11。
+
+```
+输入：[9, 11, 8, 5, 7, 12, 16, 14]
+输出：11
+```
+
+**题解**：贪心思想，时间复杂度O(n)
+
+由于只允许做一次股票买卖交易，枚举每一天作为卖出的日子，买入日子一定在卖出日子之前，为了获利最多，希望买入的日子的股票价格尽可能低。暴力做法是O(n^2^)，卖出时遍历前面 i 天的价格，找出最小值。可以维护一个最小值变量 min，存储前 i 天价格最小值，从而省去第二次遍历，时间复杂度降低到O(n)。
+
+```cpp
+class Solution {
+public:
+    int maxDiff(vector<int>& nums) {
+        if(nums.empty()) return 0;
+        
+        int res = 0;
+        for(int i = 1, minv = nums[0]; i < nums.size(); i++) { // 遍历数组，j为最低购入价格
+            minv = min(minv, nums[i]); // 记录第0-i天最小的购入价格
+            if(minv < nums[i])
+                res = max(res, nums[i] - minv); // 记录0-i天最大的利润
+        }
+        return res;
+    }
+};
+```
+
+
+
 ## 发散思维、抽象建模
 
 ### 面试题61 扑克牌中的顺子
@@ -3727,7 +4208,14 @@ public:
 
 ### 面试题64 求1+2+3+...+n
 
-【[OJ](https://www.nowcoder.com/practice/7a0da8fc483247ff8800059e12d7caf1?tpId=13&tqId=11200&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/7a0da8fc483247ff8800059e12d7caf1?tpId=13&tqId=11200&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/description/80/)】
+
+```
+输入：10
+输出：55
+```
+
+**题解**：
 
 使用递归解法最重要的是指定返回条件，但是本题无法直接使用 if 语句来指定返回条件。
 
@@ -3752,7 +4240,8 @@ class Solution {
 public:
     int Sum_Solution(int n) {
         int sum = n;
-        sum && (sum += Sum_Solution(n - 1));
+        // if(!sum) return 0; // 到0时返回
+        sum && (sum += Sum_Solution(n - 1)); // sum = 0 时，后半句不执行，即返回0
         return sum;
     }
 };
@@ -3762,7 +4251,7 @@ public:
 
 ### 面试题65 不用加减乘除做加法
 
-【[OJ](https://www.nowcoder.com/practice/59ac416b4b944300b617d4f7f111b215?tpId=13&tqId=11201&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/59ac416b4b944300b617d4f7f111b215?tpId=13&tqId=11201&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWIng](https://www.acwing.com/problem/content/description/81/)】
 
 首先看十进制是如何做的： 5+7=12，三步走 
 
@@ -3785,10 +4274,11 @@ class Solution {
 public:
     int Add(int num1, int num2)
     {
-        while (num2!=0) {
-            int temp = num1^num2;
-            num2 = (num1&num2) << 1;
-            num1 = temp;
+        while (num2) { // 进位为0时退出循环
+            int sum = num1 ^ num2; // 计算不进位时的和，不进位时对应的两位一定不同
+            int carry = (num1 & num2) << 1; // 计算进位， 对应的两位都为1才会进位，因而使用&运算
+            num1 = sum;
+            num2 = carry; // 进位结束时num2为0
         }
         return num1;
     }
