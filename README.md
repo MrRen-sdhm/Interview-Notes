@@ -6,15 +6,15 @@
 
 ## :pencil2: 数据结构与算法
 
-- [剑指Offer题解C++版](https://mrren-sdhm.github.io/Interview-Notes/#/notes/剑指offer题解C++版)
-- [LeetCode题解C++版](https://github.com/MrRen-sdhm/CS-Notes/blob/master/notes/Leetcode%20题解%20-%20目录.md)
-- [数据结构与算法笔记](https://mrren-sdhm.github.io/Interview-Notes/notes/html/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0.html)
-- [牛客网笔试面试题库](https://www.nowcoder.com/contestRoom?from=cyc_github)
+- [剑指Offer题解C++版](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/剑指offer题解C++版.md)
+- [LeetCode题解C++版](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/Leetcode%20题解%20-%20目录.md)
+- [数据结构与算法笔记](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/数据结构与算法学习笔记.md)
+- [牛客网笔试面试题库](https://www.nowcoder.com/contestRoom)
 
 ## :computer: 操作系统
 
 - [操作系统](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机操作系统%20-%20目录.md)
-- [Linux](https://github.com/CyC2018/CS-Notes/blob/master/notes/Linux.md)
+- [Linux基础](https://github.com/CyC2018/CS-Notes/blob/master/notes/Linux基础.md)
 
 ## :cloud: 计算机网络 
 
@@ -26,6 +26,10 @@
 
 - [面向对象思想](https://github.com/CyC2018/CS-Notes/blob/master/notes/面向对象思想.md)
 - [C++设计模式](https://github.com/CyC2018/CS-Notes/blob/master/notes/设计模式.md)
+
+## 🎯  嵌入式
+
+- [uCOS-III](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/uCOS-III学习笔记.md)
 
 ## :floppy_disk: 数据库
 
