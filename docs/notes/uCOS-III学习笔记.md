@@ -472,25 +472,14 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
 
 - OS_MsgQPut() 函数用于将消息放入队列中
 
-  `p_msg = OSMsgPool.NextPtr;`——从消息池获取一个消息（暂存于 p_msg），OSMsgPool 是消息池，它的 NextPtr 成员变量指向消息池中可用的消息。
-
-  `OSMsgPool.NextPtr = p_msg->NextPtr;`——更新消息池中 NextPtr 成员变量，指向消息池中下一个可用的消息。
-
-  `if (p_msg_q->NbrEntries == (OS_MSG_QTY)0)`——将获取的消息插入到消息队列时分两种情况：一种是队列中有消息情况，另一种是队列中没有消息情况。如果消息队列目前没有消息，将队列中的入队指针指向该消息，出队指针也指向该消息，因为现在消息放进来了，只有一个消息，无论是入队还是出队，都是该消息，更新队列的消息个数为 1，该消息的下一个消息为空。
-
-  `if ((opt & OS_OPT_POST_LIFO) == OS_OPT_POST_FIFO)`——如果消息队列目前已有消息，那么又分两种入队的选项：
-
-  - 如果采用 FIFO 方式插入队列，那么就将消息插入到入队端，消息队列的最后一个消息的 NextPtr 指针就指向该消息，然后入队的消息成为队列中排队的最后一个消息，那么需要更新它的下一个消息为空。
-  - 如果采用 LIFO 方式插入队列，将消息插入到出队端，队列中出队指针 OutPtr 指向该消息，需要出队的时候就是该消息首先出队。
-  
   ```c
-  void  OS_MsgQPut (OS_MSG_Q     *p_msg_q,   //消息队列指针
+void  OS_MsgQPut (OS_MSG_Q     *p_msg_q,   //消息队列指针
                     void         *p_void,    //消息指针
-                    OS_MSG_SIZE   msg_size,  //消息大小（单位：字节）
+                  OS_MSG_SIZE   msg_size,  //消息大小（单位：字节）
                     OS_OPT        opt,       //选项
-                    CPU_TS        ts,        //消息被发布时的时间戳
+                  CPU_TS        ts,        //消息被发布时的时间戳
                     OS_ERR       *p_err)     //返回错误类型
-  {
+{
       OS_MSG  *p_msg;
       OS_MSG  *p_msg_in;
   
@@ -550,6 +539,18 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
      *p_err          = OS_ERR_NONE;                           //错误类型为“无错误”
   }
   ```
+  
+  `p_msg = OSMsgPool.NextPtr;`——从消息池获取一个消息（暂存于 p_msg），OSMsgPool 是消息池，它的 NextPtr 成员变量指向消息池中可用的消息。
+  
+  `OSMsgPool.NextPtr = p_msg->NextPtr;`——更新消息池中 NextPtr 成员变量，指向消息池中下一个可用的消息。
+  
+  `if (p_msg_q->NbrEntries == (OS_MSG_QTY)0)`——将获取的消息插入到消息队列时分两种情况：一种是队列中有消息情况，另一种是队列中没有消息情况。如果消息队列目前没有消息，将队列中的入队指针指向该消息，出队指针也指向该消息，因为现在消息放进来了，只有一个消息，无论是入队还是出队，都是该消息，更新队列的消息个数为 1，该消息的下一个消息为空。
+  
+  `if ((opt & OS_OPT_POST_LIFO) == OS_OPT_POST_FIFO)`——如果消息队列目前已有消息，那么又分两种入队的选项：
+  
+  - 如果采用 FIFO 方式插入队列，那么就将消息插入到入队端，消息队列的最后一个消息的 NextPtr 指针就指向该消息，然后入队的消息成为队列中排队的最后一个消息，那么需要更新它的下一个消息为空。
+  - 如果采用 LIFO 方式插入队列，将消息插入到出队端，队列中出队指针 OutPtr 指向该消息，需要出队的时候就是该消息首先出队。
+  
 
 
 
