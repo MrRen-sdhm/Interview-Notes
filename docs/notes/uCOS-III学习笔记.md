@@ -472,7 +472,7 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
 
 - OS_MsgQPut() 函数用于将消息放入队列中
 
-  ```c
+```c
 void  OS_MsgQPut (OS_MSG_Q     *p_msg_q,   //消息队列指针
                     void         *p_void,    //消息指针
                   OS_MSG_SIZE   msg_size,  //消息大小（单位：字节）
@@ -538,138 +538,144 @@ void  OS_MsgQPut (OS_MSG_Q     *p_msg_q,   //消息队列指针
       p_msg->MsgTS   = ts;                                    //填写发布该消息时的时间戳
      *p_err          = OS_ERR_NONE;                           //错误类型为“无错误”
   }
-  ```
-  
-  `p_msg = OSMsgPool.NextPtr;`——从消息池获取一个消息（暂存于 p_msg），OSMsgPool 是消息池，它的 NextPtr 成员变量指向消息池中可用的消息。
-  
-  `OSMsgPool.NextPtr = p_msg->NextPtr;`——更新消息池中 NextPtr 成员变量，指向消息池中下一个可用的消息。
-  
-  `if (p_msg_q->NbrEntries == (OS_MSG_QTY)0)`——将获取的消息插入到消息队列时分两种情况：一种是队列中有消息情况，另一种是队列中没有消息情况。如果消息队列目前没有消息，将队列中的入队指针指向该消息，出队指针也指向该消息，因为现在消息放进来了，只有一个消息，无论是入队还是出队，都是该消息，更新队列的消息个数为 1，该消息的下一个消息为空。
-  
-  `if ((opt & OS_OPT_POST_LIFO) == OS_OPT_POST_FIFO)`——如果消息队列目前已有消息，那么又分两种入队的选项：
-  
-  - 如果采用 FIFO 方式插入队列，那么就将消息插入到入队端，消息队列的最后一个消息的 NextPtr 指针就指向该消息，然后入队的消息成为队列中排队的最后一个消息，那么需要更新它的下一个消息为空。
-  - 如果采用 LIFO 方式插入队列，将消息插入到出队端，队列中出队指针 OutPtr 指向该消息，需要出队的时候就是该消息首先出队。
-  
+```
 
+  - p_msg = OSMsgPool.NextPtr; 
+  
+    从消息池获取一个消息（暂存于 p_msg），OSMsgPool 是消息池，它的 NextPtr 成员变量指向消息池中可用的消息。
+  
+  - OSMsgPool.NextPtr = p_msg->NextPtr; 
+  
+    更新消息池中 NextPtr 成员变量，指向消息池中下一个可用的消息。
+  
+  - if (p_msg_q->NbrEntries == (OS_MSG_QTY)0)
+  
+    将获取的消息插入到消息队列时分两种情况：一种是队列中有消息情况，另一种是队列中没有消息情况。如果消息队列目前没有消息，将队列中的入队指针指向该消息，出队指针也指向该消息，因为现在消息放进来了，只有一个消息，无论是入队还是出队，都是该消息，更新队列的消息个数为 1，该消息的下一个消息为空。
+  
+  - if ((opt & OS_OPT_POST_LIFO) == OS_OPT_POST_FIFO) 
+  
+    如果消息队列目前已有消息，那么又分两种入队的选项：
+    - 如果采用 FIFO 方式插入队列，那么就将消息插入到入队端，消息队列的最后一个消息的 NextPtr 指针就指向该消息，然后入队的消息成为队列中排队的最后一个消息，那么需要更新它的下一个消息为空。
+    - 如果采用 LIFO 方式插入队列，将消息插入到出队端，队列中出队指针 OutPtr 指向该消息，需要出队的时候就是该消息首先出队。
 
+  
 
 - OS_Post() 函数负责把消息发送给任务
 
-  ```c
-  void  OS_Post (OS_PEND_OBJ  *p_obj,     //内核对象类型指针
-                 OS_TCB       *p_tcb,     //任务控制块
-                 void         *p_void,    //消息
-                 OS_MSG_SIZE   msg_size,  //消息大小
-                 CPU_TS        ts)        //时间戳
-  {
-      switch (p_tcb->TaskState) {                               //根据任务状态分类处理
-          case OS_TASK_STATE_RDY:                               //如果任务处于就绪状态
-          case OS_TASK_STATE_DLY:                               //如果任务处于延时状态
-          case OS_TASK_STATE_SUSPENDED:                         //如果任务处于挂起状态
-          case OS_TASK_STATE_DLY_SUSPENDED:                     //如果任务处于延时中被挂起状态
-               break;                                           //不用处理，直接跳出
-  
-          case OS_TASK_STATE_PEND:                              //如果任务处于无期限等待状态
-          case OS_TASK_STATE_PEND_TIMEOUT:                      //如果任务处于有期限等待状态
-               if (p_tcb->PendOn == OS_TASK_PEND_ON_MULTI) {    //如果任务在等待多个信号量或消息队列
-                   OS_Post1(p_obj,                              //标记哪个内核对象被发布
-                            p_tcb,
-                            p_void,
-                            msg_size,
-                            ts);
-               } else {                                     //如果任务不是在等待多个信号量或消息队列
-  #if (OS_MSG_EN > 0u)                                      //如果使能了任务队列或消息队列
-                   p_tcb->MsgPtr  = p_void;                 //保存消息到等待任务
-                   p_tcb->MsgSize = msg_size;                   
-  #endif
-                   p_tcb->TS      = ts;                     //保存时间戳到等待任务
-               }
-               if (p_obj != (OS_PEND_OBJ *)0) {             //如果内核对象为空
-                   OS_PendListRemove(p_tcb);                /* 从等待列表移除该等待任务 */
-  #if OS_CFG_DBG_EN > 0u                                    //如果使能了调试代码和变量 
-                   OS_PendDbgNameRemove(p_obj,              //移除内核对象的调试名
-                                        p_tcb);
-  #endif
-               }
-               OS_TaskRdy(p_tcb);                               //让该等待任务准备运行
-               p_tcb->TaskState  = OS_TASK_STATE_RDY;           //任务状态改为就绪状态
-               p_tcb->PendStatus = OS_STATUS_PEND_OK;           //清除等待状态
-               p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING;     //标记不再等待
-               break;
-  
-          case OS_TASK_STATE_PEND_SUSPENDED:                    //如果任务在无期限等待中被挂起
-          case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:            //如果任务在有期限等待中被挂起
-               if (p_tcb->PendOn == OS_TASK_PEND_ON_MULTI) {    //如果任务在等待多个信号量或消息队列
-                   OS_Post1(p_obj,                              //标记哪个内核对象被发布
-                            p_tcb,
-                            p_void,
-                            msg_size,
-                            ts);
-               } else {                                       //如果任务不在等待多个信号量或消息队列
-  #if (OS_MSG_EN > 0u)                                        //如果使能了调试代码和变量
-                   p_tcb->MsgPtr  = p_void;                   //保存消息到等待任务
-                   p_tcb->MsgSize = msg_size;                     
-  #endif
-                   p_tcb->TS      = ts;                         //保存时间戳到等待任务
-               }
-               OS_TickListRemove(p_tcb);                        /* 从节拍列表移除该等待任务 */
-               if (p_obj != (OS_PEND_OBJ *)0) {                 //如果内核对象为空
-                   OS_PendListRemove(p_tcb);                    /* 从等待列表移除该等待任务 */
-  #if OS_CFG_DBG_EN > 0u                                        //如果使能了调试代码和变量 
-                   OS_PendDbgNameRemove(p_obj,                  //移除内核对象的调试名
-                                        p_tcb);
-  #endif
-               }
-               p_tcb->TaskState  = OS_TASK_STATE_SUSPENDED;     //任务状态改为被挂起状态
-               p_tcb->PendStatus = OS_STATUS_PEND_OK;           //清除等待状态
-               p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING;     //标记不再等待
-               break;
-  
-          default:                                              //如果任务状态超出预期
-               break;                                           //直接跳出
-      }
-  }
-  ```
+```c
+void  OS_Post (OS_PEND_OBJ  *p_obj,     //内核对象类型指针
+               OS_TCB       *p_tcb,     //任务控制块
+               void         *p_void,    //消息
+               OS_MSG_SIZE   msg_size,  //消息大小
+               CPU_TS        ts)        //时间戳
+{
+    switch (p_tcb->TaskState) {                               //根据任务状态分类处理
+        case OS_TASK_STATE_RDY:                               //如果任务处于就绪状态
+        case OS_TASK_STATE_DLY:                               //如果任务处于延时状态
+        case OS_TASK_STATE_SUSPENDED:                         //如果任务处于挂起状态
+        case OS_TASK_STATE_DLY_SUSPENDED:                     //如果任务处于延时中被挂起状态
+             break;                                           //不用处理，直接跳出
 
-  如果任务处于**就绪状态、延时状态、挂起状态或者是延时中被挂起状态**，都不用处理，直接退出，因为现在这个操作是内核对象进行发布（释放）操作，而这些状态的任务是与内核对象无关的状态，也就是这些任务没在等待相关的内核对象（如消息队列、信号量等）。
+        case OS_TASK_STATE_PEND:                              //如果任务处于无期限等待状态
+        case OS_TASK_STATE_PEND_TIMEOUT:                      //如果任务处于有期限等待状态
+             if (p_tcb->PendOn == OS_TASK_PEND_ON_MULTI) {    //如果任务在等待多个信号量或消息队列
+                 OS_Post1(p_obj,                              //标记哪个内核对象被发布
+                          p_tcb,
+                          p_void,
+                          msg_size,
+                          ts);
+             } else {                                     //如果任务不是在等待多个信号量或消息队列
+#if (OS_MSG_EN > 0u)                                      //如果使能了任务队列或消息队列
+                 p_tcb->MsgPtr  = p_void;                 //保存消息到等待任务
+                 p_tcb->MsgSize = msg_size;                   
+#endif
+                 p_tcb->TS      = ts;                     //保存时间戳到等待任务
+             }
+             if (p_obj != (OS_PEND_OBJ *)0) {             //如果内核对象为空
+                 OS_PendListRemove(p_tcb);                /* 从等待列表移除该等待任务 */
+#if OS_CFG_DBG_EN > 0u                                    //如果使能了调试代码和变量 
+                 OS_PendDbgNameRemove(p_obj,              //移除内核对象的调试名
+                                      p_tcb);
+#endif
+             }
+             OS_TaskRdy(p_tcb);                               //让该等待任务准备运行
+             p_tcb->TaskState  = OS_TASK_STATE_RDY;           //任务状态改为就绪状态
+             p_tcb->PendStatus = OS_STATUS_PEND_OK;           //清除等待状态
+             p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING;     //标记不再等待
+             break;
 
-  如果任务处于**无期限等待状态或者是有期限等待状态**，那么就需要处理了，先看看任务是不是在等待多个内核对象。
+        case OS_TASK_STATE_PEND_SUSPENDED:                    //如果任务在无期限等待中被挂起
+        case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:            //如果任务在有期限等待中被挂起
+             if (p_tcb->PendOn == OS_TASK_PEND_ON_MULTI) {    //如果任务在等待多个信号量或消息队列
+                 OS_Post1(p_obj,                              //标记哪个内核对象被发布
+                          p_tcb,
+                          p_void,
+                          msg_size,
+                          ts);
+             } else {                                       //如果任务不在等待多个信号量或消息队列
+#if (OS_MSG_EN > 0u)                                        //如果使能了调试代码和变量
+                 p_tcb->MsgPtr  = p_void;                   //保存消息到等待任务
+                 p_tcb->MsgSize = msg_size;                     
+#endif
+                 p_tcb->TS      = ts;                         //保存时间戳到等待任务
+             }
+             OS_TickListRemove(p_tcb);                        /* 从节拍列表移除该等待任务 */
+             if (p_obj != (OS_PEND_OBJ *)0) {                 //如果内核对象为空
+                 OS_PendListRemove(p_tcb);                    /* 从等待列表移除该等待任务 */
+#if OS_CFG_DBG_EN > 0u                                        //如果使能了调试代码和变量 
+                 OS_PendDbgNameRemove(p_obj,                  //移除内核对象的调试名
+                                      p_tcb);
+#endif
+             }
+             p_tcb->TaskState  = OS_TASK_STATE_SUSPENDED;     //任务状态改为被挂起状态
+             p_tcb->PendStatus = OS_STATUS_PEND_OK;           //清除等待状态
+             p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING;     //标记不再等待
+             break;
 
-  - 如果任务在等待多个信号量或消息队列，就调用 OS_Post1() 函数标记一下是哪个内核对象进行发布（释放）操作。
+        default:                                              //如果任务状态超出预期
+             break;                                           //直接跳出
+    }
+}
+```
 
-  - 如果任务不是在等待多个信号量或消息队列，直接操作即可。如果使能了任务队列或消息队列（OS_MSG_EN宏定义），保存消息到等待任务控制块的 MsgPtr 成员变量中，将消息的大小保存到等待任务控制块的 MsgSize 成员变量中。 
+如果任务处于**就绪状态、延时状态、挂起状态或者是延时中被挂起状态**，都不用处理，直接退出，因为现在这个操作是内核对象进行发布（释放）操作，而这些状态的任务是与内核对象无关的状态，也就是这些任务没在等待相关的内核对象（如消息队列、信号量等）。
 
-  - 如果内核对象不为空，调用 OS_PendListRemove() 函数**从等待列表移除该等待任务**。
+如果任务处于**无期限等待状态或者是有期限等待状态**，那么就需要处理了，先看看任务是不是在等待多个内核对象。
 
-  如果任务在**无期限等待中被挂起，或者任务在有期限等待中被挂起**，反正任务就是在等待中被挂起了，也能进行内核对象发布（释放）操作。同理，先看看任务是不是在等待多个内核对象。 
+- 如果任务在等待多个信号量或消息队列，就调用 OS_Post1() 函数标记一下是哪个内核对象进行发布（释放）操作。
 
-  - 如果任务在等待多个信号量或消息队列，就调用 OS_Post1() 函数标记一下是哪个内核对象进行发布（释放）操作。 
-  - 如果任务不在等待多个信号量或消息队列，就直接操作即可。
-  - 如果使能了任务队列或消息队列（使能了 OS_MSG_EN 宏定义），保存消息到等待任务控制块的 MsgPtr 成员变量中，将消息的大小保存到等待任务控制块的 MsgSize 成员变量中。 
+- 如果任务不是在等待多个信号量或消息队列，直接操作即可。如果使能了任务队列或消息队列（OS_MSG_EN宏定义），保存消息到等待任务控制块的 MsgPtr 成员变量中，将消息的大小保存到等待任务控制块的 MsgSize 成员变量中。 
 
-  调用OS_TickListRemove()函数将任务**从节拍列表中移除**。
+- 如果内核对象不为空，调用 OS_PendListRemove() 函数**从等待列表移除该等待任务**。
 
-  从**等待列表移除**该等待任务。
+如果任务在**无期限等待中被挂起，或者任务在有期限等待中被挂起**，反正任务就是在等待中被挂起了，也能进行内核对象发布（释放）操作。同理，先看看任务是不是在等待多个内核对象。 
 
-  任务状态改为被挂起状态。
+- 如果任务在等待多个信号量或消息队列，就调用 OS_Post1() 函数标记一下是哪个内核对象进行发布（释放）操作。 
+- 如果任务不在等待多个信号量或消息队列，就直接操作即可。
+- 如果使能了任务队列或消息队列（使能了 OS_MSG_EN 宏定义），保存消息到等待任务控制块的 MsgPtr 成员变量中，将消息的大小保存到等待任务控制块的 MsgSize 成员变量中。 
 
-  清除任务的等待状态。
+调用OS_TickListRemove()函数将任务**从节拍列表中移除**。
 
-  标记任务不再等待。
+从**等待列表移除**该等待任务。
+
+任务状态改为被挂起状态。
+
+清除任务的等待状态。
+
+标记任务不再等待。
 
 
 
 - OSQPost() 使用实例：
 
-  ```c
-  /* 发布消息到消息队列 queue */
-  OSQPost ((OS_Q        *)&queue,            //消息变量指针
-           (void        *)"Fire uC/OS-III",  //要发送的数据的指针，将内存块首地址通过队列“发送出去”
-           (OS_MSG_SIZE  )sizeof ( "Fire uC/OS-III" ),        //数据字节大小
-           (OS_OPT       )OS_OPT_POST_FIFO | OS_OPT_POST_ALL, //先进先出和发布给全部任务的形式
-           (OS_ERR      *)&err);	                            //返回错误类型
-  ```
+```c
+/* 发布消息到消息队列 queue */
+OSQPost ((OS_Q        *)&queue,            //消息变量指针
+         (void        *)"Fire uC/OS-III",  //要发送的数据的指针，将内存块首地址通过队列“发送出去”
+         (OS_MSG_SIZE  )sizeof ( "Fire uC/OS-III" ),        //数据字节大小
+         (OS_OPT       )OS_OPT_POST_FIFO | OS_OPT_POST_ALL, //先进先出和发布给全部任务的形式
+         (OS_ERR      *)&err);	                            //返回错误类型
+```
 
 
 
