@@ -15,10 +15,12 @@
 
 - [操作系统](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机操作系统%20-%20目录.md)
 - [Linux基础](https://github.com/CyC2018/CS-Notes/blob/master/notes/Linux基础.md)
+- [Linux内核](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/《Linux内核设计与实现》笔记.md)
 
-## :cloud: 计算机网络 
+## :cloud: 计算机网络
 
-- [计算机网络](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机网络%20-%20目录.md)
+- [计算机网络基础](https://github.com/CyC2018/CS-Notes/blob/master/notes/计算机网络%20-%20目录.md)
+- [计算机网络 自顶向下方法](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/《计算机网络 自顶向下方法》笔记.md)
 - [HTTP](https://github.com/CyC2018/CS-Notes/blob/master/notes/HTTP.md)
 - [Socket](https://github.com/CyC2018/CS-Notes/blob/master/notes/Socket.md)
 
