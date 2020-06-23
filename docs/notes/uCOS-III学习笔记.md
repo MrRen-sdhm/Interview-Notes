@@ -383,20 +383,17 @@ struct  os_msg_q {                        /* OS_MSG_Q */
 发送消息的选项：
 
 ```c
-#define OS_OPT_POST_FIFO (OS_OPT)(0x0000u) /* 默认采用FIFO 方式发送 */ 
-#define OS_OPT_POST_LIFO (OS_OPT)(0x0010u) /* 采用LIFO 方式发送消息 */ 
-#define OS_OPT_POST_1   (OS_OPT)(0x0000u)  /* 将消息发布到最高优先级的等待任务 */  
-#define OS_OPT_POST_ALL (OS_OPT)(0x0200u)  /* 向所有等待的任务广播消息 */ 
-  
+#define OS_OPT_POST_FIFO (OS_OPT)(0x0000u) /* 默认采用FIFO 方式发送 */
+#define OS_OPT_POST_LIFO (OS_OPT)(0x0010u) /* 采用LIFO 方式发送消息 */
+#define OS_OPT_POST_1   (OS_OPT)(0x0000u)  /* 将消息发布到最高优先级的等待任务 */
+#define OS_OPT_POST_ALL (OS_OPT)(0x0200u)  /* 向所有等待的任务广播消息 */
+
 #define OS_OPT_POST_NO_SCHED (OS_OPT)(0x8000u) /* 发送消息但是不进行任务调度 */
 ```
 
-- 没有任务等待就直接将消息放入队列中即可，而有任务在等待则有可能需要唤醒该任务。
 
-  如果有任务在等待消息，会有两种情况：
 
-  - 一种是将消息发送到所有等待任务（广播消息）。
-  - 另一种是只将消息发送到等待任务中最高优先级的任务。根据 opt 选项选择其中一种方式进行发送消息，如果要把消息发送给所有等待任务，那就首先获取到等待任务个数，保存在要处理任务个数 cnt 变量中。
+OS_QPost() 函数源码：
 
 ```c
 void  OS_QPost (OS_Q         *p_q,      //消息队列指针
@@ -413,12 +410,12 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
     OS_PEND_DATA  *p_pend_data_next;
     OS_TCB        *p_tcb;
     CPU_SR_ALLOC();  //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
-					 //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
-					 // SR（临界段关中断只需保存SR），开中断时将该值还原。
+                     //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                     // SR（临界段关中断只需保存SR），开中断时将该值还原。
 
     OS_CRITICAL_ENTER();                              //进入临界段
     p_pend_list = &p_q->PendList;                     //取出该队列的等待列表
-    
+
     /* 如果有任务在等待该队列 */
     if (p_pend_list->NbrEntries == (OS_OBJ_QTY)0) {   //如果没有任务在等待该队列
         if ((opt & OS_OPT_POST_LIFO) == (OS_OPT)0) {  //把消息发布到队列的末端
@@ -435,7 +432,7 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
         OS_CRITICAL_EXIT();                          //退出临界段
         return;                                      //返回，执行完毕
     }
-    
+
     /* 如果有任务在等待该队列 */
     if ((opt & OS_OPT_POST_ALL) != (OS_OPT)0) {     //如果要把消息发布给所有等待任务
         cnt = p_pend_list->NbrEntries;              //获取等待任务数目
@@ -462,6 +459,17 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
 }
 ```
 
+
+
+- 没有任务等待就直接将消息放入队列中即可，而有任务在等待则有可能需要唤醒该任务。
+
+  如果有任务在等待消息，会有两种情况：
+
+  - 一种是将消息发送到所有等待任务（广播消息）。
+  - 另一种是只将消息发送到等待任务中最高优先级的任务。根据 opt 选项选择其中一种方式进行发送消息，如果要把消息发送给所有等待任务，那就首先获取到等待任务个数，保存在要处理任务个数 cnt 变量中。
+
+
+
 - OS_MsgQPut() 函数用于将消息放入队列中
 
   `p_msg = OSMsgPool.NextPtr;`——从消息池获取一个消息（暂存于 p_msg），OSMsgPool 是消息池，它的 NextPtr 成员变量指向消息池中可用的消息。
@@ -474,7 +482,7 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
 
   - 如果采用 FIFO 方式插入队列，那么就将消息插入到入队端，消息队列的最后一个消息的 NextPtr 指针就指向该消息，然后入队的消息成为队列中排队的最后一个消息，那么需要更新它的下一个消息为空。
   - 如果采用 LIFO 方式插入队列，将消息插入到出队端，队列中出队指针 OutPtr 指向该消息，需要出队的时候就是该消息首先出队。
-
+  
   ```c
   void  OS_MsgQPut (OS_MSG_Q     *p_msg_q,   //消息队列指针
                     void         *p_void,    //消息指针
@@ -542,6 +550,8 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
      *p_err          = OS_ERR_NONE;                           //错误类型为“无错误”
   }
   ```
+
+
 
 - OS_Post() 函数负责把消息发送给任务
 
@@ -646,6 +656,8 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
   清除任务的等待状态。
 
   标记任务不再等待。
+
+
 
 - OSQPost() 使用实例：
 
@@ -814,6 +826,8 @@ void  *OSQPend (OS_Q         *p_q,       //消息队列指针
 }
 ```
 
+
+
 - OS_MsgQGet() 函数从消息队列获取一个消息
 
   ```c
@@ -868,7 +882,9 @@ void  *OSQPend (OS_Q         *p_q,       //消息队列指针
       return (p_void);                            //返回罅隙内容
   }
   ```
-  
+
+
+
 - OS_Pend() 函数将当前任务脱离就绪列表，并根据用户指定的阻塞时间插入到节拍列表和队列等待列表，然后打开调度器，但不进行调度。
 
   ```c
@@ -903,6 +919,8 @@ void  *OSQPend (OS_Q         *p_q,       //消息队列指针
   #endif
   }
   ```
+
+
 
 - OSQPend() 使用实例
 
