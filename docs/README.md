@@ -16,7 +16,7 @@
 ## ☁️ 计算机网络
 
 - [计算机网络基础](notes/计算机网络%20-%20目录1.md) </br>
-- [计算机网络 自顶向下方法](notes/《计算机网络 自顶向下方法》笔记.md) </br>
+- [计算机网络 自顶向下方法](notes/《计算机网络%20自顶向下方法》笔记.md) </br>
 - [HTTP](notes/HTTP.md) </br>
 - [Socket](notes/Socket.md)
 
@@ -33,7 +33,7 @@
 
 - [数据库系统原理](notes/数据库系统原理.md) </br>
 - [SQL](notes/SQL.md) </br>
-- [Leetcode-Database 题解](notes/Leetcode-Database%20题解.md) </br>
+- [Leetcode-Database题解](notes/Leetcode-Database%20题解.md) </br>
 - [MySQL](notes/MySQL.md) </br>
 - [Redis](notes/Redis.md)
 
