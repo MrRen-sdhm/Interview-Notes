@@ -121,42 +121,41 @@ OSTimeDly()在我们任务中用得非常之多，**每个任务都必须是死�
 - 延时函数**不可在中断中使用**。
 - 如果**调度器被锁，则不允许进行延时操作**。因为延时就必须进行任务的切换，所以在延时的时候不能锁定调度器
 - 需要调用OS_TickListInsert() 函数将当前任务插入到节拍列表，加入节拍列表的任务会按照延时时间进行升序排列。其中会使用到哈希算法（取余）来决定任务存储到节拍列表中的位置。
-
 - OSTimeDly() 使用示例：
 
-    ```c
-    void AppTask(void * p_arg)
-    {
-        OS_ERR err;
+```c
+void AppTask(void * p_arg)
+{
+    OS_ERR err;
  while (DEF_TRUE) {
-            //  这里为任务主体代码
+        //  这里为任务主体代码
 
-            /* 调用相对延时函数, 阻塞1000 个tick */
-            OSTimeDly(1000, OS_OPT_TIME_DLY, &err);
+        /* 调用相对延时函数, 阻塞1000 个tick */
+        OSTimeDly(1000, OS_OPT_TIME_DLY, &err);
  }
-    }
-    ```
+}
+```
 
 
 
 OSTimeDlyHMSM() 函数与 OSTimeDly() 函数的功能类似，也是用于停止当前任务进行的运行，延时一段时间后再运行，但是 OSTimeDlyHMSM() 函数会更加直观，延时多少个小时、分钟、秒、毫秒。
 
 - OSTimeDlyHMSM() 使用示例：
-  
-     ```c
-     void AppTask(void * p_arg)
-     {
-         OS_ERR err;
-         while (DEF_TRUE) {
-             //  这里为任务主体代码
-     
-             /* 调用延时函数, 延时1s */
-             OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_DLY, &err);
-         }
-     }
-     ```
-   
-     
+
+```c
+void AppTask(void * p_arg)
+{
+    OS_ERR err;
+    while (DEF_TRUE) {
+        //  这里为任务主体代码
+
+        /* 调用延时函数, 延时1s */
+        OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_DLY, &err);
+    }
+}
+```
+
+
 
 ## 6. 任务的设计要点
 
@@ -210,32 +209,31 @@ uCOS 中使用队列数据结构实现**任务异步通信**工作，具有如�
 在系统初始化（OSInit() ）的时候，系统就会将消息池进行初始化，其中， OS_MsgPoolInit() 函数就是用来初始化消息池的。
 
 - 系统会将消息池里的消息逐条串成单向链表，方便管理，通过 for循环将消息池中的每个消息元素（消息）进行初始化，并且通过单链表连接起来。
-
 - 每个消息 OS_MSG 有四个元素：
 
-  ```c
-  struct  os_msg {                   /* 消息控制块  */
-      OS_MSG              *NextPtr;  /* 指向下一个可用的消息 */
-      void                *MsgPtr;   /* 指向实际的消息 */
-      OS_MSG_SIZE          MsgSize;  /* 记录消息的大小（以字节为单位）*/
-      CPU_TS               MsgTS;    /* 记录发送消息时的时间戳 */
-  };
-  ```
+```c
+struct  os_msg {                   /* 消息控制块  */
+    OS_MSG              *NextPtr;  /* 指向下一个可用的消息 */
+    void                *MsgPtr;   /* 指向实际的消息 */
+    OS_MSG_SIZE          MsgSize;  /* 记录消息的大小（以字节为单位）*/
+    CPU_TS               MsgTS;    /* 记录发送消息时的时间戳 */
+};
+```
 
-  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204357.png" alt="image-20200620204353633" style="zoom:80%;" />
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204357.png" alt="image-20200620204353633" style="zoom:80%;" />
 
 - OSMsgPool 是个全局变量，用来管理消息池的存取操作，它包含以下四个元素：
 
-  ```c
-  struct  os_msg_pool {                /* 消息池控制块 */
-      OS_MSG              *NextPtr;    /* 指向下一个可用的消息 */
-      OS_MSG_QTY           NbrFree;    /* 记录消息池中可用的消息个数 */
-      OS_MSG_QTY           NbrUsed; 	 /* 记录已用的消息个数 */
-      OS_MSG_QTY           NbrUsedMax; /* 记录使用的消息峰值数量 */
-  };
-  ```
+```c
+struct  os_msg_pool {                /* 消息池控制块 */
+    OS_MSG              *NextPtr;    /* 指向下一个可用的消息 */
+    OS_MSG_QTY           NbrFree;    /* 记录消息池中可用的消息个数 */
+    OS_MSG_QTY           NbrUsed; 	 /* 记录已用的消息个数 */
+    OS_MSG_QTY           NbrUsedMax; /* 记录使用的消息峰值数量 */
+};
+```
 
-  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204718.png" alt="image-20200620204716962" style="zoom:80%;" />
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204718.png" alt="image-20200620204716962" style="zoom:80%;" />
 
 - 初始化完成的消息池示意图：
 
@@ -321,7 +319,7 @@ struct  os_msg_q {                        /* OS_MSG_Q */
 
 - 一种是 FIFO 模式，即先进先出，这个时候消息的存取是在单向链表的两端，一个头一个尾，存取位置可能不一样就产生了这两个输入指针和输出指针。
 
-  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620215725.png" alt="image-20200620215721715" style="zoom: 67%;" />
+  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625163047.png" alt="image-20200625163041970" style="zoom:67%;" />
 
 - 另一种是 LIFO 模式，后进先出，这个时候消息的存取都是在单向链表的一端，仅仅用 OutPtr 就足够指示存取的位置，当队列中已经存在比较多的消息没有处理，这个时候有个**紧急的消息**需要马上传送到其他任务去的时候就可以在发布消息的时候选择 LIFO 模式。 
 
@@ -334,22 +332,19 @@ struct  os_msg_q {                        /* OS_MSG_Q */
 ### 创建消息队列函数OSQCreate()
 
 - 每创建一个新的队列都需要为其分配 RAM，在创建的时候我们需要自己定义一个消息队列结构体，其内存是由编译器自动分配的。
-  
 - 消息队列的阻塞列表用于记录阻塞在此消息队列上的任务。
-
 - 定义了队列的句柄（结构体）并不等于创建了队列，创建队列必须时调用消息队列创建函数进行创建，否则，以后根据队列句柄使用消息队列的其它函数时会发生错误，用户通过消息队列句柄就可使用消息队列进行发送与获取消息的操作。
-
 - 消息队列创建示例：
 
-  ```c
-  OS_Q  queue; //声明消息队列
-  OS_ERR      err;
-  /* 创建消息队列 queue */
-  OSQCreate ((OS_Q         *)&queue,            //指向消息队列的指针
-             (CPU_CHAR     *)"Queue For Test",  //队列的名字
-             (OS_MSG_QTY    )20,                //最多可存放消息的数目
-             (OS_ERR       *)&err);             //返回错误类型
-  ```
+```c
+OS_Q  queue; //声明消息队列
+OS_ERR      err;
+/* 创建消息队列 queue */
+OSQCreate ((OS_Q         *)&queue,            //指向消息队列的指针
+           (CPU_CHAR     *)"Queue For Test",  //队列的名字
+           (OS_MSG_QTY    )20,                //最多可存放消息的数目
+           (OS_ERR       *)&err);             //返回错误类型
+```
 
 
 
@@ -358,19 +353,17 @@ struct  os_msg_q {                        /* OS_MSG_Q */
 队列删除函数是根据队列结构（队列句柄）直接删除的，删除之后这个消息队列的所有信息都会被系统清空，而且不能再次使用这个消息队列了。需要注意的是，**如果某个消息队列没有被定义，那也是无法被删除的**。如果删除消息队列时，有任务正在等待消息，则不应该进行删除操作，删除之后的消息队列就不可用了。
 
 - 如果任务是就绪状态、延时状态、挂起状态或者是在延时中被挂起，这些任务状态均与等待内核对象是无关的，在内核对象被删除的时候无需进行任何操作。
-
 - 如果任务是无期限等待状态或者是有期限等待状态，那么在内核对象被删除的时候需要将这些任务恢复。
-
 - 如果任务在无期限等待中被挂起或者在有期限等待中被挂起，也是需要将这些等待内核对象的任务从等待中移除，但是由于在等待中被挂起，那么就不会将这些任务恢复为就绪态，仅仅是将任务从等待列表中移除。
 
-  ```c
-  OS_Q queue; //声明消息队列
-  OS_ERR err;
-  /* 删除消息队列 queue */
-  OSQDel ((OS_Q *)&queue, //指向消息队列的指针
-          OS_OPT_DEL_NO_PEND,
-          (OS_ERR *)&err); //返回错误类型
-  ```
+```c
+OS_Q queue; //声明消息队列
+OS_ERR err;
+/* 删除消息队列 queue */
+OSQDel ((OS_Q *)&queue, //指向消息队列的指针
+        OS_OPT_DEL_NO_PEND,
+        (OS_ERR *)&err); //返回错误类型
+```
 
 
 
@@ -473,12 +466,12 @@ void  OS_QPost (OS_Q         *p_q,      //消息队列指针
 - OS_MsgQPut() 函数用于将消息放入队列中
 
 ```c
-void  OS_MsgQPut (OS_MSG_Q     *p_msg_q,   //消息队列指针
-                    void         *p_void,    //消息指针
-                  OS_MSG_SIZE   msg_size,  //消息大小（单位：字节）
-                    OS_OPT        opt,       //选项
-                  CPU_TS        ts,        //消息被发布时的时间戳
-                    OS_ERR       *p_err)     //返回错误类型
+void  OS_MsgQPut(OS_MSG_Q     *p_msg_q,   //消息队列指针
+                 void         *p_void,    //消息指针
+                 OS_MSG_SIZE   msg_size,  //消息大小（单位：字节）
+                 OS_OPT        opt,       //选项
+                 CPU_TS        ts,        //消息被发布时的时间戳
+                 OS_ERR       *p_err)     //返回错误类型
 {
       OS_MSG  *p_msg;
       OS_MSG  *p_msg_in;
@@ -835,118 +828,118 @@ void  *OSQPend (OS_Q         *p_q,       //消息队列指针
 
 
 
-- OS_MsgQGet() 函数从消息队列获取一个消息
+OS_MsgQGet() 函数从消息队列获取一个消息。
 
-  ```c
-  void  *OS_MsgQGet (OS_MSG_Q     *p_msg_q,     //消息队列
-                     OS_MSG_SIZE  *p_msg_size,  //返回消息大小
-                     CPU_TS       *p_ts,        //返回某些操作的时间戳
-                     OS_ERR       *p_err)       //返回错误类型
-  {
-      OS_MSG  *p_msg;
-      void    *p_void;
-  
-  #ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
-      if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
-          OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
-          return ((void *)0);             //返回空消息，停止执行
-      }
-  #endif
-  
-      if (p_msg_q->NbrEntries == (OS_MSG_QTY)0) {  //如果消息队列没有消息
-         *p_msg_size = (OS_MSG_SIZE)0;             //返回消息长度为0
-          if (p_ts != (CPU_TS *)0) {               //如果 p_ts 非空
-             *p_ts  = (CPU_TS  )0;                 //清零 p_ts
-          }
-         *p_err = OS_ERR_Q_EMPTY;                  //错误类型为“队列没消息”
-          return ((void *)0);                      //返回空消息，停止执行
-      }
-      
-      /* 如果消息队列有消息 !!!*/
-      p_msg           = p_msg_q->OutPtr;          //从队列的出口端提取消息           
-      p_void          = p_msg->MsgPtr;            //提取消息内容
-     *p_msg_size      = p_msg->MsgSize;           //提取消息长度
-      if (p_ts != (CPU_TS *)0) {                  //如果 p_ts 非空
-         *p_ts  = p_msg->MsgTS;                   //获取消息被发布时的时间戳
-      }
-  
-      p_msg_q->OutPtr = p_msg->NextPtr;           //修改队列的出队指针
-  
-      if (p_msg_q->OutPtr == (OS_MSG *)0) {       //如果队列没有消息了
-          p_msg_q->InPtr      = (OS_MSG   *)0;    //清零出队指针
-          p_msg_q->NbrEntries = (OS_MSG_QTY)0;    //清零消息数
-      } else {                                    //如果队列还有消息
-          p_msg_q->NbrEntries--;                  //队列的消息数减1
-      }
-      
-      /* 从消息队列提取完消息信息后，将消息释放回消息池供继续使用 !!!*/
-      p_msg->NextPtr    = OSMsgPool.NextPtr;      /* 消息插回消息池，以便重复利用 */
-      OSMsgPool.NextPtr = p_msg;
-      OSMsgPool.NbrFree++;                        //消息池的可用消息数加1
-      OSMsgPool.NbrUsed--;                        //消息池的已用消息数减1
-  
-     *p_err             = OS_ERR_NONE;            //错误类型为“无错误”
-      return (p_void);                            //返回罅隙内容
-  }
-  ```
+```c
+void  *OS_MsgQGet (OS_MSG_Q     *p_msg_q,     //消息队列
+                   OS_MSG_SIZE  *p_msg_size,  //返回消息大小
+                   CPU_TS       *p_ts,        //返回某些操作的时间戳
+                   OS_ERR       *p_err)       //返回错误类型
+{
+    OS_MSG  *p_msg;
+    void    *p_void;
 
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((void *)0);             //返回空消息，停止执行
+    }
+#endif
 
+    if (p_msg_q->NbrEntries == (OS_MSG_QTY)0) {  //如果消息队列没有消息
+       *p_msg_size = (OS_MSG_SIZE)0;             //返回消息长度为0
+        if (p_ts != (CPU_TS *)0) {               //如果 p_ts 非空
+           *p_ts  = (CPU_TS  )0;                 //清零 p_ts
+        }
+       *p_err = OS_ERR_Q_EMPTY;                  //错误类型为“队列没消息”
+        return ((void *)0);                      //返回空消息，停止执行
+    }
+    
+    /* 如果消息队列有消息 !!!*/
+    p_msg           = p_msg_q->OutPtr;          //从队列的出口端提取消息           
+    p_void          = p_msg->MsgPtr;            //提取消息内容
+   *p_msg_size      = p_msg->MsgSize;           //提取消息长度
+    if (p_ts != (CPU_TS *)0) {                  //如果 p_ts 非空
+       *p_ts  = p_msg->MsgTS;                   //获取消息被发布时的时间戳
+    }
 
-- OS_Pend() 函数将当前任务脱离就绪列表，并根据用户指定的阻塞时间插入到节拍列表和队列等待列表，然后打开调度器，但不进行调度。
+    p_msg_q->OutPtr = p_msg->NextPtr;           //修改队列的出队指针
 
-  ```c
-  void  OS_Pend (OS_PEND_DATA  *p_pend_data,  //待插入等待列表的元素
-                 OS_PEND_OBJ   *p_obj,        //等待的内核对象
-                 OS_STATE       pending_on,   //等待哪种对象内核
-                 OS_TICK        timeout)      //等待期限
-  {
-      OS_PEND_LIST  *p_pend_list;
-  
-      OSTCBCurPtr->PendOn     = pending_on;                 //资源不可用，开始等待
-      OSTCBCurPtr->PendStatus = OS_STATUS_PEND_OK;          //正常等待中
-  
-      OS_TaskBlock(OSTCBCurPtr,                             /* 阻塞当前运行任务 */
-                   timeout);                                /* 如果timeout非0，把任务插入节拍列表 */
-  
-      if (p_obj != (OS_PEND_OBJ *)0) {                      //如果等待对象非空
-          p_pend_list             = &p_obj->PendList;       //获取对象的等待列表到 p_pend_list
-          p_pend_data->PendObjPtr = p_obj;                  //保存要等待的对象
-          OS_PendDataInit((OS_TCB       *)OSTCBCurPtr,      /* 初始化p_pend_data（待插入等待列表）*/
-                          (OS_PEND_DATA *)p_pend_data,
-                          (OS_OBJ_QTY    )1);
-          OS_PendListInsertPrio(p_pend_list,                /* 按优先级将p_pend_data插入到等待列表 */
-                                p_pend_data);
-      } else {                                                 //如果等待对象为空
-          OSTCBCurPtr->PendDataTblEntries = (OS_OBJ_QTY    )0; //清零当前任务的等待域数据
-          OSTCBCurPtr->PendDataTblPtr     = (OS_PEND_DATA *)0; 
-      }
-  #if OS_CFG_DBG_EN > 0u                                       //如果使能了调试代码和变量 
-      OS_PendDbgNameAdd(p_obj,                                 //更新信号量的 DbgNamePtr 元素为其等待
-                        OSTCBCurPtr);                          //列表中优先级最高的任务的名称。
-  #endif
-  }
-  ```
+    if (p_msg_q->OutPtr == (OS_MSG *)0) {       //如果队列没有消息了
+        p_msg_q->InPtr      = (OS_MSG   *)0;    //清零出队指针
+        p_msg_q->NbrEntries = (OS_MSG_QTY)0;    //清零消息数
+    } else {                                    //如果队列还有消息
+        p_msg_q->NbrEntries--;                  //队列的消息数减1
+    }
+    
+    /* 从消息队列提取完消息信息后，将消息释放回消息池供继续使用 !!!*/
+    p_msg->NextPtr    = OSMsgPool.NextPtr;      /* 消息插回消息池，以便重复利用 */
+    OSMsgPool.NextPtr = p_msg;
+    OSMsgPool.NbrFree++;                        //消息池的可用消息数加1
+    OSMsgPool.NbrUsed--;                        //消息池的已用消息数减1
+
+   *p_err             = OS_ERR_NONE;            //错误类型为“无错误”
+    return (p_void);                            //返回罅隙内容
+}
+```
 
 
 
-- OSQPend() 使用实例
+OS_Pend() 函数将当前任务脱离就绪列表，并根据用户指定的阻塞时间插入到节拍列表和队列等待列表，然后打开调度器，但不进行调度。
 
-  ```c
-  OS_Q queue; //声明消息队列 
-  
-  OS_ERR      err;
-  OS_MSG_SIZE msg_size;
-  
-  /* 获取消息队列 queue 的消息 */ 
-  pMsg = OSQPend ((OS_Q         *)&queue,             //消息变量指针
-                  (OS_TICK       )0,                  //等待时长为无限
-                  (OS_OPT        )OS_OPT_PEND_BLOCKING,  //如果没有获取到信号量就等待
-                  (OS_MSG_SIZE  *)&msg_size,          //获取消息的字节大小
-                  (CPU_TS       *)0,                  //获取任务发送时的时间戳
-                  (OS_ERR       *)&err);              //返回错误
-  ```
+```c
+void  OS_Pend (OS_PEND_DATA  *p_pend_data,  //待插入等待列表的元素
+               OS_PEND_OBJ   *p_obj,        //等待的内核对象
+               OS_STATE       pending_on,   //等待哪种对象内核
+               OS_TICK        timeout)      //等待期限
+{
+    OS_PEND_LIST  *p_pend_list;
 
-  
+    OSTCBCurPtr->PendOn     = pending_on;                 //资源不可用，开始等待
+    OSTCBCurPtr->PendStatus = OS_STATUS_PEND_OK;          //正常等待中
+
+    OS_TaskBlock(OSTCBCurPtr,                             /* 阻塞当前运行任务 */
+                 timeout);                                /* 如果timeout非0，把任务插入节拍列表 */
+
+    if (p_obj != (OS_PEND_OBJ *)0) {                      //如果等待对象非空
+        p_pend_list             = &p_obj->PendList;       //获取对象的等待列表到 p_pend_list
+        p_pend_data->PendObjPtr = p_obj;                  //保存要等待的对象
+        OS_PendDataInit((OS_TCB       *)OSTCBCurPtr,      /* 初始化p_pend_data（待插入等待列表）*/
+                        (OS_PEND_DATA *)p_pend_data,
+                        (OS_OBJ_QTY    )1);
+        OS_PendListInsertPrio(p_pend_list,                /* 按优先级将p_pend_data插入到等待列表 */
+                              p_pend_data);
+    } else {                                                 //如果等待对象为空
+        OSTCBCurPtr->PendDataTblEntries = (OS_OBJ_QTY    )0; //清零当前任务的等待域数据
+        OSTCBCurPtr->PendDataTblPtr     = (OS_PEND_DATA *)0; 
+    }
+#if OS_CFG_DBG_EN > 0u                                       //如果使能了调试代码和变量 
+    OS_PendDbgNameAdd(p_obj,                                 //更新信号量的 DbgNamePtr 元素为其等待
+                      OSTCBCurPtr);                          //列表中优先级最高的任务的名称。
+#endif
+}
+```
+
+
+
+OSQPend() 使用实例
+
+```c
+OS_Q queue; //声明消息队列 
+
+OS_ERR      err;
+OS_MSG_SIZE msg_size;
+
+/* 获取消息队列 queue 的消息 */ 
+pMsg = OSQPend ((OS_Q         *)&queue,             //消息变量指针
+                (OS_TICK       )0,                  //等待时长为无限
+                (OS_OPT        )OS_OPT_PEND_BLOCKING,  //如果没有获取到信号量就等待
+                (OS_MSG_SIZE  *)&msg_size,          //获取消息的字节大小
+                (CPU_TS       *)0,                  //获取任务发送时的时间戳
+                (OS_ERR       *)&err);              //返回错误
+```
+
+
 
 ## 7. 消息队列使用注意事项
 
@@ -1085,25 +1078,2181 @@ struct  os_sem {                        /* Semaphore */
 
 ### 创建信号量函数OSSemCreate()
 
+内核对象使用之前一定要先创建，这个创建过程必须要**保证在所有可能使用内核对象的任务之前**，所以一般我们都是**在创建任务之前**就创建好系统需要的内核对象（如信号量等）。
+
+信号量创建函数源码：
+
+```c
+void  OSSemCreate (OS_SEM      *p_sem,  //多值信号量控制块指针
+                   CPU_CHAR    *p_name, //多值信号量名称
+                   OS_SEM_CTR   cnt,    //资源数目或事件是否发生标志
+                   OS_ERR      *p_err)  //返回错误类型
+{
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和定义一个局部变
+                    //量，用于保存关中断前的 CPU 状态寄存器 SR（临界段关中断只需保存SR）
+                    //，开中断时将该值还原。 
+	
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，不继续执行
+    }
+#endif
+
+#ifdef OS_SAFETY_CRITICAL_IEC61508                //如果使能（默认禁用）了安全关键
+    if (OSSafetyCriticalStartFlag == DEF_TRUE) {  //如果是在调用 OSSafetyCriticalStart() 后创建该多值信号量
+       *p_err = OS_ERR_ILLEGAL_CREATE_RUN_TIME;   //错误类型为“非法创建内核对象”
+        return;                                   //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u            //如果使能（默认使能）了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {    //如果该函数是在中断中被调用
+       *p_err = OS_ERR_CREATE_ISR;                //错误类型为“在中断函数中定时”
+        return;                                   //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u            //如果使能（默认使能）了参数检测
+    if (p_sem == (OS_SEM *)0) {       //如果参数 p_sem 为空  
+       *p_err = OS_ERR_OBJ_PTR_NULL;  //错误类型为“多值信号量对象为空”
+        return;                       //返回，不继续执行
+    }
+#endif
+
+    OS_CRITICAL_ENTER();               //进入临界段
+    p_sem->Type    = OS_OBJ_TYPE_SEM;  //初始化多值信号量指标  
+    p_sem->Ctr     = cnt;                                 
+    p_sem->TS      = (CPU_TS)0;
+    p_sem->NamePtr = p_name;                               
+    OS_PendListInit(&p_sem->PendList); //初始化该多值信号量的等待列表     
+
+#if OS_CFG_DBG_EN > 0u       //如果使能（默认使能）了调试代码和变量 
+    OS_SemDbgListAdd(p_sem); //将该定时添加到多值信号量双向调试链表
+#endif
+    OSSemQty++;              //多值信号量个数加1
+
+    OS_CRITICAL_EXIT_NO_SCHED();     //退出临界段（无调度）
+   *p_err = OS_ERR_NONE;             //错误类型为“无错误”
+}
+```
+
+信号量创建函数使用示例：
+
+```c
+OS_SEM SemOfKey; //标志KEY1 是否被按下的信号量
+
+/* 创建信号量 SemOfKey */
+OSSemCreate((OS_SEM      *)&SemOfKey,     //指向信号量变量的指针
+            (CPU_CHAR    *)"SemOfKey",    //信号量的名字
+            (OS_SEM_CTR   )0,             //信号量这里是指示事件发生，所以赋值为0，表示事件还没有发生
+            (OS_ERR      *)&err);         //错误类型
+```
+
+
+
 ### 信号量删除函数OSSemDel()
+
+OSSemDel() 用于删除一个信号量，信号量删除函数是根据信号量结构（信号量句柄）直接删除的，删除之后这个信号量的所有信息都会被系统清空，而且不能再次使用这个信号量了。
+
+需要注意的是：**如果信号量没有被定义，那也是无法被删除的，如果有任务阻塞在该信号量上，尽量不要删除该信号量。**
+
+OSSemDel() 函数源码：
+
+```c
+#if OS_CFG_SEM_DEL_EN > 0u             //如果使能了 OSSemDel() 函数 
+OS_OBJ_QTY  OSSemDel (OS_SEM  *p_sem,  //多值信号量指针
+                      OS_OPT   opt,    //选项
+                      OS_ERR  *p_err)  //返回错误类型
+{
+    OS_OBJ_QTY     cnt;
+    OS_OBJ_QTY     nbr_tasks;
+    OS_PEND_DATA  *p_pend_data;
+    OS_PEND_LIST  *p_pend_list;
+    OS_TCB        *p_tcb;
+    CPU_TS         ts;
+    CPU_SR_ALLOC();
+
+#ifdef OS_SAFETY_CRITICAL                      //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {                //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();        //执行安全检测异常函数
+        return ((OS_OBJ_QTY)0);                //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u         //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) { //如果该函数在中断中被调用
+       *p_err = OS_ERR_DEL_ISR;                //返回错误类型为“在中断中删除”
+        return ((OS_OBJ_QTY)0);                //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                    //如果使能了参数检测
+    if (p_sem == (OS_SEM *)0) {               //如果 p_sem 为空
+       *p_err = OS_ERR_OBJ_PTR_NULL;          //返回错误类型为“内核对象为空”
+        return ((OS_OBJ_QTY)0);               //返回0（有错误），不继续执行
+    }
+    switch (opt) {                            //根据选项分类处理
+        case OS_OPT_DEL_NO_PEND:              //如果选项在预期之内
+        case OS_OPT_DEL_ALWAYS:
+             break;                           //直接跳出
+
+        default:                              //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;      //返回错误类型为“选项非法”
+             return ((OS_OBJ_QTY)0);          //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u              //如果使能了对象类型检测
+    if (p_sem->Type != OS_OBJ_TYPE_SEM) {    //如果 p_sem 不是多值信号量类型
+       *p_err = OS_ERR_OBJ_TYPE;             //返回错误类型为“内核对象类型错误”
+        return ((OS_OBJ_QTY)0);              //返回0（有错误），不继续执行
+    }
+#endif
+
+    CPU_CRITICAL_ENTER();                      //关中断
+    p_pend_list = &p_sem->PendList;            //获取信号量的等待列表到 p_pend_list
+    cnt         = p_pend_list->NbrEntries;     //获取等待该信号量的任务数
+    nbr_tasks   = cnt;
+    switch (opt) {                             //根据选项分类处理
+        case OS_OPT_DEL_NO_PEND:               //如果只在没有任务等待的情况下删除信号量
+             if (nbr_tasks == (OS_OBJ_QTY)0) { //如果没有任务在等待该信号量
+#if OS_CFG_DBG_EN > 0u                         //如果使能了调试代码和变量   
+                 OS_SemDbgListRemove(p_sem);   //将该信号量从信号量调试列表移除
+#endif
+                 OSSemQty--;                   //信号量数目减1
+                 OS_SemClr(p_sem);             //清除信号量内容
+                 CPU_CRITICAL_EXIT();          //开中断
+                *p_err = OS_ERR_NONE;          //返回错误类型为“无错误”
+             } else {                          //如果有任务在等待该信号量
+                 CPU_CRITICAL_EXIT();          //开中断
+                *p_err = OS_ERR_TASK_WAITING;  //返回错误类型为“有任务在等待该信号量”
+             }
+             break;
+
+        case OS_OPT_DEL_ALWAYS:                             //如果必须删除信号量
+             OS_CRITICAL_ENTER_CPU_EXIT();                  //锁调度器，并开中断
+             ts = OS_TS_GET();                              //获取时间戳
+             while (cnt > 0u) {                             //逐个移除该信号量等待列表中的任务
+                 p_pend_data = p_pend_list->HeadPtr;
+                 p_tcb       = p_pend_data->TCBPtr;
+                 OS_PendObjDel((OS_PEND_OBJ *)((void *)p_sem),
+                               p_tcb,
+                               ts);
+                 cnt--;
+             }
+#if OS_CFG_DBG_EN > 0u                                      //如果使能了调试代码和变量 
+             OS_SemDbgListRemove(p_sem);                    //将该信号量从信号量调试列表移除
+#endif
+             OSSemQty--;                                    //信号量数目减1
+             OS_SemClr(p_sem);                              //清除信号量内容
+             OS_CRITICAL_EXIT_NO_SCHED();                   //减锁调度器，但不进行调度
+             OSSched();                                     //任务调度，执行最高优先级的就绪任务
+            *p_err = OS_ERR_NONE;                           //返回错误类型为“无错误”
+             break;
+
+        default:                                            //如果选项超出预期
+             CPU_CRITICAL_EXIT();                           //开中断
+            *p_err = OS_ERR_OPT_INVALID;                    //返回错误类型为“选项非法”
+             break;
+    }
+    return ((OS_OBJ_QTY)nbr_tasks);                         //返回删除信号量前等待其的任务数
+}
+#endif
+```
+
+- 如果 opt 是 OS_OPT_DEL_NO_PEND，则表示只在没有任务等待的情况下删除信号量，如果当前系统中有任务阻塞在该信号量上，则不能删除，反之，则可以删除信号量。
+- 如果 opt 是 OS_OPT_DEL_ALWAYS，则表示无论如何都必须删除信号量，那么在删除之前，系统会把所有阻塞在该信号量上的**任务恢复**。
+- 调用 OS_PendObjDel() 函数将阻塞在内核对象（如信号量）上的任务从阻塞态恢复，此时系统再删除内核对象，删除之后，这些等待事件的任务需要被恢复。
+
+
+
+信号量删除函数 OSSemDel() 的使用是很简单的，只需要传入要删除的信号量的句柄与选项还有保存返回的错误类型即可，调用函数时，系统将删除这个信号量。
+
+需要注意的是：在调用删除信号量函数前，系统应存在已创建的信号量。如果删除信号量时，系统中有任务正在等待该信号量，则不应该进行删除操作，因为删除之后的信号量就不可用了。
+
+信号量删除函数使用示例：
+
+```c
+OS_SEM  SemOfKey;                          //声明信号量 
+OS_ERR      err;
+
+/* 删除信号量 sem*/ 
+OSSemDel ((OS_SEM         *)&SemOfKey,      //指向信号量的指针 
+          OS_OPT_DEL_NO_PEND, 
+          (OS_ERR       *)&err);            //返回错误类型
+```
+
+
+
+
 
 ### 信号量释放函数OSSemPost()
 
+与消息队列的操作一样，**信号量的释放可以在任务、中断中使用**。 
+
+当信号量有效的时候，任务才能获取信号量，uCOS中有两个函数可使得信号量变得有效：
+
+- 一个是在创建的时候进行初始化，将它可用的信号量个数设置一个初始值。
+
+- 另一个是通过释放函数使得信号量变得有效。
+
+  如果信号量用作二值信号量，那么在创建信号量的时候其初始值的范围是 0~1，假如初始值为 1 个可用的信号量的话，被获取一次就变得无效了，那就需要我们释放信号量，uCOS 提供了信号量释放函数，每调用一次该函数就释放一个信号量。
+
+uCOS 的信号量是**允许一直释放**的，但是，**信号量的范围还需用户自己根据需求进行决定**，当用作二值信号量的时候，必须确保其可用值在 0~1 范围内；而用作计数信号量的话，其范围是由用户根据实际情况来决定的，要注意代码的严谨性。
+
+OSSemPost() 源码：
+
+```c
+OS_SEM_CTR  OSSemPost (OS_SEM  *p_sem,    //多值信号量控制块指针
+                       OS_OPT   opt,      //选项
+                       OS_ERR  *p_err)    //返回错误类型
+{
+    OS_SEM_CTR  ctr;
+    CPU_TS      ts;
+
+
+
+#ifdef OS_SAFETY_CRITICAL                 //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {           //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();   //执行安全检测异常函数
+        return ((OS_SEM_CTR)0);           //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                //如果使能（默认使能）了参数检测功能   
+    if (p_sem == (OS_SEM *)0) {           //如果 p_sem 为空
+       *p_err  = OS_ERR_OBJ_PTR_NULL;     //返回错误类型为“内核对象指针为空”
+        return ((OS_SEM_CTR)0);           //返回0（有错误），不继续执行
+    }
+    switch (opt) {                                   //根据选项情况分类处理
+        case OS_OPT_POST_1:                          //如果选项在预期内，不处理
+        case OS_OPT_POST_ALL:
+        case OS_OPT_POST_1   | OS_OPT_POST_NO_SCHED:
+        case OS_OPT_POST_ALL | OS_OPT_POST_NO_SCHED:
+             break;
+
+        default:                                     //如果选项超出预期
+            *p_err =  OS_ERR_OPT_INVALID;            //返回错误类型为“选项非法”
+             return ((OS_SEM_CTR)0u);                //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u            //如果使能了对象类型检测           
+    if (p_sem->Type != OS_OBJ_TYPE_SEM) {  //如果 p_sem 的类型不是多值信号量类型
+       *p_err = OS_ERR_OBJ_TYPE;           //返回错误类型为“对象类型错误”
+        return ((OS_SEM_CTR)0);            //返回0（有错误），不继续执行
+    }
+#endif
+
+    ts = OS_TS_GET();                             //获取时间戳
+
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u              //如果使能了中断延迟发布
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {    //如果该函数是在中断中被调用
+        OS_IntQPost((OS_OBJ_TYPE)OS_OBJ_TYPE_SEM, //将该信号量发布到中断消息队列
+                    (void      *)p_sem,
+                    (void      *)0,
+                    (OS_MSG_SIZE)0,
+                    (OS_FLAGS   )0,
+                    (OS_OPT     )opt,
+                    (CPU_TS     )ts,
+                    (OS_ERR    *)p_err);
+        return ((OS_SEM_CTR)0);                   //返回0（尚未发布），不继续执行        
+    }
+#endif
+
+    ctr = OS_SemPost(p_sem,                       //将信号量按照普通方式处理
+                     opt,
+                     ts,
+                     p_err);
+
+    return (ctr);                                 //返回信号的当前计数值
+}
+```
+
+
+
+- 释放信号量选项 ：
+
+```c
+#define  OS_OPT_POST_FIFO (OS_OPT)(0x0000u) // 默认采用 FIFO 方式发布信号量
+#define  OS_OPT_POST_LIFO (OS_OPT)(0x0010u) // uCOS 也支持采用 FIFO 方式发布信号量
+#define  OS_OPT_POST_1    (OS_OPT)(0x0000u) // 发布给一个任务
+#define  OS_OPT_POST_ALL  (OS_OPT)(0x0200u) // 发布给所有等待的任务，也叫广播信号量
+```
+
+- 如果使能了中断延迟发布，并且该函数在中断中被调用，则使用OS_IntQPost()函数将信号量发布到中断消息队列中。
+- 使用OS_SemPost() 将信号量按照普通方式处理。
+
+OS_SemPost() 源码：
+
+```c
+OS_SEM_CTR  OS_SemPost (OS_SEM  *p_sem, //多值信号量指针
+                        OS_OPT   opt,   //选项
+                        CPU_TS   ts,    //时间戳
+                        OS_ERR  *p_err) //返回错误类型
+{
+    OS_OBJ_QTY     cnt;
+    OS_SEM_CTR     ctr;
+    OS_PEND_LIST  *p_pend_list;
+    OS_PEND_DATA  *p_pend_data;
+    OS_PEND_DATA  *p_pend_data_next;
+    OS_TCB        *p_tcb;
+    CPU_SR_ALLOC();
+
+
+
+    CPU_CRITICAL_ENTER();                                   //关中断
+    p_pend_list = &p_sem->PendList;                         //取出该信号量的等待列表
+    if (p_pend_list->NbrEntries == (OS_OBJ_QTY)0) {         //如果没有任务在等待该信号量
+        switch (sizeof(OS_SEM_CTR)) {                       //判断是否将导致该信号量计数值溢出，
+            case 1u:                                        //如果溢出，则开中断，返回错误类型为
+                 if (p_sem->Ctr == DEF_INT_08U_MAX_VAL) {   //“计数值溢出”，返回0（有错误），
+                     CPU_CRITICAL_EXIT();                   //不继续执行。
+                    *p_err = OS_ERR_SEM_OVF;
+                     return ((OS_SEM_CTR)0);
+                 }
+                 break;
+
+            case 2u:
+                 if (p_sem->Ctr == DEF_INT_16U_MAX_VAL) {
+                     CPU_CRITICAL_EXIT();
+                    *p_err = OS_ERR_SEM_OVF;
+                     return ((OS_SEM_CTR)0);
+                 }
+                 break;
+
+            case 4u:
+                 if (p_sem->Ctr == DEF_INT_32U_MAX_VAL) {
+                     CPU_CRITICAL_EXIT();
+                    *p_err = OS_ERR_SEM_OVF;
+                     return ((OS_SEM_CTR)0);
+                 }
+                 break;
+
+            default:
+                 break;
+        }
+        p_sem->Ctr++;                                       //信号量计数值不溢出则加1
+        ctr       = p_sem->Ctr;                             //获取信号量计数值到 ctr
+        p_sem->TS = ts;                                     //保存时间戳
+        CPU_CRITICAL_EXIT();                                //则开中断
+       *p_err     = OS_ERR_NONE;                            //返回错误类型为“无错误”
+        return (ctr);                                       //返回信号量的计数值，不继续执行
+    }
+
+    OS_CRITICAL_ENTER_CPU_EXIT();                           //加锁调度器，但开中断
+    if ((opt & OS_OPT_POST_ALL) != (OS_OPT)0) {             //如果要将信号量发布给所有等待任务
+        cnt = p_pend_list->NbrEntries;                      //获取等待任务数目到 cnt
+    } else {                                                //如果要将信号量发布给优先级最高的等待任务
+        cnt = (OS_OBJ_QTY)1;                                //将要操作的任务数为1，cnt 置1
+    }
+    p_pend_data = p_pend_list->HeadPtr;                     //获取等待列表的首个任务到 p_pend_data
+    while (cnt > 0u) {                                      //逐个处理要发布的任务
+        p_tcb            = p_pend_data->TCBPtr;             //取出当前任务
+        p_pend_data_next = p_pend_data->NextPtr;            //取出下一个任务
+        OS_Post((OS_PEND_OBJ *)((void *)p_sem),             //发布信号量给当前任务
+                p_tcb,
+                (void      *)0,
+                (OS_MSG_SIZE)0,
+                ts);
+        p_pend_data = p_pend_data_next;                     //处理下一个任务          
+        cnt--;
+    }
+    ctr = p_sem->Ctr;                                       //获取信号量计数值到 ctr
+    OS_CRITICAL_EXIT_NO_SCHED();                            //减锁调度器，但不执行任务调度
+    if ((opt & OS_OPT_POST_NO_SCHED) == (OS_OPT)0) {        //如果 opt 没选择“发布时不调度任务”
+        OSSched();                                          //任务调度
+    }
+   *p_err = OS_ERR_NONE;                                    //返回错误类型为“无错误”
+    return (ctr);                                           //返回信号量的当前计数值
+}
+```
+
+- 判断一下有没有任务在等待该信号量，如果没有任务在等待该信号量，则要先看看信号量的信号量计数值是否即将溢出。
+- 怎么判断计数值是否溢出呢？uCOS 支持多个数据类型的信号量计数值，可以是 8 位的，16 位的，32 位的，具体是多少位是由我们自己定义的。
+- 恢复任务时**将调度器锁定，但开中断**，因为接下来的操作需要操作任务与信号量的列表，系统不希望其他任务来打扰。
+
+
+
+如果可用信号量未满，信号量控制块结构体成员变量 Ctr 就会加 1，然后判断是否有阻塞的任务，如果有的话就会恢复阻塞的任务，然后返回成功信息，用户可以选择只释放（发布）给一个任务或者是释放（发布）给所有在等待信号量的任务（广播信号量），并且**用户可以选择在释放（发布）完成的时候要不要进行任务调度，如果信号量在中断中释放，用户可以选择是否需要延迟释放（发布）**。 
+
+
+
+OSSemPost() 使用实例：
+
+```c
+OS_SEM SemOfKey; //标志KEY1 是否被按下的信号量 
+OSSemPost((OS_SEM  *)&SemOfKey,       //发布SemOfKey 
+		 (OS_OPT   )OS_OPT_POST_ALL,  //发布给所有等待任务    
+		 (OS_ERR *)&err); 			  //返回错误类型 
+```
+
+
+
 ### 信号量获取函数OSSemPend()
+
+与消息队列的操作一样，**信号量的获取可以在任务中使用**。 
+
+当信号量有效的时候，任务才能获取信号量，当任务获取了某个信号量的时候，该信号量的可用个数就减 1，当它减到 0 的时候，任务就无法再获取了，并且获取的任务会进入**阻塞**态（假如用户指定了阻塞超时时间的话）。
+
+**uCOS 支持系统中多个任务获取同一个信号量**，假如信号量中已有多个任务在等待，那么这些任务会**按照优先级顺序进行排列**，如果信号量在释放的时候选择只释放给一个任务，那么在所有等待任务中最高优先级的任务优先获得信号量，而如果信号量在释放的时候选择释放给所有任务，则所有等待的任务都会获取到信号量。
+
+OSSemPend() 源码：
+
+```c
+OS_SEM_CTR  OSSemPend (OS_SEM   *p_sem,   //多值信号量指针
+                       OS_TICK   timeout, //等待超时时间
+                       OS_OPT    opt,     //选项
+                       CPU_TS   *p_ts,    //等到信号量时的时间戳
+                       OS_ERR   *p_err)   //返回错误类型
+{
+    OS_SEM_CTR    ctr;
+    OS_PEND_DATA  pend_data;
+    CPU_SR_ALLOC();
+
+
+
+#ifdef OS_SAFETY_CRITICAL                       //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {                 //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();         //执行安全检测异常函数
+        return ((OS_SEM_CTR)0);                 //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u          //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {  //如果该函数在中断中被调用
+       *p_err = OS_ERR_PEND_ISR;                //返回错误类型为“在中断中等待”
+        return ((OS_SEM_CTR)0);                 //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                     //如果使能了参数检测
+    if (p_sem == (OS_SEM *)0) {                //如果 p_sem 为空
+       *p_err = OS_ERR_OBJ_PTR_NULL;           //返回错误类型为“内核对象为空”
+        return ((OS_SEM_CTR)0);                //返回0（有错误），不继续执行
+    }
+    switch (opt) {                             //根据选项分类处理
+        case OS_OPT_PEND_BLOCKING:             //如果选择“等待不到对象进行堵塞”
+        case OS_OPT_PEND_NON_BLOCKING:         //如果选择“等待不到对象不进行堵塞”
+             break;                            //直接跳出，不处理
+
+        default:                               //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;       //返回错误类型为“选项非法”
+             return ((OS_SEM_CTR)0);           //返回0（有错误），不继续执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u               //如果使能了对象类型检测
+    if (p_sem->Type != OS_OBJ_TYPE_SEM) {     //如果 p_sem 不是多值信号量类型
+       *p_err = OS_ERR_OBJ_TYPE;              //返回错误类型为“内核对象类型错误”
+        return ((OS_SEM_CTR)0);               //返回0（有错误），不继续执行
+    }
+#endif
+
+    if (p_ts != (CPU_TS *)0) {                //如果 p_ts 非空
+       *p_ts  = (CPU_TS)0;                    //初始化（清零）p_ts，待用于返回时间戳
+    }
+    CPU_CRITICAL_ENTER();                     //关中断
+    if (p_sem->Ctr > (OS_SEM_CTR)0) {         //如果资源可用
+        p_sem->Ctr--;                         //资源数目减1
+        if (p_ts != (CPU_TS *)0) {            //如果 p_ts 非空
+           *p_ts  = p_sem->TS;                //获取该信号量最后一次发布的时间戳
+        }
+        ctr   = p_sem->Ctr;                   //获取信号量的当前资源数目
+        CPU_CRITICAL_EXIT();                  //开中断
+       *p_err = OS_ERR_NONE;                  //返回错误类型为“无错误”
+        return (ctr);                         //返回信号量的当前资源数目，不继续执行
+    }
+
+    if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) {    //如果没有资源可用，而且选择了不堵塞任务
+        ctr   = p_sem->Ctr;                                 //获取信号量的资源数目到 ctr
+        CPU_CRITICAL_EXIT();                                //开中断
+       *p_err = OS_ERR_PEND_WOULD_BLOCK;                    //返回错误类型为“等待渴求堵塞”  
+        return (ctr);                                       //返回信号量的当前资源数目，不继续执行
+    } else {                                                //如果没有资源可用，但选择了堵塞任务
+        if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) {    //如果调度器被锁
+            CPU_CRITICAL_EXIT();                            //开中断
+           *p_err = OS_ERR_SCHED_LOCKED;                    //返回错误类型为“调度器被锁”
+            return ((OS_SEM_CTR)0);                         //返回0（有错误），不继续执行
+        }
+    }
+                                                            
+    OS_CRITICAL_ENTER_CPU_EXIT();                           //锁调度器，并重开中断
+    OS_Pend(&pend_data,                                     //堵塞等待任务，将当前任务脱离就绪列表，
+            (OS_PEND_OBJ *)((void *)p_sem),                 //并插入到节拍列表和等待列表。
+            OS_TASK_PEND_ON_SEM,
+            timeout);
+
+    OS_CRITICAL_EXIT_NO_SCHED();                            //开调度器，但不进行调度
+
+    OSSched();                                              //找到并调度最高优先级就绪任务
+    /* 当前任务（获得信号量）得以继续运行 */
+    CPU_CRITICAL_ENTER();                                   //关中断
+    switch (OSTCBCurPtr->PendStatus) {                      //根据当前运行任务的等待状态分类处理
+        case OS_STATUS_PEND_OK:                             //如果等待状态正常
+             if (p_ts != (CPU_TS *)0) {                     //如果 p_ts 非空
+                *p_ts  =  OSTCBCurPtr->TS;                  //获取信号被发布的时间戳
+             }
+            *p_err = OS_ERR_NONE;                           //返回错误类型为“无错误”
+             break;
+
+        case OS_STATUS_PEND_ABORT:                          //如果等待被终止中止
+             if (p_ts != (CPU_TS *)0) {                     //如果 p_ts 非空
+                *p_ts  =  OSTCBCurPtr->TS;                  //获取等待被中止的时间戳
+             }
+            *p_err = OS_ERR_PEND_ABORT;                     //返回错误类型为“等待被中止”
+             break;
+
+        case OS_STATUS_PEND_TIMEOUT:                        //如果等待超时
+             if (p_ts != (CPU_TS *)0) {                     //如果 p_ts 非空
+                *p_ts  = (CPU_TS  )0;                       //清零 p_ts
+             }
+            *p_err = OS_ERR_TIMEOUT;                        //返回错误类型为“等待超时”
+             break;
+
+        case OS_STATUS_PEND_DEL:                            //如果等待的内核对象被删除
+             if (p_ts != (CPU_TS *)0) {                     //如果 p_ts 非空
+                *p_ts  =  OSTCBCurPtr->TS;                  //获取内核对象被删除的时间戳
+             }
+            *p_err = OS_ERR_OBJ_DEL;                        //返回错误类型为“等待对象被删除”
+             break;
+
+        default:                                            //如果等待状态超出预期
+            *p_err = OS_ERR_STATUS_INVALID;                 //返回错误类型为“等待状态非法”
+             CPU_CRITICAL_EXIT();                           //开中断
+             return ((OS_SEM_CTR)0);                        //返回0（有错误），不继续执行
+    }
+    ctr = p_sem->Ctr;                                       //获取信号量的当前资源数目
+    CPU_CRITICAL_EXIT();                                    //开中断
+    return (ctr);                                           //返回信号量的当前资源数目
+}
+```
+
+**如果调度器未被锁，就锁定调度器，重新打开中断**。为什么刚刚调度器被锁就错误的呢，而现在又要锁定调度器？
+
+那是因为**之前锁定的调度器不是被这个函数锁定的，这是不允许的，因为现在要阻塞当前任务，而调度器锁定了就表示无法进行任务调度，这也是不允许的**。那为什么又要关闭调度器呢，因为**接下来的操作是需要操作队列与任务的列表，这个时间就不会很短，系统不希望有其他任务来操作任务列表，因为可能引起其他任务解除阻塞，这可能会发生优先级翻转**。
+
+​	比如任务 A 的优先级低于当前任务，但是在当前任务进入阻塞的过程中，任务 A 却因为其他原因解除阻塞了，那系统肯定是会	去运行任务 A，这显然是要绝对禁止的，因为挂起调度器意味着任务不能切换并且不准调用可能引起任务切换的 API 函数，所	以，锁定调度器，打开中断这样的处理，既不会影响中断的响应，又避免了其他任务来操作队列与任务的列表。 
+
+调用 OS_Pend()函数将当前任务脱离就绪列表，并根据用户指定的阻塞时间插入到节拍列表和队列等待列表，然后打开调度器，但不进行调度。
+
+当有任务试图获取信号量的时候，当且仅当信号量有效的时候，任务才能获取到信号量。如果信号量无效，在用户指定的阻塞超时时间中，该任务将保持阻塞状态以等待信号量有效。当其它任务或中断释放了有效的信号量，该任务将自动由阻塞态转移为就绪态。当任务等待的时间超过了指定的阻塞时间，即使信号量中还是没有可用信号量，任务也会自动从阻塞态转移为就绪态。
+
+
+
+OSSemPend() 使用实例：
+
+```c
+OSSemPend ((OS_SEM   *)&SemOfKey,            //等待该信号量被发布 
+           (OS_TICK   )0,                    //无期限等待 
+           (OS_OPT    )OS_OPT_PEND_BLOCKING, //如果没有信号量可用就等待 
+           (CPU_TS   *)&ts_sem_post,         //获取信号量最后一次被发布的时间戳 
+           (OS_ERR   *)&err);                //返回错误类型 
+```
 
 
 
 ## 7\. 使用信号量的注意事项
 
-
+- **信号量访问共享资源不会导致中断延迟。当任务在执行信号量所保护的共享资源时， ISR 或高优先级任务可以抢占该任务**。 
+- 应用中可以有**任意个**信号量用于保护共享资源。然而，推荐将信号量用于 I/O 端口的保护，而不是内存地址。 
+- 信号量经常会被过度使用。很多情况下，访问一个简短的共享资源时不推荐使用信号量，请求和释放信号量会消耗 CPU 时间。通过关/开中断能更有效地执行这些操作。假设两个任务共享一个 32 位的整数变量。第一个任务将这个整数变量加1，第二个任务将这个变量清零。考虑到执行这些操作用时很短，不需要使用信号量。执行这个操作前任务只需关中断，执行完毕后再开中断。但是若操作浮点数变量且处理器不支持硬件浮点操作时，就需要用到信号量。因为在这种情况下处理浮点数变量需较长时间。 
+- 信号量会导致一种严重的问题：**优先级反转**。 
 
 
 
 # 互斥量
 
+## 1\. 互斥量的基本概念
+
+互斥量又称**互斥信号量**（本质也是一种信号量，不具备传递数据功能），是**一种特殊的二值信号量**，它和信号量不同的是，它**「支持互斥量所有权、递归访问以及防止优先级翻转」**的特性，用于**实现对临界资源的独占式处理**。
+
+- 任意时刻互斥量的状态只有两种，**开锁或闭锁**。当互斥量被任务持有时，该互斥量处于闭锁状态，这个任务获得互斥量的所有权。当该任务释放这个互斥量时，该互斥量处于开锁状态，任务失去该互斥量的所有权。**当一个任务持有互斥量时，其他任务将不能再对该互斥量进行开锁或持有**。
+
+- **持有该互斥量的任务也能够再次获得这个锁而不被挂起，这就是递归访问**，也就是递归互斥量的特性，这个特性与一般的信号量有很大的不同，在信号量中，由于已经不存在可用的信号量，任务递归获取信号量时会发生主动挂起任务最终形成死锁。 
+- 二值信号量也可以实现临界资源的保护，但是信号量会导致的另一个潜在问题，那就是**任务优先级翻转**（具体会在下文讲解）。而 uCOS 提供的互斥量可以通过**优先级继承算法**，**降低**优先级翻转问题产生的影响，所以，用于临界资源的保护一般建议使用互斥量。 
+
+如果想要用于实现同步（任务之间或者任务与中断之间），二值信号量或许是更好的选择，虽然互斥量也可以用于任务与任务间同步，但是互斥量更多的是用于保护资源的互锁。 
+
+
+
+## 2\. 互斥量的优先级继承机制
+
+在 uCOS 操作系统中为了降低优先级翻转问题利用了**优先级继承算法**。优先级继承算法是指，**「暂时提高某个占有某种资源的低优先级任务的优先级，使之与在所有等待该资源的任务中优先级最高那个任务的优先级相等，而当这个低优先级任务执行完毕释放该资源时，优先级重新回到初始设定值」**。因此，继承优先级的任务**避免了系统资源被任何中间优先级的任务抢占**。 
+
+互斥量与二值信号量最大的不同是：**互斥量具有优先级继承机制，而信号量没有**。也就是说，某个临界资源受到一个互斥量保护，如果这个资源正在被一个低优先级任务使用，那么此时的互斥量是闭锁状态，也代表了没有任务能申请到这个互斥量，如果此时一个高优先级任务想要对这个资源进行访问，去申请这个互斥量，那么**高优先级任务会因为申请不到互斥量而进入阻塞态**，那么系统会将现在持有该互斥量的任务的优先级临时提升到与高优先级任务的优先级相同，这个**优先级提升的过程叫做优先级继承**。这个**优先级继承机制确保高优先级任务进入阻塞状态的时间尽可能短，以及将已经出现的 “优先级翻转” 危害降低到最小**。 
+
+任务的优先级在创建的时候就已经是设置好的，高优先级的任务可以打断低优先级的任务，抢占 CPU 的使用权。但是在很多场合中，**某些资源只有一个，当低优先级任务正在占用该资源的时候，即便高优先级任务也只能乖乖的等待低优先级任务使用完该资源后释放资源**。这里「高优先级任务无法运行而低优先级任务可以运行的现象」称为 “**优先级翻转**”。 
+
+为什么说优先级翻转在操作系统中是危害很大？因为在我们一开始创造这个系统的时候，我们就已经设置好了任务的优先级了，越重要的任务优先级越高。但是发生优先级翻转，对我们操作系统是致命的危害，**会导致系统的高优先级任务阻塞时间过长**。 
+
+
+
+优先级翻转举例：
+
+举个例子，现在有 3 个任务分别为 H 任务（High）、M 任务（Middle）、L 任务（Low），3 个任务的优先级顺序为 H 任务>M 任务>L 任务。正常运行的时候 H 任务可以打断 M 任务与 L 任务，M 任务可以打断 L 任务，假设系统中有一个资源被保护了，此时该资源被 L 任务正在使用中，某一刻，**H 任务需要使用该资源**，但是 L 任务还没使用完，**H任务则因为申请不到资源而进入阻塞态**，L 任务继续使用该资源，此时已经出现了“优先级翻转”现象，高优先级任务在等着低优先级的任务执行，如果在 L 任务执行的时候刚好M 任务被唤醒了，**由于 M 任务优先级比 L 任务优先级高，那么会打断 L 任务**，抢占了CPU 的使用权，**直到 M 任务执行完，再把 CUP 使用权归还给 L 任务，L 任务继续执行，等到执行完毕之后释放该资源，H 任务此时才从阻塞态解除，使用该资源**。这个过程，本来是最高优先级的 H 任务，在等待了更低优先级的 L 任务与 M 任务，其阻塞的时间是 M任务运行时间+L 任务运行时间，这只是只有 3 个任务的系统，假如很多个这样子的任务打断最低优先级的任务，那这个系统最高优先级任务岂不是崩溃了，这个现象是绝对不允许出现的，高优先级的任务必须能及时响应。所以，没有优先级继承的情况下，使用资源保护，其危害极大。
+
+> 注意：**只有当任务想要获取被占有的资源时，才会进入阻塞态**。H任务想获取L任务占有的资源，但该资源被锁，因而H任务阻塞。而M任务不想获取L任务占有的资源，因而会打断L任务。
+>
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104258.png" alt="image-20200625095321575" style="zoom: 50%;" />
+
+优先级继承举例：
+
+若在上面的例子中，加入优先级继承机制。那么在 H 任务申请该资源的时候，由于申请不到资源会进入阻塞态，那么系统就会**把当前正在使用资源的 L 任务的优先级临时提高到与 H 任务优先级相同，此时 M 任务被唤醒了，因为它的优先级比 H 任务低，所以无法打断 L 任务**，因为此时 L 任务的优先级被临时提升到 H，所以当 L 任务使用完该资源了，进行释放，那么此时 H 任务优先级最高，将接着抢占 CPU 的使用权， H 任务的阻塞时间仅仅是 L 任务的执行时间，此时的优先级的危害降到了最低，这就是优先级继承的优势。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104303.png" alt="image-20200625095844093" style="zoom: 67%;" />
+
+注意：
+
+在获得互斥量后，请尽快释放互斥量，同时需要注意的是**在任务持有互斥量的这段时间，不得更改任务的优先级**。UCOS 的优先级继承机制**不能解决优先级反转，只能将这种情况的影响降低到最小**，硬实时系统在一开始设计时就要避免优先级反转发生。 
+
+
+
+## 3\. 互斥量应用场景
+
+互斥量的使用比较单一，因为它是信号量的一种，并且它是以锁的形式存在。在初始化的时候，互斥量处于开锁的状态，而被任务持有的时候则立刻转为闭锁的状态。互斥量更适合于： 
+
+- 可能会引起优先级翻转的情况。
+- 任务可能会多次获取互斥量的情况下，这样可以避免同一任务多次递归持有而造成死锁的问题。
+
+多任务环境下往往存在多个任务竞争同一临界资源的应用场景，互斥量可被**用于对临界资源的保护从而实现独占式访问**。另外，互斥量可以**降低**信号量存在的优先级翻转问题带来的影响。
+
+​	比如有两个任务需要对串口进行发送数据，其硬件资源只有一个，那么两个任务肯定不能同时发送啦，不然导致数据错误，那	么，就可以用互斥量对串口资源进行保护，当一个任务正在使用串口的时候，另一个任务则无法使用串口，等到任务使用串口	完毕之后，另外一个任务才能获得串口的使用权。
+
+另外需要注意的是**「互斥量不能在中断服务函数中使用」**，因为**其特有的优先级继承机制只在任务起作用**，而在中断的上下文环境中毫无意义。
+
+
+
+## 4\. 互斥量运作机制
+
+用互斥量处理不同任务对临界资源的同步访问时，任务需要获得互斥量才能进行资源访问，如果一旦有任务成功获得了互斥量，则互斥量立即变为闭锁状态，此时其他任务会因为获取不到互斥量而不能访问这个资源，任务会根据用户自定义的等待时间进行等待，直到互斥量被持有的任务释放后，其他任务才能获取互斥量从而得以访问该临界资源，此时互斥量再次上锁，如此一来就可以确保每个时刻只有一个任务正在访问这个临界资源，保证了临界资源操作的安全性。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104306.png" alt="image-20200625104240288" style="zoom: 50%;" />
+
+- 因为互斥量具有优先级继承机制，一般选择使用互斥量对资源进行保护，**如果资源被占用的时候，无论是什么优先级的任务想要使用该资源都会被阻塞**。
+
+- 假如正在使用该资源的任务 1 比阻塞中的任务 2 的优先级还低，那么任务1 将被系统临时提升到与高优先级任务 2 相等的优先级（任务 1 的优先级从 L 变成 H）。
+
+- 当任务 1 使用完资源之后，释放互斥量，此时任务 1 的优先级会从 H 变回原来的 L。
+
+- 任务 2 此时可以获得互斥量，然后进行资源的访问，当任务 2 访问了资源的时候，该互斥量的状态又为闭锁状态，其他任务无法获取互斥量。
+
+
+
+## 5\. 互斥量控制块
+
+uCOS 的互斥量由多个元素组成，在互斥量被创建时，需要由我们自己定义互斥量（也可以称之为互斥量句柄），因为它是用于保存互斥量的一些信息的，其数据结构 OS_MUTEX 除了一些必须的基本信息外，还有指向任务控制块的指针 OwnerTCBPtr、任务优先级变量 OwnerOriginalPrio、PendList 链表与 OwnerNestingCtr 变量等，为的是方便系统来管理互斥量。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104720.png" alt="image-20200625104718298" style="zoom:80%;" />
+
+```c
+struct  os_mutex {                            /* Mutual Exclusion Semaphore                             */
+                                              /* ------------------ GENERIC  MEMBERS ------------------ */
+    OS_OBJ_TYPE          Type;                /* 互斥量的类型，uCOS 能识别它是一个 mutex */
+    CPU_CHAR            *NamePtr;             /* 互斥量的名字，每个内核对象都被分配一个名字 */
+    OS_PEND_LIST         PendList;            /* 等待互斥量的任务列表 */
+#if OS_CFG_DBG_EN > 0u
+    OS_MUTEX            *DbgPrevPtr;
+    OS_MUTEX            *DbgNextPtr;
+    CPU_CHAR            *DbgNamePtr;
+#endif
+                                              /* ------------------ SPECIFIC MEMBERS ------------------ */
+    OS_TCB              *OwnerTCBPtr;		  /* 指向持有互斥量任务控制块的指针，如果任务占用这个mutex，那么该变量会指向占用这个mutex的任务的OS_TCB */
+    OS_PRIO              OwnerOriginalPrio;   /* 用于记录持有互斥量任务的优先级，如果任务占用这个mutex，那么该变量中存放着任务的原优先级，当占用mutex任务的优先级被提升时就会用到这个变量 */
+    OS_NESTING_CTR       OwnerNestingCtr;     /* 表示互斥量是否可用，当该值为0的时候表示互斥量处于开锁状态，互斥量可用 */
+    CPU_TS               TS;                  /* mutex 中的变量TS用于保存该mutex最后一次被释放的时间戳 */
+};
+```
+
+- OwnerTCBPtr 指向持有互斥量任务控制块的指针，如果任务占用这个 mutex，那么该变量会指向占用这个 mutex 的任务的OS_TCB
+- OwnerOriginalPrio 用于记录持有互斥量任务的优先级，如果任务占用这个 mutex，那么该变量中存放着任务的原优先级，当占用 mutex 任务的优先级被提升时就会用到这个变量
+- OwnerNestingCtr 表示互斥量是否可用，当该值为 0 的时候表示互斥量处于开锁状态，互斥量可用
+  - uCOS 允许任务递归调用同一个 mutex 多达 256 次，每递归调用一次mutex 该值就会加一，但也需要释放相同次数才能真正释放掉这个 mutex
+
+
+
+## 6\. 互斥量函数接口
+
+### 创建互斥量函数OSMutexCreate()
+
+在定义完互斥量结构体变量后就可以调用 OSMutexCreate()函数进行创建一个互斥量，跟信号量的创建差不多，我们知道，其实这里的“创建互斥量”指的就是对内核对象（互斥量）的一些初始化。要特别注意的是**内核对象使用之前一定要先创建**，这个创建过程必须要保证在所有可能使用内核对象的任务之前，所以一般我们都是**在创建任务之前就创建好系统需要的内核对象（如互斥量等）**。
+
+```c
+void  OSMutexCreate (OS_MUTEX  *p_mutex, //互斥信号量指针
+                     CPU_CHAR  *p_name,  //取信号量的名称
+                     OS_ERR    *p_err)   //返回错误类型
+{
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。 
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，不继续执行
+    }
+#endif
+
+#ifdef OS_SAFETY_CRITICAL_IEC61508               //如果使能（默认禁用）了安全关键
+    if (OSSafetyCriticalStartFlag == DEF_TRUE) { //如果是在调用 OSSafetyCriticalStart() 后创建
+       *p_err = OS_ERR_ILLEGAL_CREATE_RUN_TIME;  //错误类型为“非法创建内核对象”
+        return;                                  //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u           //如果使能（默认使能）了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {   //如果该函数是在中断中被调用
+       *p_err = OS_ERR_CREATE_ISR;               //错误类型为“在中断函数中定时”
+        return;                                  //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u            //如果使能（默认使能）了参数检测
+    if (p_mutex == (OS_MUTEX *)0) {   //如果参数 p_mutex 为空                       
+       *p_err = OS_ERR_OBJ_PTR_NULL;  //错误类型为“创建对象为空”
+        return;                       //返回，不继续执行
+    }
+#endif
+
+    OS_CRITICAL_ENTER();              //进入临界段，初始化互斥信号量指标 
+    p_mutex->Type              =  OS_OBJ_TYPE_MUTEX;  //标记创建对象数据结构为互斥信号量  
+    p_mutex->NamePtr           =  p_name;
+    p_mutex->OwnerTCBPtr       = (OS_TCB       *)0;
+    p_mutex->OwnerNestingCtr   = (OS_NESTING_CTR)0;   //互斥信号量目前可用
+    p_mutex->TS                = (CPU_TS        )0;
+    p_mutex->OwnerOriginalPrio =  OS_CFG_PRIO_MAX;
+    OS_PendListInit(&p_mutex->PendList);              //初始化该互斥信号量的等待列表   
+
+#if OS_CFG_DBG_EN > 0u           //如果使能（默认使能）了调试代码和变量 
+    OS_MutexDbgListAdd(p_mutex); //将该信号量添加到互斥信号量双向调试链表
+#endif
+    OSMutexQty++;                //互斥信号量个数加1         
+
+    OS_CRITICAL_EXIT_NO_SCHED(); //退出临界段（无调度）
+   *p_err = OS_ERR_NONE;          //错误类型为“无错误”
+}
+```
+
+OSMutexCreate() 使用实例：
+
+```c
+OS_MUTEX mutex; //声明互斥量
+/* 创建互斥量 mutex */
+OSMutexCreate ((OS_MUTEX *)&mutex, //指向互斥量变量的指针
+               (CPU_CHAR *)"Mutex For Test", //互斥量的名字
+               (OS_ERR *)&err); //错误类型 
+```
+
+
+
+### 删除互斥量函数OSMutexDel()
+
+OSMutexDel()用于删除一个互斥量，互斥量删除函数是根据互斥量结构（互斥量句柄）直接删除的，删除之后这个互斥量的所有信息都会被系统清空，而且不能再次使用这个互斥量了，但是需要注意的是，**如果某个互斥量没有被定义，那也是无法被删除的**，**如果有任务阻塞在该互斥量上，那么尽量不要删除该互斥量**。
+
+```c
+#if OS_CFG_MUTEX_DEL_EN > 0u                //如果使能了 OSMutexDel()   
+OS_OBJ_QTY  OSMutexDel (OS_MUTEX  *p_mutex, //互斥信号量指针
+                        OS_OPT     opt,     //选项
+                        OS_ERR    *p_err)   //返回错误类型
+{
+    OS_OBJ_QTY     cnt;
+    OS_OBJ_QTY     nbr_tasks;
+    OS_PEND_DATA  *p_pend_data;
+    OS_PEND_LIST  *p_pend_list;
+    OS_TCB        *p_tcb;
+    OS_TCB        *p_tcb_owner;
+    CPU_TS         ts;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((OS_OBJ_QTY)0);         //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u        //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {//如果该函数在中断中被调用
+       *p_err = OS_ERR_DEL_ISR;               //错误类型为“在中断中中止等待”
+        return ((OS_OBJ_QTY)0);               //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                //如果使能了参数检测
+    if (p_mutex == (OS_MUTEX *)0) {       //如果 p_mutex 为空             
+       *p_err = OS_ERR_OBJ_PTR_NULL;      //错误类型为“对象为空”
+        return ((OS_OBJ_QTY)0);           //返回0（有错误），停止执行
+    }
+    switch (opt) {                        //根据选项分类处理
+        case OS_OPT_DEL_NO_PEND:          //如果选项在预期内
+        case OS_OPT_DEL_ALWAYS:
+             break;                       //直接跳出
+
+        default:                          //如果选项超出预期
+            *p_err =  OS_ERR_OPT_INVALID; //错误类型为“选项非法”
+             return ((OS_OBJ_QTY)0);      //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u               //如果使能了对象类型检测
+    if (p_mutex->Type != OS_OBJ_TYPE_MUTEX) { //如果 p_mutex 非互斥信号量类型
+       *p_err = OS_ERR_OBJ_TYPE;              //错误类型为“对象类型错误”
+        return ((OS_OBJ_QTY)0);               //返回0（有错误），停止执行
+    }
+#endif
+
+    OS_CRITICAL_ENTER();                        //进入临界段
+    p_pend_list = &p_mutex->PendList;           //获取信号量的等待列表
+    cnt         = p_pend_list->NbrEntries;      //获取等待该信号量的任务数
+    nbr_tasks   = cnt;
+    switch (opt) {                              //根据选项分类处理
+        case OS_OPT_DEL_NO_PEND:                //如果只在没任务等待时删除信号量
+             if (nbr_tasks == (OS_OBJ_QTY)0) {  //如果没有任务在等待该信号量
+#if OS_CFG_DBG_EN > 0u                          //如果使能了调试代码和变量  
+                 OS_MutexDbgListRemove(p_mutex);//将该信号量从信号量调试列表移除
+#endif
+                 OSMutexQty--;                  //互斥信号量数目减1
+                 OS_MutexClr(p_mutex);          //清除信号量内容
+                 OS_CRITICAL_EXIT();            //退出临界段
+                *p_err = OS_ERR_NONE;           //错误类型为“无错误”
+             } else {                           //如果有任务在等待该信号量
+                 OS_CRITICAL_EXIT();            //退出临界段
+                *p_err = OS_ERR_TASK_WAITING;   //错误类型为“有任务正在等待”
+             }
+             break;                             //跳出
+
+        case OS_OPT_DEL_ALWAYS:                                          //如果必须删除信号量  
+             p_tcb_owner = p_mutex->OwnerTCBPtr;                         //获取信号量持有任务
+             if ((p_tcb_owner       != (OS_TCB *)0) &&                   //如果持有任务存在，
+                 (p_tcb_owner->Prio !=  p_mutex->OwnerOriginalPrio)) {   //而且优先级被提升过。
+                 switch (p_tcb_owner->TaskState) {                       //根据其任务状态处理
+                     case OS_TASK_STATE_RDY:                             //如果是就绪状态
+                          OS_RdyListRemove(p_tcb_owner);                 //将任务从就绪列表移除
+                          p_tcb_owner->Prio = p_mutex->OwnerOriginalPrio;//还原任务的优先级
+                          OS_PrioInsert(p_tcb_owner->Prio);              //将该优先级插入优先级表格
+                          OS_RdyListInsertTail(p_tcb_owner);             //将任务重插入就绪列表
+                          break;                                         //跳出
+
+                     case OS_TASK_STATE_DLY:                             //如果是延时状态
+                     case OS_TASK_STATE_SUSPENDED:                       //如果是被挂起状态
+                     case OS_TASK_STATE_DLY_SUSPENDED:                   //如果是延时中被挂起状态
+                          p_tcb_owner->Prio = p_mutex->OwnerOriginalPrio;//还原任务的优先级
+                          break;
+
+                     case OS_TASK_STATE_PEND:                            //如果是无期限等待状态
+                     case OS_TASK_STATE_PEND_TIMEOUT:                    //如果是有期限等待状态
+                     case OS_TASK_STATE_PEND_SUSPENDED:                  //如果是无期等待中被挂状态
+                     case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:          //如果是有期等待中被挂状态
+                          OS_PendListChangePrio(p_tcb_owner,             //改变任务在等待列表的位置
+                                                p_mutex->OwnerOriginalPrio);
+                          break;
+
+                     default:                                            //如果状态超出预期
+                          OS_CRITICAL_EXIT();
+                         *p_err = OS_ERR_STATE_INVALID;                  //错误类型为“任务状态非法”
+                          return ((OS_OBJ_QTY)0);                        //返回0（有错误），停止执行
+                 }
+             }
+
+             ts = OS_TS_GET();                                           //获取时间戳
+             while (cnt > 0u) {                                          //移除该互斥信号量等待列表
+                 p_pend_data = p_pend_list->HeadPtr;                     //中的所有任务。
+                 p_tcb       = p_pend_data->TCBPtr;
+                 OS_PendObjDel((OS_PEND_OBJ *)((void *)p_mutex),
+                               p_tcb,
+                               ts);
+                 cnt--;
+             }
+#if OS_CFG_DBG_EN > 0u                          //如果使能了调试代码和变量 
+             OS_MutexDbgListRemove(p_mutex);    //将信号量从互斥信号量调试列表移除
+#endif
+             OSMutexQty--;                      //互斥信号量数目减1
+             OS_MutexClr(p_mutex);              //清除信号量内容
+             OS_CRITICAL_EXIT_NO_SCHED();       //退出临界段，但不调度
+             OSSched();                         //调度最高优先级任务运行
+            *p_err = OS_ERR_NONE;               //错误类型为“无错误”
+             break;                             //跳出
+
+        default:                                //如果选项超出预期
+             OS_CRITICAL_EXIT();                //退出临界段
+            *p_err = OS_ERR_OPT_INVALID;        //错误类型为“选项非法”
+             break;                             //跳出
+    }
+    return (nbr_tasks);                         //返回删除前信号量等待列表中的任务数
+}
+#endif
+```
+
+- 如果 opt 是 OS_OPT_DEL_NO_PEND，则表示只在没有任务等待的情况下删除互斥量，如果当前系统中有任务阻塞在该互斥量上，则不能删除，反之，则可以删除互斥量。 
+- 如果 opt 是 OS_OPT_DEL_ALWAYS，则表示无论如何都必须删除互斥量，那么在删除之前，系统会把所有阻塞在该互斥量上的任务恢复。
+- 如果任务处于就绪状态，那么就将任务从就绪列表移除，然后还原任务的优先级，互斥量控制块中的OwnerOriginalPrio 成员变量保存的就是持有互斥量任务的原本优先级。 调用 OS_PrioInsert()函数将任务按照其原本的优先级插入优先级列表中。将任务重新插入就绪列表。
+- 如果任务处于延时状态、被挂起状态或者是延时中被挂起状态，就直接将任务的优先级恢复即可，并不用进行任务列表相关的操作。
+- 如果任务处于无期限等待状态、有期限等待状态、无期等待中被挂状态或者是有期等待中被挂状态，那么就调用OS_PendListChangePrio() 函数改变任务在等待列表的位置，根据任务的优先级进行修改即可。
+- 根据前面 cnt 记录阻塞在该互斥量上的任务个数，逐个移除该互斥量等待列表中的任务。
+- 调用 OS_PendObjDel()函数将阻塞在内核对象（如互斥量）上的任务从阻塞态恢复，此时系统再删除内核对象，删除之后，这些等待事件的任务需要被恢复。
+
+
+
+OSMutexDel()函数使用实例：
+
+```c
+OS_SEM  mutex;;                             //声明互斥量 
+OS_ERR      err; 
+/* 删除互斥量mutex*/ 
+OSMutexDel ((OS_MUTEX         *)&mutex,     //指向互斥量的指针 
+			OS_OPT_DEL_NO_PEND, 
+			(OS_ERR       *)&err);          //返回错误类型
+```
+
+需要注意的是在调用删除互斥量函数前，系统应存在已创建的互斥量。如果删除互斥量时，系统中有任务正在等待该互斥量，则不应该进行删除操作，因为删除之后的互斥量就不可用了。
+
+
+
+### 获取互斥量函数OSMutexPend()
+
+当互斥量处于开锁的状态，任务才能获取互斥量成功，当任务持有了某个互斥量的时候，其它任务就无法获取这个互斥量，需要等到持有互斥量的任务进行释放后，其他任务才能获取成功，任务通过互斥量获取函数来获取互斥量的所有权。任务对互斥量
+的所有权是独占的，任意时刻互斥量只能被一个任务持有，如果互斥量处于开锁状态，那么获取该互斥量的任务将成功获得该互斥量，并拥有互斥量的使用权；如果互斥量处于闭锁状态，获取该互斥量的任务将无法获得互斥量，任务将**被挂起**，在任务被挂起之前，会进行**优先级继承**，**如果当前任务优先级比持有互斥量的任务优先级高，那么将会临时提升持有互斥量任务的优先级**。
+
+```c
+void  OSMutexPend (OS_MUTEX  *p_mutex, //互斥信号量指针
+                   OS_TICK    timeout, //超时时间（节拍）
+                   OS_OPT     opt,     //选项
+                   CPU_TS    *p_ts,    //时间戳
+                   OS_ERR    *p_err)   //返回错误类型
+{
+    OS_PEND_DATA  pend_data;
+    OS_TCB       *p_tcb;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u         //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) { //如果该函数在中断中被调用
+       *p_err = OS_ERR_PEND_ISR;               //错误类型为“在中断中等待”
+        return;                                //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u               //如果使能了参数检测
+    if (p_mutex == (OS_MUTEX *)0) {      //如果 p_mutex 为空
+       *p_err = OS_ERR_OBJ_PTR_NULL;     //返回错误类型为“内核对象为空”
+        return;                          //返回，不继续执行
+    }
+    switch (opt) {                       //根据选项分类处理
+        case OS_OPT_PEND_BLOCKING:       //如果选项在预期内
+        case OS_OPT_PEND_NON_BLOCKING:
+             break;
+
+        default:                         //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID; //错误类型为“选项非法”
+             return;                     //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u               //如果使能了对象类型检测
+    if (p_mutex->Type != OS_OBJ_TYPE_MUTEX) { //如果 p_mutex 非互斥信号量类型
+       *p_err = OS_ERR_OBJ_TYPE;              //错误类型为“内核对象类型错误”
+        return;                               //返回，不继续执行
+    }
+#endif
+
+    if (p_ts != (CPU_TS *)0) {  //如果 p_ts 非空
+       *p_ts  = (CPU_TS  )0;    //初始化（清零）p_ts，待用于返回时间戳    
+    }
+
+    CPU_CRITICAL_ENTER();                                //关中断
+    if (p_mutex->OwnerNestingCtr == (OS_NESTING_CTR)0) { //如果信号量可用
+        p_mutex->OwnerTCBPtr       =  OSTCBCurPtr;       //让当前任务持有信号量 
+        p_mutex->OwnerOriginalPrio =  OSTCBCurPtr->Prio; //保存持有任务的优先级
+        p_mutex->OwnerNestingCtr   = (OS_NESTING_CTR)1;  //开始嵌套
+        if (p_ts != (CPU_TS *)0) {                       //如果 p_ts 非空    
+           *p_ts  = p_mutex->TS;                         //返回信号量的时间戳记录
+        }
+        CPU_CRITICAL_EXIT();                             //开中断
+       *p_err = OS_ERR_NONE;                             //错误类型为“无错误”
+        return;                                          //返回，不继续执行
+    }
+    /* 如果信号量不可用 */
+    if (OSTCBCurPtr == p_mutex->OwnerTCBPtr) { //如果当前任务已经持有该信号量
+        p_mutex->OwnerNestingCtr++;            //信号量前套数加1
+        if (p_ts != (CPU_TS *)0) {             //如果 p_ts 非空
+           *p_ts  = p_mutex->TS;               //返回信号量的时间戳记录
+        }
+        CPU_CRITICAL_EXIT();                   //开中断
+       *p_err = OS_ERR_MUTEX_OWNER;            //错误类型为“任务已持有信号量”
+        return;                                //返回，不继续执行
+    }
+    /* 如果当前任务非持有该信号量 */
+    if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) {//如果选择了不堵塞任务
+        CPU_CRITICAL_EXIT();                            //开中断
+       *p_err = OS_ERR_PEND_WOULD_BLOCK;                //错误类型为“渴求堵塞”  
+        return;                                         //返回，不继续执行
+    } else {                                            //如果选择了堵塞任务
+        if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) {//如果调度器被锁
+            CPU_CRITICAL_EXIT();                        //开中断
+           *p_err = OS_ERR_SCHED_LOCKED;                //错误类型为“调度器被锁”
+            return;                                     //返回，不继续执行
+        }
+    }
+    /* 如果调度器未被锁 */                                                        
+    OS_CRITICAL_ENTER_CPU_EXIT();                          //锁调度器，并重开中断
+    p_tcb = p_mutex->OwnerTCBPtr;                          //获取信号量持有任务
+    if (p_tcb->Prio > OSTCBCurPtr->Prio) {                 //如果持有任务优先级低于当前任务
+        switch (p_tcb->TaskState) {                        //根据持有任务的任务状态分类处理
+            case OS_TASK_STATE_RDY:                        //如果是就绪状态
+                 OS_RdyListRemove(p_tcb);                  //从就绪列表移除持有任务
+                 p_tcb->Prio = OSTCBCurPtr->Prio;          //提升持有任务的优先级到当前任务
+                 OS_PrioInsert(p_tcb->Prio);               //将该优先级插入优先级表格
+                 OS_RdyListInsertHead(p_tcb);              //将持有任务插入就绪列表
+                 break;                                    //跳出
+
+            case OS_TASK_STATE_DLY:                        //如果是延时状态
+            case OS_TASK_STATE_DLY_SUSPENDED:              //如果是延时中被挂起状态
+            case OS_TASK_STATE_SUSPENDED:                  //如果是被挂起状态
+                 p_tcb->Prio = OSTCBCurPtr->Prio;          //提升持有任务的优先级到当前任务
+                 break;                                    //跳出
+
+            case OS_TASK_STATE_PEND:                       //如果是无期限等待状态
+            case OS_TASK_STATE_PEND_TIMEOUT:               //如果是有期限等待状态
+            case OS_TASK_STATE_PEND_SUSPENDED:             //如果是无期限等待中被挂起状态
+            case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:     //如果是有期限等待中被挂起状态
+                 OS_PendListChangePrio(p_tcb,              //改变持有任务在等待列表的位置
+                                       OSTCBCurPtr->Prio);
+                 break;                                    //跳出
+
+            default:                                       //如果任务状态超出预期
+                 OS_CRITICAL_EXIT();                       //开中断
+                *p_err = OS_ERR_STATE_INVALID;             //错误类型为“任务状态非法”
+                 return;                                   //返回，不继续执行
+        }
+    }
+    /* 堵塞任务，将当前任务脱离就绪列表，并插入到节拍列表和等待列表。*/
+    OS_Pend(&pend_data,                                     
+            (OS_PEND_OBJ *)((void *)p_mutex),
+             OS_TASK_PEND_ON_MUTEX,
+             timeout);
+
+    OS_CRITICAL_EXIT_NO_SCHED();          //开调度器，但不进行调度
+
+    OSSched();                            //调度最高优先级任务运行
+
+    CPU_CRITICAL_ENTER();                 //开中断
+    switch (OSTCBCurPtr->PendStatus) {    //根据当前运行任务的等待状态分类处理
+        case OS_STATUS_PEND_OK:           //如果等待正常（获得信号量）
+             if (p_ts != (CPU_TS *)0) {   //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS; //返回信号量最后一次被释放的时间戳
+             }
+            *p_err = OS_ERR_NONE;         //错误类型为“无错误”
+             break;                       //跳出
+
+        case OS_STATUS_PEND_ABORT:        //如果等待被中止
+             if (p_ts != (CPU_TS *)0) {   //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS; //返回等待被中止时的时间戳
+             }
+            *p_err = OS_ERR_PEND_ABORT;   //错误类型为“等待被中止”
+             break;                       //跳出
+
+        case OS_STATUS_PEND_TIMEOUT:      //如果超时内为获得信号量
+             if (p_ts != (CPU_TS *)0) {   //如果 p_ts 非空
+                *p_ts  = (CPU_TS  )0;     //清零 p_ts
+             }
+            *p_err = OS_ERR_TIMEOUT;      //错误类型为“超时”
+             break;                       //跳出
+
+        case OS_STATUS_PEND_DEL:          //如果信号量已被删除                  
+             if (p_ts != (CPU_TS *)0) {   //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS; //返回信号量被删除时的时间戳
+             }
+            *p_err = OS_ERR_OBJ_DEL;      //错误类型为“对象被删除”
+             break;                       //跳出
+
+        default:                           //根据等待状态超出预期
+            *p_err = OS_ERR_STATUS_INVALID;//错误类型为“状态非法”
+             break;                        //跳出
+    }
+    CPU_CRITICAL_EXIT();                   //开中断
+}
+```
+
+- 如果互斥量可用，互斥量控制块中的 OwnerNestingCtr 变量为 0 则表示互斥量处于开锁状态，互斥量可用被任务获取。
+- 嵌套其实是将互斥量变为闭锁状态，而其他任务就不能获取互斥量，但是本身持有互斥量的任务就拥有该互斥量的所有权，能递归获取该互斥量，每获取一次已经持有的互斥量，OwnerNestingCtr 的值就会加一，以表示互斥量嵌套，任务获取了多少次互斥量就需要释放多少次互斥量。
+- 如果当前任务并没有持有该互斥量，那肯定是不能获取到的，就看看用户有没有选择阻塞任务，如果选择了不阻塞任务，那么就返回错误类型为“渴求阻塞”的错误代码，退出，不继续执行。
+- 而用户如果选择了阻塞任务，就判断一下调度器是否被锁，如果调度器被锁了，就返回错误类型为“调度器被锁”的错误代码。
+- 如果调度器未被锁，就锁调度器，并重开中断，原因和前面的消息队列/信号量获取函数一样。
+- 获取持有互斥量的任务，判断一下当前任务与持有互斥量的任务优先级情况，如果持有互斥量的任务优先级低于当前任务，就会临时将持有互斥量任务的优先级提升，提升到与当前任务优先级一致，这就是**优先级继承**。
+- 如果该任务处于就绪状态，那么从就绪列表中移除该任务，然后将该任务的优先级到与当前任务优先级一致。将该优先级插入优先级表格。再将该任务按照优先级顺序插入就绪列表。
+- 如果持有互斥量任务处于延时状态、延时中被挂起状态或者是被挂起状态，仅仅是提升持有互斥量任务的优先级与当前任务优先级一致即可，不需要操作就绪列表。 
+- 如果持有互斥量任务无期限等待状态、有期限等待状态、无期限等待中被挂起状态或者是有期限等待中被挂起状态，那么就直接根据任务的优先级来改变持有互斥量任务在等待列表的位置即可。 
+- 调用 OS_Pend()函数阻塞任务，将当前任务脱离就绪列表，并插入到节拍列表和等待列表中。再进行一次任务调度，以运行处于最高优先级的就绪任务。
+
+
+
+**如果任务获取互斥量成功，那么在使用完毕需要立即释放**，否则很容易造成其他任务无法获取互斥量，因为互斥量的优先级继承机制是只能将优先级危害降低，而不能完全消除。同时还需注意的是，**互斥量是不允许在中断中操作的**，因为互斥量特有的优先级继承机制在中断是毫无意义的。
+
+
+
+OSMutexPend() 函数使用实例：
+
+```c
+OS_MUTEX mutex;                         		   //声明互斥量 
+OS_ERR      err; 
+
+OSMutexPend ((OS_MUTEX  *)&mutex,                  //申请互斥量 mutex 
+             (OS_TICK    )0,                       //无期限等待 
+             (OS_OPT     )OS_OPT_PEND_BLOCKING,    //如果不能申请到互斥量就堵塞任务 
+             (CPU_TS    *)0,                       //不想获得时间戳 
+             (OS_ERR    *)&err);                   //返回错误类 
+```
+
+
+
+### 释放互斥量函数OSMutexPost()
+
+任务想要访问某个资源的时候，需要先获取互斥量，然后进行资源访问，**在任务使用完该资源的时候，必须要及时归还互斥量**，这样别的任务才能对资源进行访问。在前面的讲解中，我们知道，当互斥量有效的时候，任务才能获取互斥量，那么，是什么函数使得互斥量变得有效呢？uCOS 给我们提供了互斥量释放函数 OSMutexPost()，任务可以调用该函数进行释放互斥量，表示我已经用完了，别人可以申请使用，但是要注意的是，**「互斥量的释放只能在任务中，不允许在中断中释放互斥量」**。
+
+使用该函数接口时，只有已持有互斥量所有权的任务才能释放它，当任务调用 OSMutexPost() 函数时会释放一次互斥量，当互斥量的成员变量 OwnerNestingCtr 为 0 的时候，互斥量状态才会成为开锁状态，等待获取该互斥量的任务将被唤醒。如果任务的优先级被互斥量的优先级翻转机制临时提升，那么当互斥量被完全释放后，**任务的优先级将恢复为原本设定的优先级**。
+
+```c
+void  OSMutexPost (OS_MUTEX  *p_mutex, //互斥信号量指针
+                   OS_OPT     opt,     //选项
+                   OS_ERR    *p_err)   //返回错误类型
+{
+    OS_PEND_LIST  *p_pend_list;
+    OS_TCB        *p_tcb;
+    CPU_TS         ts;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和定义一个局部变
+                    //量，用于保存关中断前的 CPU 状态寄存器 SR（临界段关中断只需保存SR）
+                    //，开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u         //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) { //如果该函数在中断中被调用
+       *p_err = OS_ERR_POST_ISR;               //错误类型为“在中断中等待”
+        return;                                //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                 //如果使能了参数检测
+    if (p_mutex == (OS_MUTEX *)0) {        //如果 p_mutex 为空            
+       *p_err = OS_ERR_OBJ_PTR_NULL;       //错误类型为“内核对象为空”
+        return;                            //返回，不继续执行
+    }
+    switch (opt) {                         //根据选项分类处理  
+        case OS_OPT_POST_NONE:             //如果选项在预期内，不处理
+        case OS_OPT_POST_NO_SCHED:
+             break;
+
+        default:                           //如果选项超出预期
+            *p_err =  OS_ERR_OPT_INVALID;  //错误类型为“选项非法”
+             return;                       //返回，不继续执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u               //如果使能了对象类型检测   
+    if (p_mutex->Type != OS_OBJ_TYPE_MUTEX) { //如果 p_mutex 的类型不是互斥信号量类型 
+       *p_err = OS_ERR_OBJ_TYPE;              //返回，不继续执行
+        return;
+    }
+#endif
+
+    CPU_CRITICAL_ENTER();                      //关中断
+    if (OSTCBCurPtr != p_mutex->OwnerTCBPtr) { //如果当前运行任务不持有该信号量
+        CPU_CRITICAL_EXIT();                   //开中断
+       *p_err = OS_ERR_MUTEX_NOT_OWNER;        //错误类型为“任务不持有该信号量”
+        return;                                //返回，不继续执行
+    }
+
+    OS_CRITICAL_ENTER_CPU_EXIT();                       //锁调度器，开中断
+    ts          = OS_TS_GET();                          //获取时间戳
+    p_mutex->TS = ts;                                   //存储信号量最后一次被释放的时间戳
+    p_mutex->OwnerNestingCtr--;                         //信号量的嵌套数减1
+    if (p_mutex->OwnerNestingCtr > (OS_NESTING_CTR)0) { //如果信号量仍被嵌套
+        OS_CRITICAL_EXIT();                             //解锁调度器
+       *p_err = OS_ERR_MUTEX_NESTING;                   //错误类型为“信号量被嵌套”
+        return;                                         //返回，不继续执行
+    }
+    /* 如果信号量未被嵌套，已可用 */
+    p_pend_list = &p_mutex->PendList;                //获取信号量的等待列表
+    if (p_pend_list->NbrEntries == (OS_OBJ_QTY)0) {  //如果没有任务在等待该信号量
+        p_mutex->OwnerTCBPtr     = (OS_TCB       *)0;//请空信号量持有者信息
+        p_mutex->OwnerNestingCtr = (OS_NESTING_CTR)0;
+        OS_CRITICAL_EXIT();                          //解锁调度器
+       *p_err = OS_ERR_NONE;                         //错误类型为“无错误”
+        return;                                      //返回，不继续执行
+    }
+    /* 如果有任务在等待该信号量 */
+    if (OSTCBCurPtr->Prio != p_mutex->OwnerOriginalPrio) { //如果当前任务的优先级被改过
+        OS_RdyListRemove(OSTCBCurPtr);                     //从就绪列表移除当前任务
+        OSTCBCurPtr->Prio = p_mutex->OwnerOriginalPrio;    //还原当前任务的优先级
+        OS_PrioInsert(OSTCBCurPtr->Prio);                  //在优先级表格插入这个优先级
+        OS_RdyListInsertTail(OSTCBCurPtr);                 //将当前任务插入就绪列表尾端
+        OSPrioCur         = OSTCBCurPtr->Prio;             //更改当前任务优先级变量的值
+    }
+
+    p_tcb                      = p_pend_list->HeadPtr->TCBPtr; //获取等待列表的首端任务
+    p_mutex->OwnerTCBPtr       = p_tcb;                        //将信号量交给该任务
+    p_mutex->OwnerOriginalPrio = p_tcb->Prio;
+    p_mutex->OwnerNestingCtr   = (OS_NESTING_CTR)1;            //开始嵌套
+    /* 释放信号量给该任务 */
+    OS_Post((OS_PEND_OBJ *)((void *)p_mutex), 
+            (OS_TCB      *)p_tcb,
+            (void        *)0,
+            (OS_MSG_SIZE  )0,
+            (CPU_TS       )ts);
+
+    OS_CRITICAL_EXIT_NO_SCHED();                     //减锁调度器，但不执行任务调度
+
+    if ((opt & OS_OPT_POST_NO_SCHED) == (OS_OPT)0) { //如果 opt 没选择“发布时不调度任务”
+        OSSched();                                   //任务调度
+    }
+
+   *p_err = OS_ERR_NONE;                             //错误类型为“无错误”
+}
+```
+
+- 如果互斥量仍被嵌套，也就是OwnerNestingCtr 不为 0，那还是表明当前任务还是持有互斥量的，并未完全释放，返回错误类型为“互斥量仍被嵌套”的错误代码，然后退出，不继续执行。
+- 如果互斥量未被嵌套，已可用（OwnerNestingCtr 为 0），那么就获取互斥量的等待列表保存在 p_pend_list 变量中，通过该变量访问互斥量等待列表。
+- 如果没有任务在等待该互斥量，那么就清空互斥量持有者信息，互斥量中的OwnerTCBPtr 成员变量重置为 0。
+- 如果有任务在等待该互斥量，那么就很有可能发生了优先级继承，先看看当前任务的优先级是否被修改过，如果有则说明发生了优先级继承，就需要重新恢复任务原本的优先级。
+
+已经获取到互斥量的任务拥有互斥量的所有权，能重复获取同一个互斥量，但是**任务获取了多少次互斥量就要释放多少次互斥量才能彻底释放掉互斥量，互斥量的状态才会变成开锁状态**，否则在此之前互斥量都处于无效状态，别的任务就无法获取该互斥量。使用该函数接口时，只有已持有互斥量所有权的任务才能释放它，每释放一次该互斥量，它的OwnerNestingCtr 成员变量就减 1。当该互斥量的 OwnerNestingCtr 成员变量为 0 时（即持有任务已经释放所有的持有操作），互斥量则变为开锁状态，等待在该互斥量上的任务将被唤醒。如果任务的优先级被互斥量的优先级翻转机制临时提升，那么当互斥量被释放后，任务的优先级将恢复为原本设定的优先级。
+
+
+
+OSMutexPost() 使用实例：
+
+```c
+OS_MUTEX mutex; //声明互斥互斥量
+OS_ERR err;
+OSMutexPost ((OS_MUTEX *)&mutex, //释放互斥互斥量 mutex
+    		 (OS_OPT )OS_OPT_POST_NONE, //进行任务调度
+    		 (OS_ERR *)&err); //返回错误类型
+```
+
+
+
+## 7\. 总结
+
+互斥量更适用于保护各个任务间对共享资源的互斥访问，当然系统中对于这种互斥访问的资源可以使用很多种保护的方式，如关闭中断方式、关调度器方式、信号量保护或者采用互斥量保护，但是这些方式各有好坏，下面就简单说明一下这 4 种方式的使用情况，具体见：
+
+| 共享资源保护方式 | 说明                                                         |
+| :--------------: | :----------------------------------------------------------- |
+|   关闭中断方式   | 什么时候该用：**当系统能很快地结束访问该共享资源时**，如一些共享的全局变量的操作，可以关闭中断，操作完成再打开中断即可。但是我们一般不推荐使用这种方法，因为会导致中断延迟。 |
+|   锁调度器方式   | **当访问共享资源较久的时候**，比如对一些列表的操作，如遍历列表、插入、删除等操作，对于操作时间是不确定的，如一些 os 中的内存分配，都可以采用锁定调度器这种方式进行共享资源的保护。 |
+|  信号量保护方式  | **当该共享资源经常被多个任务使用时**可以使用这种方式。但信号量可能会导致优先级反转，并且信号量是无法解决这种危害的。 |
+|  互斥量保护方式  | **推荐使用这种方法访问共享资源**，尤其当任务要访问的共享资源有阻塞时间的时候。uCOS-III 的互斥量有内置的优先级继承机制，这样**可防止优先级翻转**。然而，互斥量方式慢于信号量方式，因为互斥量需执行额外的操作，改变任务的优先级。 |
+
 
 
 # 事件
+
+## 1\. 事件的基本概念
+
+事件是一种实现**任务间通信**的机制，主要用于实现**多任务间的同步**，但事件通信只能是事件类型的通信，无数据传输。**「与信号量不同的是，它可以实现一对多，多对多的同步」**。即**一个任务可以等待多个事件的发生**：可以是任意一个事件发生时唤醒任务进行事件处理；也可以是几个事件都发生后才唤醒任务进行事件处理。同样，也可以是多个任务同步多个事件。 
+
+每一个事件组只需要很少的 RAM 空间来保存事件组的状态。事件组存储在一个 **OS_FLAGS** 类型的 Flags 变量中，该变量在事件结构体中定义。而变量的**宽度由我们自己定义**，可以是 8 位、16 位、32 位的变量，取决于 os_type.h 中的 OS_FLAGS 的位数。在STM32 中，我们一般将其定义为 32 位的变量，**有 32 个位用来实现事件标志组**。每一位代表一个事件，任务通过 “逻辑与” 或 “逻辑或” 与一个或多个事件建立关联，形成一个事件组。事件的 “逻辑或” 也被称作是**独立型同步**，指的是任务感兴趣的所有事件**任一件发生即可被唤醒**；事件 “逻辑与” 则被称为是**关联型同步**，指的是任务感兴趣的**若干事件都发生时**才被唤醒，并且事件发生的时间可以不同步。
+
+多任务环境下，任务、中断之间往往需要同步操作，一个事件发生会告知等待中的任务，即形成一个任务与任务、中断与任务间的同步。事件可以提供一对多、多对多的同步操作。**一对多同步模型**：一个任务等待多个事件的触发，这种情况是比较常见的；**多对多同步模型**：多个任务等待多个事件的触发。任务可以通过设置事件位来实现事件的触发和等待操作。uCOS 的事件仅用于同步，不提供数据传输功能。
+
+任务可以通过设置事件位来实现事件的触发和等待操作。uCOS 的**事件仅用于同步，不提供数据传输功能**。
+
+uCOS 提供的事件具有如下特点：
+
+- 事件只与任务相关联，事件相互独立，一个 32 位（数据宽度由用户定义）的事件集合用于标识该任务发生的事件类型，其中每一位表示一种事件类型（0 表示该事件类型未发生、1 表示该事件类型已经发生），一共 32 种事件类型。 
+
+  > 我的理解：这里的事件类型指的就是事件，32位可以标识32个事件是否发生
+
+- 事件仅用于同步，不提供数据传输功能。 
+
+- **事件无排队性，即多次向任务设置同一事件(如果任务还未来得及读走)，等效于只设置一次**。 
+
+- 允许多个任务对同一事件进行读写操作。 
+
+- 支持事件等待超时机制。 
+
+- 支持显式清除事件。 
+
+在 uCOS 的等待事件中，用户可以选择感兴趣的事件，并且**选择等待事件的选项**，它有 4 个属性，分别是**逻辑与、逻辑或、等待所有事件清除或者等待任意事件清除**。当任务等待事件同步时，可以通过任务感兴趣的事件位和事件选项来判断当前获取的事件是否满足要求，如果满足则说明任务等待到对应的事件，系统将唤醒等待的任务；否则，任务会根据用户指定的阻塞超时时间继续等待下去。
+
+
+
+## 2\. 事件的应用场景
+
+uCOS 的事件用于事件类型的通讯，无数据传输，也就是说，我们**可以用事件来做标志位，判断某些事件是否发生了**，然后根据结果做处理，那很多人又会问了，为什么我不直接用变量做标志呢，岂不是更好更有效率？非也非也，若是在裸机编程中，用全局变量是最为有效的方法，这点我不否认，但是**在操作系统中，使用全局变量就要考虑以下问题**了：
+
+- 如何对全局变量进行**保护**呢，如何处理多任务同时对它进行访问？
+- 如何让内核对事件进行有效管理呢？使用全局变量的话，就需要在任务中轮询查看事件是否发送，这简直就是在**浪费 CPU 资源**啊，还有等待超时机制，使用全局变量的话需要用户自己去实现。 
+
+所以，在操作系统中，还是使用操作系统给我们提供的通信机制就好了，简单方便还实用。 
+
+在某些场合，可能需要多个事件发生了才能进行下一步操作，比如一些危险机器的启动，需要检查各项指标，当指标不达标的时候，无法启动，但是检查各个指标的时候，不能一下子检测完毕啊，所以，需要事件来做统一的等待，当所有的事件都完成了，那么机器才允许启动，这只是事件的其中一个应用。
+
+事件可使用于多种场合，它**能够在一定程度上替代信号量，用于任务与任务间，中断与任务间的同步**。一个任务或中断服务例程发送一个事件给事件对象，而后等待的任务被唤醒并对相应的事件进行处理。但是它**与信号量不同的是，事件的发送操作是不可累计的，而信号量的释放动作是可累计的**。事件另外一个特性是，**接收任务可等待多种事件，即多个事件对应一个任务或多个任务**。同时按照任务等待的参数，**可选择是 “逻辑或” 触发还是 “逻辑与” 触发**。这个特性也是信号量等所不具备的，信号量只能识别单一同步动作，而不能同时等待多个事件的同步。
+
+各个事件可分别发送或一起发送给事件对象，而任务可以等待多个事件，任务仅对感兴趣的事件进行关注。当有它们感兴趣的事件发生时并且符合感兴趣的条件，任务将被唤醒并进行后续的处理动作。
+
+
+
+## 3\. 事件运作机制
+
+等待（接收）事件时，可以根据感兴趣的事件类型等待事件的单个或者多个事件类型。事件等待成功后，必须使用 OS_OPT_PEND_FLAG_CONSUME 选项来清除已接收到的事件类型，否则不会清除已接收到的事件，这样就需要用户显式清除事件位。用户可以自定义通过传入  opt 选项来选择读取模式，是**等待所有感兴趣的事件**还是**等待感兴趣的任意一个事件**。
+
+设置事件时，对指定事件写入指定的事件类型，设置事件集合的对应事件位为 1，可以一次同时写多个事件类型，设置事件成功可能会触发任务调度。清除事件时，根据参数事件句柄和待清除的事件类型，对事件对应位进行清 0 操作。事件不与任务相关联，事件相互独立，一个 32 位的变量就是事件的集合，用于标识该任务发生的事件类型，其中每一位表示一种事件类型（0 表示该事件类型未发生、1 表示该事件类型已经发生），一共 32 种事件类型（事件集合Flags（一个32 位的变量））具体见下图：
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625140425.png" alt="image-20200625140423228" style="zoom:67%;" />
+
+事件唤醒机制：当任务因为等待某个或者多个事件发生而进入阻塞态，当事件发生的时候会被唤醒。事件唤醒任务示意图 ：
+
+<img src="C:/Users/sdhm/AppData/Roaming/Typora/typora-user-images/image-20200625140509715.png" alt="image-20200625140509715" style="zoom: 50%;" />
+
+任务 1 对事件 3 或事件 5 感兴趣（逻辑或），当发生其中的某一个事件都会被唤醒，并且执行相应操作。而任务 2 对事件 3 与事件 5 感兴趣（逻辑与），当且仅当事件 3 与事件 5 都发生的时候，任务 2 才会被唤醒，如果只有一个其中一个事件发生，那么任务还是会继续等待事件发 生 。 如果在接收事件函数中设置了清除事件位选项 OS_OPT_PEND_FLAG_CONSUME，那么当任务唤醒后将把事件 3 和事件 5 的事件标志清零，否则事件标志将依然存在。
+
+
+
+## 4\. 事件控制块
+
+理论上用户可以创建任意个事件（仅限制于处理器的 RAM 大小）。通过设置 os_cfg.h 中的宏定义 OS_CFG_FLAG_EN 为 1 即可开启事件功能。事件是一个内核对象，由数据类型 **OS_FLAG_GRP**（事件标志组）定义，该数据类型由 os_flag_grp 定义（在 os.h 文件）。 
+
+uCOS 的事件由多个元素组成，在事件被创建时，需要由我们自己定义事件（也可以称之为事件句柄），用于保存事件的一些信息，其数据结构 OS_FLAG_GRP 中除了事件必须的一些基本信息外，还有 PendList 链表与一个 32 位的事件组变量 Flags 等，为的是方便系统来管理事件。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625140813.png" alt="image-20200625140808816" style="zoom:80%;" />
+
+```c
+struct  os_flag_grp {                 /* Event Flag Group                                       */
+                                      /* ------------------ GENERIC  MEMBERS ------------------ */
+    OS_OBJ_TYPE          Type;        /* 事件的类型，uCOS 用于识别它是一个事件 */
+    CPU_CHAR            *NamePtr;     /* 事件的名字，每个内核对象都会被分配一个名，采用字符串形式
+记录下来。   */
+    OS_PEND_LIST         PendList;    /* 用于控制挂起任务列表的结构体，用于记录阻塞在此事件上的任务 */
+#if OS_CFG_DBG_EN > 0u
+    OS_FLAG_GRP         *DbgPrevPtr;
+    OS_FLAG_GRP         *DbgNextPtr;
+    CPU_CHAR            *DbgNamePtr;
+#endif
+                                      /* ------------------ SPECIFIC MEMBERS ------------------ */
+    OS_FLAGS             Flags;       /* 保存了当前事件标志位的状态。这个变量可以为8 位，16 位或 32 位 */
+    CPU_TS               TS;          /* 事件中的变量 TS 用于保存该事件最后一次被释放的时间戳 */
+};
+```
+
+- 因为可以有多个任务同时等待系统中的事件，所以事件中包含了一个用于控制挂起任务列表的结构体，用于记录阻塞在此事件上的任务。
+- 事件中包含了很多标志位，Flags 这个变量中保存了当前这些标志位的状态。这个变量可以为8 位，16 位或 32 位。
+
+注意：用户代码不能直接访问这个结构体，必须通过uCOS 提供的 API 访问。 
+
+
+
+## 5\. 事件函数接口
+
+### 事件创建函数OSFlagCreate()
+
+事件创建函数，顾名思义，就是创建一个事件，与其他内核对象一样，都是需要先创建才能使用的资源，uCOS 给我们提供了一个创建事件的函数 OSFlagCreate()，当创建一个事件时，系统会对我们定义的事件控制块进行基本的初始化，所以，在使用创建函数之前，我们需要先定义一个事件控制块（句柄）
+
+OSFlagCreate() 源码：
+
+```c
+void  OSFlagCreate (OS_FLAG_GRP  *p_grp,  //事件标志组指针
+                    CPU_CHAR     *p_name, //命名事件标志组
+                    OS_FLAGS      flags,  //标志初始值
+                    OS_ERR       *p_err)  //返回错误类型
+{
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，停止执行
+    }
+#endif
+
+#ifdef OS_SAFETY_CRITICAL_IEC61508               //如果使能了安全关键
+    if (OSSafetyCriticalStartFlag == DEF_TRUE) { //如果在调用OSSafetyCriticalStart()后创建
+       *p_err = OS_ERR_ILLEGAL_CREATE_RUN_TIME;  //错误类型为“非法创建内核对象”
+        return;                                  //返回，停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u         //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) { //如果该函数是在中断中被调用
+       *p_err = OS_ERR_CREATE_ISR;             //错误类型为“在中断中创建对象”
+        return;                                //返回，停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u           //如果使能了参数检测
+    if (p_grp == (OS_FLAG_GRP *)0) { //如果 p_grp 为空                                      
+       *p_err = OS_ERR_OBJ_PTR_NULL; //错误类型为“创建对象为空”
+        return;                      //返回，停止执行
+    }
+#endif
+
+    OS_CRITICAL_ENTER();               //进入临界段
+    p_grp->Type    = OS_OBJ_TYPE_FLAG; //标记创建对象数据结构为事件标志组
+    p_grp->NamePtr = p_name;           //标记事件标志组的名称
+    p_grp->Flags   = flags;            //设置标志初始值
+    p_grp->TS      = (CPU_TS)0;        //清零事件标志组的时间戳
+    OS_PendListInit(&p_grp->PendList); //初始化该事件标志组的等待列表  
+
+#if OS_CFG_DBG_EN > 0u                 //如果使能了调试代码和变量
+    OS_FlagDbgListAdd(p_grp);          //将该标志组添加到事件标志组双向调试链表
+#endif
+    OSFlagQty++;                       //事件标志组个数加1
+
+    OS_CRITICAL_EXIT_NO_SCHED();       //退出临界段（无调度）
+   *p_err = OS_ERR_NONE;               //错误类型为“无错误”
+}
+```
+
+
+
+OSFlagCreate() 使用示例：
+
+```c
+OS_FLAG_GRP flag_grp;                   	    //声明事件
+OS_ERR      err; 
+
+/* 创建事件 flag_grp */ 
+OSFlagCreate ((OS_FLAG_GRP  *)&flag_grp,        //指向事件的指针 
+              (CPU_CHAR     *)"FLAG For Test",  //事件的名字 
+              (OS_FLAGS      )0,                //事件的初始值 
+              (OS_ERR       *)&err);            //返回错误类型
+```
+
+
+
+### 事件删除函数OSFlagDel()
+
+在很多场合，某些事件只用一次的，就好比在事件应用场景说的危险机器的启动，假如各项指标都达到了，并且机器启动成功了，那这个事件之后可能就没用了，那就可以进行销毁了。uCOS 给我们提供了一个删除事件的函数——OSFlagDel()，使用它就能将事件进行删除了。当系统不再使用事件对象时，可以通过删除事件对象控制块来进行删除。
+
+```c
+#if OS_CFG_FLAG_DEL_EN > 0u                 //如果使能了 OSFlagDel() 函数
+OS_OBJ_QTY  OSFlagDel (OS_FLAG_GRP  *p_grp, //事件标志组指针
+                       OS_OPT        opt,   //选项
+                       OS_ERR       *p_err) //返回错误类型
+{
+    OS_OBJ_QTY        cnt;
+    OS_OBJ_QTY        nbr_tasks;
+    OS_PEND_DATA     *p_pend_data;
+    OS_PEND_LIST     *p_pend_list;
+    OS_TCB           *p_tcb;
+    CPU_TS            ts;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((OS_OBJ_QTY)0);         //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u         //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) { //如果该函数在中断中被调用
+       *p_err = OS_ERR_DEL_ISR;                //错误类型为“在中断中删除对象”
+        return ((OS_OBJ_QTY)0);                //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                //如果使能了参数检测
+    if (p_grp == (OS_FLAG_GRP *)0) {      //如果 p_grp 为空 
+       *p_err  = OS_ERR_OBJ_PTR_NULL;     //错误类型为“对象为空”
+        return ((OS_OBJ_QTY)0);           //返回0（有错误），停止执行
+    }
+    switch (opt) {                        //根据选项分类处理
+        case OS_OPT_DEL_NO_PEND:          //如果选项在预期内
+        case OS_OPT_DEL_ALWAYS:
+             break;                       //直接跳出
+
+        default:                          //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;  //错误类型为“选项非法”
+             return ((OS_OBJ_QTY)0);      //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u           //如果使能了对象类型检测
+    if (p_grp->Type != OS_OBJ_TYPE_FLAG) {//如果 p_grp 不是事件标志组类型
+       *p_err = OS_ERR_OBJ_TYPE;          //错误类型为“对象类型有误”
+        return ((OS_OBJ_QTY)0);           //返回0（有错误），停止执行
+    }
+#endif
+    OS_CRITICAL_ENTER();                         //进入临界段
+    p_pend_list = &p_grp->PendList;              //获取消息队列的等待列表
+    cnt         = p_pend_list->NbrEntries;       //获取等待该队列的任务数
+    nbr_tasks   = cnt;                           //按照任务数目逐个处理
+    switch (opt) {                               //根据选项分类处理
+        case OS_OPT_DEL_NO_PEND:                 //如果只在没任务等待时进行删除
+             if (nbr_tasks == (OS_OBJ_QTY)0) {   //如果没有任务在等待该标志组
+#if OS_CFG_DBG_EN > 0u                           //如果使能了调试代码和变量
+                 OS_FlagDbgListRemove(p_grp);    //将该标志组从标志组调试列表移除
+#endif
+                 OSFlagQty--;                    //标志组数目减1
+                 OS_FlagClr(p_grp);              //清除该标志组的内容
+
+                 OS_CRITICAL_EXIT();             //退出临界段
+                *p_err = OS_ERR_NONE;            //错误类型为“无错误”
+             } else {
+                 OS_CRITICAL_EXIT();             //退出临界段
+                *p_err = OS_ERR_TASK_WAITING;    //错误类型为“有任务在等待标志组”
+             }
+             break;                              //跳出
+
+        case OS_OPT_DEL_ALWAYS:                  //如果必须删除标志组
+             ts = OS_TS_GET();                   //获取时间戳
+             while (cnt > 0u) {                  //逐个移除该标志组等待列表中的任务
+                 p_pend_data = p_pend_list->HeadPtr;
+                 p_tcb       = p_pend_data->TCBPtr;
+                 OS_PendObjDel((OS_PEND_OBJ *)((void *)p_grp),
+                               p_tcb,
+                               ts);
+                 cnt--;
+             }
+#if OS_CFG_DBG_EN > 0u                           //如果使能了调试代码和变量 
+             OS_FlagDbgListRemove(p_grp);        //将该标志组从标志组调试列表移除
+#endif
+             OSFlagQty--;                        //标志组数目减1
+             OS_FlagClr(p_grp);                  //清除该标志组的内容
+             OS_CRITICAL_EXIT_NO_SCHED();        //退出临界段（无调度）
+             OSSched();                          //调度任务
+            *p_err = OS_ERR_NONE;                //错误类型为“无错误”
+             break;                              //跳出
+
+        default:                                 //如果选项超出预期
+             OS_CRITICAL_EXIT();                 //退出临界段
+            *p_err = OS_ERR_OPT_INVALID;         //错误类型为“选项非法”
+             break;                              //跳出
+    }
+    return (nbr_tasks);                          //返回删除标志组前等待其的任务数
+}
+#endif
+```
+
+- 判断 opt 选项是否合理，该选项有两个，OS_OPT_DEL_ALWAYS 与 OS_OPT_DEL_NO_PEND
+- 如果 opt 是 OS_OPT_DEL_NO_PEND，则表示只在没有任务等待的情况下删除事件，如果当前系统中有任务还在等待该事件的某些位，则不能进行删除操作，反之，则可以删除事件。
+- 如果 opt 是 OS_OPT_DEL_ALWAYS，则表示无论如何都必须删除事件，那么在删除之前，系统会把所有阻塞在该事件上的任务恢复。
+
+
+
+事件删除函数 OSFlagDel() 的使用也是很简单的，只需要传入要删除的事件的句柄与选项还有保存返回的错误类型即可，调用函数时，系统将删除这个事件。需要注意的是在 调用删除事件函数前，系统应存在已创建的事件。如果删除互斥量时，系统中有任务正在等待该事件，则不应该进行删除操作。
+
+```c
+OS_FLAG_GRP  flag_grp;                   //声明事件句柄
+OS_ERR      err;
+/* 删除事件 */
+OSFlagDel((OS_FLAG_GRP *)& flag_grp,     //指向事件的指针
+          OS_OPT_DEL_NO_PEND,
+          (OS_ERR      *)&err);          //返回错误类型
+```
+
+
+
+### 事件设置函数OSFlagPost()
+
+OSFlagPost()用于设置事件组中指定的位，当位被置位之后，并且满足任务的等待事件，那么等待在事件该标志位上的任务将会被恢复。使用该函数接口时，**通过参数指定的事件标志来设置事件的标志位，然后遍历等待在事件对象上的事件等待列表，判断是否有任务的事件激活要求与当前事件对象标志值匹配，如果有，则唤醒该任务**。简单来说，就是设置我们自己定义的事件标志位为 1，并且看看有没有任务在等待这个事件，有的话就唤醒它。
+
+OSFlagPost() 源码：
+
+```c
+OS_FLAGS  OSFlagPost (OS_FLAG_GRP  *p_grp, //事件标志组指针
+                      OS_FLAGS      flags, //选定要操作的标志位
+                      OS_OPT        opt,   //选项
+                      OS_ERR       *p_err) //返回错误类型
+{
+    OS_FLAGS  flags_cur;
+    CPU_TS    ts;
+
+
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((OS_FLAGS)0);           //返回0，停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u               //如果使能（默认使能）了参数检测
+    if (p_grp == (OS_FLAG_GRP *)0) {     //如果参数 p_grp 为空 
+       *p_err  = OS_ERR_OBJ_PTR_NULL;    //错误类型为“事件标志组对象为空”
+        return ((OS_FLAGS)0);            //返回0，停止执行
+    }
+    switch (opt) {                       //根据选项分类处理
+        case OS_OPT_POST_FLAG_SET:       //如果选项在预期之内
+        case OS_OPT_POST_FLAG_CLR:
+        case OS_OPT_POST_FLAG_SET | OS_OPT_POST_NO_SCHED:
+        case OS_OPT_POST_FLAG_CLR | OS_OPT_POST_NO_SCHED:
+             break;                      //直接跳出
+
+        default:                         //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID; //错误类型为“选项非法”
+             return ((OS_FLAGS)0);       //返回0，停止执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u            //如果使能了对象类型检测
+    if (p_grp->Type != OS_OBJ_TYPE_FLAG) { //如果 p_grp 不是事件标志组类型
+       *p_err = OS_ERR_OBJ_TYPE;           //错误类型“对象类型有误”
+        return ((OS_FLAGS)0);              //返回0，停止执行
+    }
+#endif
+
+    ts = OS_TS_GET();                             //获取时间戳              
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u              //如果使能了中断延迟发布
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {    //如果该函数是在中断中被调用
+        OS_IntQPost((OS_OBJ_TYPE)OS_OBJ_TYPE_FLAG,//将该标志组发布到中断消息队列
+                    (void      *)p_grp,
+                    (void      *)0,
+                    (OS_MSG_SIZE)0,
+                    (OS_FLAGS   )flags,
+                    (OS_OPT     )opt,
+                    (CPU_TS     )ts,
+                    (OS_ERR    *)p_err);
+        return ((OS_FLAGS)0);                     //返回0，停止执行
+    }
+#endif
+    /* 如果没有使能中断延迟发布 */
+    flags_cur = OS_FlagPost(p_grp,               //将标志组直接发布
+                            flags,
+                            opt,
+                            ts,
+                            p_err);
+
+    return (flags_cur);                         //返回当前标志位的值
+}
+```
+
+- 如果使能了中断延迟发布并且该函数在中断中被调用，则将该事件发布到中断消息队列。
+- 如果没有使能中断延迟发布，则直接通过 OS_FlagPost() 函数将该事件对应的标志位置位。
+
+
+
+OS_FlagPost() 源码：
+
+```c
+OS_FLAGS  OS_FlagPost (OS_FLAG_GRP  *p_grp, //事件标志组指针
+                       OS_FLAGS      flags, //选定要操作的标志位
+                       OS_OPT        opt,   //选项
+                       CPU_TS        ts,    //时间戳
+                       OS_ERR       *p_err) //返回错误类型
+{
+    OS_FLAGS        flags_cur;
+    OS_FLAGS        flags_rdy;
+    OS_OPT          mode;
+    OS_PEND_DATA   *p_pend_data;
+    OS_PEND_DATA   *p_pend_data_next;
+    OS_PEND_LIST   *p_pend_list;
+    OS_TCB         *p_tcb;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。 
+	
+    CPU_CRITICAL_ENTER();                                //关中断
+    switch (opt) {                                       //根据选项分类处理
+        case OS_OPT_POST_FLAG_SET:                       //如果要求将选定位置1
+        case OS_OPT_POST_FLAG_SET | OS_OPT_POST_NO_SCHED:
+             p_grp->Flags |=  flags;                     //将选定位置1
+             break;                                      //跳出
+
+        case OS_OPT_POST_FLAG_CLR:                       //如果要求将选定位请0
+        case OS_OPT_POST_FLAG_CLR | OS_OPT_POST_NO_SCHED:
+             p_grp->Flags &= ~flags;                     //将选定位请0
+             break;                                      //跳出
+
+        default:                                         //如果选项超出预期
+             CPU_CRITICAL_EXIT();                        //开中断
+            *p_err = OS_ERR_OPT_INVALID;                 //错误类型为“选项非法”
+             return ((OS_FLAGS)0);                       //返回0，停止执行
+    }
+    p_grp->TS   = ts;                                    //将时间戳存入事件标志组
+    p_pend_list = &p_grp->PendList;                      //获取事件标志组的等待列表
+    if (p_pend_list->NbrEntries == 0u) {                 //如果没有任务在等待标志组
+        CPU_CRITICAL_EXIT();                             //开中断
+       *p_err = OS_ERR_NONE;                             //错误类型为“无错误”
+        return (p_grp->Flags);                           //返回事件标志组的标志值
+    }
+    /* 如果有任务在等待标志组 */
+    OS_CRITICAL_ENTER_CPU_EXIT();                     //进入临界段，重开中断
+    p_pend_data = p_pend_list->HeadPtr;               //获取等待列表头个等待任务
+    p_tcb       = p_pend_data->TCBPtr;
+    while (p_tcb != (OS_TCB *)0) {                    //从头至尾遍历等待列表的所有任务
+        p_pend_data_next = p_pend_data->NextPtr;
+        mode             = p_tcb->FlagsOpt & OS_OPT_PEND_FLAG_MASK; //获取任务的标志选项
+        switch (mode) {                               //根据任务的标志选项分类处理
+            case OS_OPT_PEND_FLAG_SET_ALL:            //如果要求任务等待的标志位都得置1
+                 flags_rdy = (OS_FLAGS)(p_grp->Flags & p_tcb->FlagsPend); 
+                 if (flags_rdy == p_tcb->FlagsPend) { //如果任务等待的标志位都置1了
+                     OS_FlagTaskRdy(p_tcb,            //让该任务准备运行
+                                    flags_rdy,
+                                    ts);
+                 }
+                 break;                               //跳出
+
+            case OS_OPT_PEND_FLAG_SET_ANY:            //如果要求任务等待的标志位有1位置1即可
+                 flags_rdy = (OS_FLAGS)(p_grp->Flags & p_tcb->FlagsPend);
+                 if (flags_rdy != (OS_FLAGS)0) {      //如果任务等待的标志位有置1的
+                     OS_FlagTaskRdy(p_tcb,            //让该任务准备运行
+                                    flags_rdy,
+                                    ts);
+                 }
+                 break;                              //跳出
+
+#if OS_CFG_FLAG_MODE_CLR_EN > 0u                     //如果使能了标志位清0触发模式
+            case OS_OPT_PEND_FLAG_CLR_ALL:           //如果要求任务等待的标志位都得请0
+                 flags_rdy = (OS_FLAGS)(~p_grp->Flags & p_tcb->FlagsPend);
+                 if (flags_rdy == p_tcb->FlagsPend) {//如果任务等待的标志位都请0了
+                     OS_FlagTaskRdy(p_tcb,           //让该任务准备运行
+                                    flags_rdy,
+                                    ts);
+                 }
+                 break;            //跳出
+
+            case OS_OPT_PEND_FLAG_CLR_ANY:          //如果要求任务等待的标志位有1位请0即可
+                 flags_rdy = (OS_FLAGS)(~p_grp->Flags & p_tcb->FlagsPend);
+                 if (flags_rdy != (OS_FLAGS)0) {    //如果任务等待的标志位有请0的
+                     OS_FlagTaskRdy(p_tcb,          //让该任务准备运行
+                                    flags_rdy,
+                                    ts);
+                 }
+                 break;                            //跳出
+#endif
+            default:                               //如果标志选项超出预期
+                 OS_CRITICAL_EXIT();               //退出临界段
+                *p_err = OS_ERR_FLAG_PEND_OPT;     //错误类型为“标志选项非法”
+                 return ((OS_FLAGS)0);             //返回0，停止运行
+        }
+        p_pend_data = p_pend_data_next;            //准备处理下一个等待任务
+        if (p_pend_data != (OS_PEND_DATA *)0) {    //如果该任务存在
+            p_tcb = p_pend_data->TCBPtr;           //获取该任务的任务控制块
+        } else {                                   //如果该任务不存在
+            p_tcb = (OS_TCB *)0;                   //清空 p_tcb，退出 while 循环
+        }
+    }
+    OS_CRITICAL_EXIT_NO_SCHED();                  //退出临界段（无调度）
+
+    if ((opt & OS_OPT_POST_NO_SCHED) == (OS_OPT)0) {  //如果 opt 没选择“发布时不调度任务”
+        OSSched();                                    //任务调度
+    }
+
+    CPU_CRITICAL_ENTER();        //关中断
+    flags_cur = p_grp->Flags;    //获取事件标志组的标志值
+    CPU_CRITICAL_EXIT();         //开中断
+   *p_err     = OS_ERR_NONE;     //错误类型为“无错误”
+    return (flags_cur);          //返回事件标志组的当前标志值
+}
+```
+
+- 如果要求任务等待的标志位都得置 1，就获取一下任务已经等待到的事件标志，保存在 flags_rdy 变量中。
+- 如果任务等待的标志位都置 1 了，就调用 OS_FlagTaskRdy() 函数让该任务恢复为就绪态，准备运行，然后跳出 switch 语句。
+- 如果要求任务等待的标志位有任意一个位置1 即可。
+- 如果任务等待的标志位有置 1 的，也就是满足了任务唤醒的条件，就调用 OS_FlagTaskRdy() 函数让该任务恢复为就绪态，准备运行，然后跳出 switch 语句。
+- 如果任务等待的标志位都清 0 了，就调用 OS_FlagTaskRdy() 函数让该任务恢复为就绪态，准备运行，然后跳出 switch 语句。
+
+
+
+OSFlagPost() 的使用很简单，举个例子，比如我们要记录一个事件的发生，这个事件在事件组的位置是 bit0，当它还未发生的时候，那么事件组 bit0 的值也是 0，当它发生的时候，我们往事件标志组的 bit0 位中写入这个事件，也就是 0x01，那这就表示事件已经发生了，当然，uCOS 也支持事件清零触发。为了便于理解，一般操作我们都是用宏定义来实现 #define EVENT (0x01 << x)， “<< x”表示写入事件集合的 bit x ，在使用该函数之前必须先创建事件。
+
+OSFlagPost() 使用实例：
+
+```c
+OS_FLAG_GRP flag_grp;                   //声明事件标志组
+
+#define KEY1_EVENT  (0x01 << 0) //设置事件掩码的位0
+#define KEY2_EVENT  (0x01 << 1) //设置事件掩码的位1
+
+static  void  AppTaskPost ( void * p_arg )
+{
+	OS_ERR      err;
+	
+	(void)p_arg;
+				 
+	while (DEF_TRUE) {                                                       //任务体
+		if( Key_ReadStatus ( macKEY1_GPIO_PORT, macKEY1_GPIO_PIN, 1 ) == 1 ) //如果KEY1被按下
+		{		                                                    		 //点亮LED1
+			printf("KEY1被按下\n");
+			OSFlagPost ((OS_FLAG_GRP  *)&flag_grp,                           //将标志组的BIT0置1
+                  (OS_FLAGS      )KEY1_EVENT,
+                  (OS_OPT        )OS_OPT_POST_FLAG_SET,
+                  (OS_ERR       *)&err);
+		}
+
+		if( Key_ReadStatus ( macKEY2_GPIO_PORT, macKEY2_GPIO_PIN, 1 ) == 1 ) //如果KEY2被按下
+		{		                                                    		 //点亮LED2
+			printf("KEY2被按下\n");
+			OSFlagPost ((OS_FLAG_GRP  *)&flag_grp,                           //将标志组的BIT1置1
+                  (OS_FLAGS      )KEY2_EVENT,
+                  (OS_OPT        )OS_OPT_POST_FLAG_SET,
+                  (OS_ERR       *)&err);
+		}
+
+		OSTimeDlyHMSM ( 0, 0, 0, 20, OS_OPT_TIME_DLY, & err );  			 //每20ms扫描一次
+	}
+}
+```
+
+
+
+### 事件等待函数OSFlagPend()
+
+既然标记了事件的发生，那么我们怎么知道他到底有没有发生，这也是需要一个函数来获取事件是否已经发生，uCOS 提供了一个等待指定事件的函数——OSFlagPend()，通过这个函数，**任务可以知道事件标志组中的哪些位，有什么事件发生了，然后通过  “逻辑与”、“逻辑或” 等操作对感兴趣的事件进行获取**，并且这个函数实现了等待超时机制，**「当且仅当任务等待的事件发生时，任务才能获取到事件信息」**。在这段时间中，如果事件一直没发生，该任务将**保持阻塞状态**以等待事件发生。当其它任务或中断服务程序往其等待的事件设置对应的标志位，该任务将自动由阻塞态转为就绪态。当任务等待的时间**超过了指定的阻塞时间，即使事件还未发生，任务也会自动从阻塞态转移为就绪态**。这样子很有效的体现了操作系统的实时性，如果事件正确获取（等待到）则返回对应的事件标志位，由用户判断再做处理，因为在事件超时的时候也可能会返回一个不能确定的事件值，所以最好判断一下任务所等待的事件是否真的发生。
+
+OSFlagPend()源码：
+
+```c
+OS_FLAGS  OSFlagPend (OS_FLAG_GRP  *p_grp,   //事件标志组指针
+                      OS_FLAGS      flags,   //选定要操作的标志位
+                      OS_TICK       timeout, //等待期限（单位：时钟节拍）
+                      OS_OPT        opt,     //选项
+                      CPU_TS       *p_ts,    //返回等到事件标志时的时间戳
+                      OS_ERR       *p_err)   //返回错误类型
+{
+    CPU_BOOLEAN   consume;
+    OS_FLAGS      flags_rdy;
+    OS_OPT        mode;
+    OS_PEND_DATA  pend_data;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((OS_FLAGS)0);           //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u          //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {  //如果该函数在中断中被调用
+       *p_err = OS_ERR_PEND_ISR;                //错误类型为“在中断中中止等待”
+        return ((OS_FLAGS)0);                   //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u               //如果使能了参数检测
+    if (p_grp == (OS_FLAG_GRP *)0) {     //如果 p_grp 为空
+       *p_err = OS_ERR_OBJ_PTR_NULL;     //错误类型为“对象为空”
+        return ((OS_FLAGS)0);            //返回0（有错误），停止执行
+    }
+    switch (opt) {                       //根据选项分类处理
+        case OS_OPT_PEND_FLAG_CLR_ALL:   //如果选项在预期内
+        case OS_OPT_PEND_FLAG_CLR_ANY:
+        case OS_OPT_PEND_FLAG_SET_ALL:
+        case OS_OPT_PEND_FLAG_SET_ANY:
+        case OS_OPT_PEND_FLAG_CLR_ALL | OS_OPT_PEND_FLAG_CONSUME:
+        case OS_OPT_PEND_FLAG_CLR_ANY | OS_OPT_PEND_FLAG_CONSUME:
+        case OS_OPT_PEND_FLAG_SET_ALL | OS_OPT_PEND_FLAG_CONSUME:
+        case OS_OPT_PEND_FLAG_SET_ANY | OS_OPT_PEND_FLAG_CONSUME:
+        case OS_OPT_PEND_FLAG_CLR_ALL | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_CLR_ANY | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_SET_ALL | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_SET_ANY | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_CLR_ALL | OS_OPT_PEND_FLAG_CONSUME | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_CLR_ANY | OS_OPT_PEND_FLAG_CONSUME | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_SET_ALL | OS_OPT_PEND_FLAG_CONSUME | OS_OPT_PEND_NON_BLOCKING:
+        case OS_OPT_PEND_FLAG_SET_ANY | OS_OPT_PEND_FLAG_CONSUME | OS_OPT_PEND_NON_BLOCKING:
+             break;                     //直接跳出
+
+        default:                        //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;//错误类型为“选项非法”
+             return ((OS_OBJ_QTY)0);    //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_OBJ_TYPE_CHK_EN > 0u            //如果使能了对象类型检测
+    if (p_grp->Type != OS_OBJ_TYPE_FLAG) { //如果 p_grp 不是事件标志组类型 
+       *p_err = OS_ERR_OBJ_TYPE;           //错误类型为“对象类型有误”
+        return ((OS_FLAGS)0);              //返回0（有错误），停止执行
+    }
+#endif
+
+    if ((opt & OS_OPT_PEND_FLAG_CONSUME) != (OS_OPT)0) { //选择了标志位匹配后自动取反
+        consume = DEF_TRUE;
+    } else {                                             //未选择标志位匹配后自动取反
+        consume = DEF_FALSE;
+    }
+
+    if (p_ts != (CPU_TS *)0) {      //如果 p_ts 非空
+       *p_ts = (CPU_TS)0;           //初始化（清零）p_ts，待用于返回时间戳
+    }
+
+    mode = opt & OS_OPT_PEND_FLAG_MASK;                    //从选项中提取对标志位的要求
+    CPU_CRITICAL_ENTER();                                  //关中断
+    switch (mode) {                                        //根据事件触发模式分类处理
+        case OS_OPT_PEND_FLAG_SET_ALL:                     //如果要求所有标志位均要置1
+             flags_rdy = (OS_FLAGS)(p_grp->Flags & flags); //提取想要的标志位的值
+             if (flags_rdy == flags) {                     //如果该值与期望值匹配
+                 if (consume == DEF_TRUE) {                //如果要求将标志位匹配后取反
+                     p_grp->Flags &= ~flags_rdy;           //清0标志组的相关标志位
+                 }
+                 OSTCBCurPtr->FlagsRdy = flags_rdy;        //保存让任务脱离等待的标志值
+                 if (p_ts != (CPU_TS *)0) {                //如果 p_ts 非空
+                    *p_ts  = p_grp->TS;                    //获取任务等到标志组时的时间戳
+                 }
+                 CPU_CRITICAL_EXIT();                      //开中断        
+                *p_err = OS_ERR_NONE;                      //错误类型为“无错误”
+                 return (flags_rdy);                       //返回让任务脱离等待的标志值
+             } else {                                      //如果想要标志位的值与期望值不匹配                  
+                 if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) { //如果选择了不堵塞任务
+                     CPU_CRITICAL_EXIT();                  //关中断
+                    *p_err = OS_ERR_PEND_WOULD_BLOCK;      //错误类型为“渴求堵塞”  
+                     return ((OS_FLAGS)0);                 //返回0（有错误），停止执行
+                 } else {                                  //如果选择了堵塞任务
+                     if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) { //如果调度器被锁
+                         CPU_CRITICAL_EXIT();              //关中断
+                        *p_err = OS_ERR_SCHED_LOCKED;      //错误类型为“调度器被锁”
+                         return ((OS_FLAGS)0);             //返回0（有错误），停止执行
+                     }
+                 }
+                 /* 如果调度器未被锁 */
+                 OS_CRITICAL_ENTER_CPU_EXIT();             //进入临界段，重开中断           
+                 OS_FlagBlock(&pend_data,                  //阻塞当前运行任务，等待事件标志组
+                              p_grp,
+                              flags,
+                              opt,
+                              timeout);
+                 OS_CRITICAL_EXIT_NO_SCHED();              //退出临界段（无调度）
+             }
+             break;                                        //跳出
+
+        case OS_OPT_PEND_FLAG_SET_ANY:                     //如果要求有标志位被置1即可
+             flags_rdy = (OS_FLAGS)(p_grp->Flags & flags); //提取想要的标志位的值
+             if (flags_rdy != (OS_FLAGS)0) {               //如果有位被置1         
+                 if (consume == DEF_TRUE) {                //如果要求将标志位匹配后取反             
+                     p_grp->Flags &= ~flags_rdy;           //清0湿巾标志组的相关标志位          
+                 }
+                 OSTCBCurPtr->FlagsRdy = flags_rdy;        //保存让任务脱离等待的标志值
+                 if (p_ts != (CPU_TS *)0) {                //如果 p_ts 非空
+                    *p_ts  = p_grp->TS;                    //获取任务等到标志组时的时间戳
+                 }
+                 CPU_CRITICAL_EXIT();                      //开中断                
+                *p_err = OS_ERR_NONE;                      //错误类型为“无错误”
+                 return (flags_rdy);                       //返回让任务脱离等待的标志值
+             } else {                                      //如果没有位被置1                          
+                 if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) { //如果没设置堵塞任务
+                     CPU_CRITICAL_EXIT();                  //关中断
+                    *p_err = OS_ERR_PEND_WOULD_BLOCK;      //错误类型为“渴求堵塞”     
+                     return ((OS_FLAGS)0);                 //返回0（有错误），停止执行
+                 } else {                                  //如果设置了堵塞任务          
+                     if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) { //如果调度器被锁
+                         CPU_CRITICAL_EXIT();              //关中断
+                        *p_err = OS_ERR_SCHED_LOCKED;      //错误类型为“调度器被锁”
+                         return ((OS_FLAGS)0);             //返回0（有错误），停止执行
+                     }
+                 }
+                 /* 如果调度器没被锁 */                                    
+                 OS_CRITICAL_ENTER_CPU_EXIT();             //进入临界段，重开中断             
+                 OS_FlagBlock(&pend_data,                  //阻塞当前运行任务，等待事件标志组
+                              p_grp,
+                              flags,
+                              opt,
+                              timeout);
+                 OS_CRITICAL_EXIT_NO_SCHED();              //退出中断（无调度）
+             }
+             break;                                        //跳出
+
+#if OS_CFG_FLAG_MODE_CLR_EN > 0u                           //如果使能了标志位清0触发模式
+        case OS_OPT_PEND_FLAG_CLR_ALL:                     //如果要求所有标志位均要清0
+             flags_rdy = (OS_FLAGS)(~p_grp->Flags & flags);//提取想要的标志位的值
+             if (flags_rdy == flags) {                     //如果该值与期望值匹配
+                 if (consume == DEF_TRUE) {                //如果要求将标志位匹配后清0
+                     p_grp->Flags |= flags_rdy;            //置1标志组的相关标志位
+                 }
+                 OSTCBCurPtr->FlagsRdy = flags_rdy;        //保存让任务脱离等待的标志值
+                 if (p_ts != (CPU_TS *)0) {                //如果 p_ts 非空
+                    *p_ts  = p_grp->TS;                    //获取任务等到标志组时的时间戳
+                 }
+                 CPU_CRITICAL_EXIT();                      //开中断
+                *p_err = OS_ERR_NONE;                      //错误类型为“无错误”
+                 return (flags_rdy);                       //返回0（有错误），停止执行
+             } else {                                      //如果想要标志位的值与期望值不匹配
+                 if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) {  //如果选择了不堵塞任务
+                     CPU_CRITICAL_EXIT();                  //关中断
+                    *p_err = OS_ERR_PEND_WOULD_BLOCK;      //错误类型为“渴求堵塞”
+                     return ((OS_FLAGS)0);                 //返回0（有错误），停止执行
+                 } else {                                  //如果选择了堵塞任务
+                     if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) { //如果调度器被锁
+                         CPU_CRITICAL_EXIT();              //关中断           
+                        *p_err = OS_ERR_SCHED_LOCKED;      //错误类型为“调度器被锁”
+                         return ((OS_FLAGS)0);             //返回0（有错误），停止执行
+                     }
+                 }
+                 /* 如果调度器未被锁 */                                          
+                 OS_CRITICAL_ENTER_CPU_EXIT();             //进入临界段，重开中断      
+                 OS_FlagBlock(&pend_data,                  //阻塞当前运行任务，等待事件标志组
+                              p_grp,
+                              flags,
+                              opt,
+                              timeout);
+                 OS_CRITICAL_EXIT_NO_SCHED();             //退出临界段（无调度）
+             }
+             break;                                       //跳出
+
+        case OS_OPT_PEND_FLAG_CLR_ANY:                    //如果要求有标志位被清0即可
+             flags_rdy = (OS_FLAGS)(~p_grp->Flags & flags);//提取想要的标志位的值
+             if (flags_rdy != (OS_FLAGS)0) {              //如果有位被清0
+                 if (consume == DEF_TRUE) {               //如果要求将标志位匹配后取反 
+                     p_grp->Flags |= flags_rdy;           //置1湿巾标志组的相关标志位  
+                 }
+                 OSTCBCurPtr->FlagsRdy = flags_rdy;       //保存让任务脱离等待的标志值 
+                 if (p_ts != (CPU_TS *)0) {               //如果 p_ts 非空
+                    *p_ts  = p_grp->TS;                   //获取任务等到标志组时的时间戳
+                 }
+                 CPU_CRITICAL_EXIT();                     //开中断 
+                *p_err = OS_ERR_NONE;                     //错误类型为“无错误”
+                 return (flags_rdy);                      //返回0（有错误），停止执行
+             } else {                                     //如果没有位被清0
+                 if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) { //如果没设置堵塞任务
+                     CPU_CRITICAL_EXIT();                 //开中断
+                    *p_err = OS_ERR_PEND_WOULD_BLOCK;     //错误类型为“渴求堵塞”
+                     return ((OS_FLAGS)0);                //返回0（有错误），停止执行
+                 } else {                                 //如果设置了堵塞任务  
+                     if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) { //如果调度器被锁
+                         CPU_CRITICAL_EXIT();             //开中断
+                        *p_err = OS_ERR_SCHED_LOCKED;     //错误类型为“调度器被锁”
+                         return ((OS_FLAGS)0);            //返回0（有错误），停止执行
+                     }
+                 }
+                 /* 如果调度器没被锁 */                                          
+                 OS_CRITICAL_ENTER_CPU_EXIT();            //进入临界段，重开中断
+                 OS_FlagBlock(&pend_data,                 //阻塞当前运行任务，等待事件标志组
+                              p_grp,
+                              flags,
+                              opt,
+                              timeout);
+                 OS_CRITICAL_EXIT_NO_SCHED();             //退出中断（无调度）
+             }
+             break;                                       //跳出
+#endif
+
+        default:                                          //如果要求超出预期
+             CPU_CRITICAL_EXIT();
+            *p_err = OS_ERR_OPT_INVALID;                  //错误类型为“选项非法”
+             return ((OS_FLAGS)0);                        //返回0（有错误），停止执行
+    }
+
+    OSSched();                                            //任务调度
+    /* 任务等到了事件标志组后得以继续运行 */
+    CPU_CRITICAL_ENTER();                                 //关中断
+    switch (OSTCBCurPtr->PendStatus) {                    //根据运行任务的等待状态分类处理
+        case OS_STATUS_PEND_OK:                           //如果等到了事件标志组
+             if (p_ts != (CPU_TS *)0) {                   //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS;                 //返回等到标志组时的时间戳
+             }
+            *p_err = OS_ERR_NONE;                         //错误类型为“无错误”
+             break;                                       //跳出
+
+        case OS_STATUS_PEND_ABORT:                        //如果等待被中止
+             if (p_ts != (CPU_TS *)0) {                   //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS;                 //返回等待被中止时的时间戳
+             }
+             CPU_CRITICAL_EXIT();                         //开中断
+            *p_err = OS_ERR_PEND_ABORT;                   //错误类型为“等待被中止”
+             break;                                       //跳出
+
+        case OS_STATUS_PEND_TIMEOUT:                      //如果等待超时
+             if (p_ts != (CPU_TS *)0) {                   //如果 p_ts 非空
+                *p_ts  = (CPU_TS  )0;                     //清零 p_ts
+             }
+             CPU_CRITICAL_EXIT();                         //开中断
+            *p_err = OS_ERR_TIMEOUT;                      //错误类型为“超时”
+             break;                                       //跳出
+
+        case OS_STATUS_PEND_DEL:                          //如果等待对象被删除
+             if (p_ts != (CPU_TS *)0) {                   //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS;                 //返回对象被删时的时间戳
+             }
+             CPU_CRITICAL_EXIT();                         //开中断
+            *p_err = OS_ERR_OBJ_DEL;                      //错误类型为“对象被删”
+             break;                                       //跳出
+
+        default:                                          //如果等待状态超出预期
+             CPU_CRITICAL_EXIT();                         //开中断
+            *p_err = OS_ERR_STATUS_INVALID;               //错误类型为“状态非法”
+             break;                                       //跳出
+    }
+    if (*p_err != OS_ERR_NONE) {                          //如果有错误存在
+        return ((OS_FLAGS)0);                             //返回0（有错误），停止执行
+    }
+    /* 如果没有错误存在 */
+    flags_rdy = OSTCBCurPtr->FlagsRdy;                    //读取让任务脱离等待的标志值
+    if (consume == DEF_TRUE) {                            //如果需要取反触发事件的标志位
+        switch (mode) {                                   //根据事件触发模式分类处理
+            case OS_OPT_PEND_FLAG_SET_ALL:                //如果是通过置1来标志事件的发生
+            case OS_OPT_PEND_FLAG_SET_ANY:                                           
+                 p_grp->Flags &= ~flags_rdy;              //清0标志组里触发事件的标志位
+                 break;                                   //跳出
+
+#if OS_CFG_FLAG_MODE_CLR_EN > 0u                          //如果使能了标志位清0触发模式
+            case OS_OPT_PEND_FLAG_CLR_ALL:                //如果是通过清0来标志事件的发生
+            case OS_OPT_PEND_FLAG_CLR_ANY:                 
+                 p_grp->Flags |=  flags_rdy;              //置1标志组里触发事件的标志位
+                 break;                                   //跳出
+#endif
+            default:                                      //如果触发模式超出预期
+                 CPU_CRITICAL_EXIT();                     //开中断
+                *p_err = OS_ERR_OPT_INVALID;              //错误类型为“选项非法”
+                 return ((OS_FLAGS)0);                    //返回0（有错误），停止执行
+        }
+    }
+    CPU_CRITICAL_EXIT();                                  //开中断
+   *p_err = OS_ERR_NONE;                                  //错误类型为“无错误”
+    return (flags_rdy);                                   //返回让任务脱离等待的标志值
+}
+```
+
+- uCOS 利用**状态机**的方法等待事件，根据不一样的情况分别进行处理。
+  - 处理过程：当用户调用这个函数接口时，**系统首先根据用户指定参数和接收选项来判断它要等待的事件是否发生，如果已经发生，则根据等待选项来决定是否清除事件的相应标志位，并且返回事件标志位的值**，但是这个值可能不是一个稳定的值，所以在等待到对应事件的时候，我们最好要判断事件是否与任务需要的一致；**如果事件没有发生，则把任务添加到事件等待列表中，将当前任务阻塞**，直到事件发生或等待时间超时。
+
+```CQL
+OS_FLAG_GRP flag_grp;           //声明事件标志组
+
+#define KEY1_EVENT  (0x01 << 0)	//设置事件掩码的位0
+#define KEY2_EVENT  (0x01 << 1)	//设置事件掩码的位1
+
+static  void  AppTaskPend ( void * p_arg )
+{
+	OS_ERR      err;
+  	OS_FLAGS      flags_rdy;
+	
+	(void)p_arg;
+					 
+	while (DEF_TRUE) { //任务体
+        //等待标志组的的BIT0和BIT1均被置1 
+        flags_rdy =   OSFlagPend ((OS_FLAG_GRP *)&flag_grp,                 
+                                  (OS_FLAGS     )( KEY1_EVENT | KEY2_EVENT ),
+                                  (OS_TICK      )0,
+                                  (OS_OPT       )OS_OPT_PEND_FLAG_SET_ALL |
+                                  OS_OPT_PEND_BLOCKING |
+                                  OS_OPT_PEND_FLAG_CONSUME,
+                                  (CPU_TS      *)0,
+                                  (OS_ERR      *)&err);
+                                  
+        if((flags_rdy & (KEY1_EVENT|KEY2_EVENT)) == (KEY1_EVENT|KEY2_EVENT))
+        {
+          /* 如果接收完成并且正确 */
+          printf ( "KEY1与KEY2都按下\n");	
+          macLED1_TOGGLE(); //LED1反转
+        }                         
+	}
+}
+```
 
 
 
