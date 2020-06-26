@@ -32,7 +32,7 @@ uCOS 内核中也允许创建相同优先级的任务。**相同优先级的任�
 
 uCOS 系统中的每一个任务都有多种运行状态，任务间状态转移具体见下图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620130337.png" alt="image-20200620130325774" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620130337.png" width="400px" /> </div>
 
 (1)：创建任务→就绪态（Ready）：任务创建完成后进入就绪态，表明任务已准备就绪，随时可以运行，只等待调度器进行调度。
 
@@ -220,7 +220,7 @@ struct  os_msg {                   /* 消息控制块  */
 };
 ```
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204357.png" alt="image-20200620204353633" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204357.png" width="200px" /> </div>
 
 - OSMsgPool 是个全局变量，用来管理消息池的存取操作，它包含以下四个元素：
 
@@ -233,13 +233,13 @@ struct  os_msg_pool {                /* 消息池控制块 */
 };
 ```
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204718.png" alt="image-20200620204716962" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204718.png" width="200px" /> </div>
 
 - 初始化完成的消息池示意图：
 
-  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204941.png" alt="image-20200620204939846" style="zoom: 67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620204941.png" width="700px" /> </div>
 
-  
+
 
 ### 2.2 消息队列的运作机制
 
@@ -253,7 +253,7 @@ uCOS 的消息队列控制块由多个元素组成，**当消息队列被创建�
 
 当消息队列不再被使用时，可以对它进行删除操作，一旦删除操作完成，消息队列将被永久性的删除，所有关于队列的信息会被清空，直到再次创建才可使用。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620205914.png" alt="image-20200620205909765" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620205914.png" width="700px" /> </div>
 
 
 
@@ -283,7 +283,7 @@ uCOS 的消息队列控制块由多个元素组成，**当消息队列被创建�
 
 uCOS 的消息队列由多个元素组成，在消息队列被创建时，需要我们自己定义消息队列（也可以称之为消息队列句柄），因为它是用于保存消息队列的一些信息的，其数据结构 **OS_Q 除了队列必须的一些基本信息外，还有 PendList 链表与 MsgQ**，为的是方便系统来管理消息队列。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620215030.png" alt="image-20200620215029196" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620215030.png" width="200px" /> </div>
 
 OS_Q 的定义：
 
@@ -319,11 +319,11 @@ struct  os_msg_q {                        /* OS_MSG_Q */
 
 - 一种是 FIFO 模式，即先进先出，这个时候消息的存取是在单向链表的两端，一个头一个尾，存取位置可能不一样就产生了这两个输入指针和输出指针。
 
-  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625163047.png" alt="image-20200625163041970" style="zoom:67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625163047.png" width="700px" /> </div>
 
 - 另一种是 LIFO 模式，后进先出，这个时候消息的存取都是在单向链表的一端，仅仅用 OutPtr 就足够指示存取的位置，当队列中已经存在比较多的消息没有处理，这个时候有个**紧急的消息**需要马上传送到其他任务去的时候就可以在发布消息的时候选择 LIFO 模式。 
 
-  <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620215801.png" alt="image-20200620215756111" style="zoom: 67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200620215801.png" width="700px" /> </div>
 
 
 
@@ -1027,15 +1027,15 @@ pMsg = OSQPend ((OS_Q         *)&queue,             //消息变量指针
 
 - 信号量无效时候获取：在二值信号量无效的时候，假如此时有任务获取该信号量的话，那么任务将进入**阻塞**状态，如下图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221953.png" alt="image-20200623221104743" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221953.png" width="300px" /> </div>
 
 - 中断、任务释放信号量：假如某个时间中断/任务释放了信号量，其过程具体见下图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221956.png" alt="image-20200623221303147" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221956.png" width="280px" /> </div>
 
 - 二值信号量运作机制：由于获取无效信号量而进入阻塞态的任务将获得信号量并且恢复为就绪态，其过程具体见下图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221952.png" alt="image-20200623221313287" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221952.png" width="400px" /> </div>
 
 
 
@@ -1043,7 +1043,7 @@ pMsg = OSQPend ((OS_Q         *)&queue,             //消息变量指针
 
 计数信号量可以用于**资源管理**，**允许多个任务获取信号量访问共享资源，但会限制任务的最大数目**。**访问的任务数达到可支持的最大数目时，会阻塞其他试图获取该信号量的任务**，直到有任务释放了信号量。这就是计数型信号量的运作机制，虽然计数信号量允许多个任务访问同一个资源，但是也有限定，比如某个资源限定只能有 3 个任务访问，那么第 4 个任务访问的时候，会因为获取不到信号量而进入阻塞，等到有任务（比如任务 1）释放掉该资源的时候，第 4 个任务才能获取到信号量从而进行资源的访问，其运作的机制具体见图 21-4。 
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221954.png" alt="image-20200623221458427" style="zoom: 67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221954.png" width="600px" /> </div>
 
 
 
@@ -1053,7 +1053,7 @@ uCOS 的信号量由多个元素组成，在信号量被创建时，需要由我
 
 消息队列控制块：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221955.png" alt="image-20200623221647094" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200623221955.png" width="200px" /> </div>
 
 ```c
 struct  os_sem {                        /* Semaphore */
@@ -1696,13 +1696,13 @@ OSSemPend ((OS_SEM   *)&SemOfKey,            //等待该信号量被发布
 > 注意：**只有当任务想要获取被占有的资源时，才会进入阻塞态**。H任务想获取L任务占有的资源，但该资源被锁，因而H任务阻塞。而M任务不想获取L任务占有的资源，因而会打断L任务。
 >
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104258.png" alt="image-20200625095321575" style="zoom: 50%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104258.png" width="600px" /> </div>
 
 优先级继承举例：
 
 若在上面的例子中，加入优先级继承机制。那么在 H 任务申请该资源的时候，由于申请不到资源会进入阻塞态，那么系统就会**把当前正在使用资源的 L 任务的优先级临时提高到与 H 任务优先级相同，此时 M 任务被唤醒了，因为它的优先级比 H 任务低，所以无法打断 L 任务**，因为此时 L 任务的优先级被临时提升到 H，所以当 L 任务使用完该资源了，进行释放，那么此时 H 任务优先级最高，将接着抢占 CPU 的使用权， H 任务的阻塞时间仅仅是 L 任务的执行时间，此时的优先级的危害降到了最低，这就是优先级继承的优势。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104303.png" alt="image-20200625095844093" style="zoom: 67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104303.png" width="600px" /> </div>
 
 注意：
 
@@ -1729,7 +1729,7 @@ OSSemPend ((OS_SEM   *)&SemOfKey,            //等待该信号量被发布
 
 用互斥量处理不同任务对临界资源的同步访问时，任务需要获得互斥量才能进行资源访问，如果一旦有任务成功获得了互斥量，则互斥量立即变为闭锁状态，此时其他任务会因为获取不到互斥量而不能访问这个资源，任务会根据用户自定义的等待时间进行等待，直到互斥量被持有的任务释放后，其他任务才能获取互斥量从而得以访问该临界资源，此时互斥量再次上锁，如此一来就可以确保每个时刻只有一个任务正在访问这个临界资源，保证了临界资源操作的安全性。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104306.png" alt="image-20200625104240288" style="zoom: 50%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104306.png" width="450px" /> </div>
 
 - 因为互斥量具有优先级继承机制，一般选择使用互斥量对资源进行保护，**如果资源被占用的时候，无论是什么优先级的任务想要使用该资源都会被阻塞**。
 
@@ -1745,7 +1745,7 @@ OSSemPend ((OS_SEM   *)&SemOfKey,            //等待该信号量被发布
 
 uCOS 的互斥量由多个元素组成，在互斥量被创建时，需要由我们自己定义互斥量（也可以称之为互斥量句柄），因为它是用于保存互斥量的一些信息的，其数据结构 OS_MUTEX 除了一些必须的基本信息外，还有指向任务控制块的指针 OwnerTCBPtr、任务优先级变量 OwnerOriginalPrio、PendList 链表与 OwnerNestingCtr 变量等，为的是方便系统来管理互斥量。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104720.png" alt="image-20200625104718298" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625104720.png" width="200" /> </div>
 
 ```c
 struct  os_mutex {                            /* Mutual Exclusion Semaphore                             */
@@ -2000,7 +2000,7 @@ OS_OBJ_QTY  OSMutexDel (OS_MUTEX  *p_mutex, //互斥信号量指针
 OSMutexDel()函数使用实例：
 
 ```c
-OS_SEM  mutex;;                             //声明互斥量 
+OS_SEM  mutex;                              //声明互斥量 
 OS_ERR      err; 
 /* 删除互斥量mutex*/ 
 OSMutexDel ((OS_MUTEX         *)&mutex,     //指向互斥量的指针 
@@ -2416,11 +2416,11 @@ uCOS 的事件用于事件类型的通讯，无数据传输，也就是说，我
 
 设置事件时，对指定事件写入指定的事件类型，设置事件集合的对应事件位为 1，可以一次同时写多个事件类型，设置事件成功可能会触发任务调度。清除事件时，根据参数事件句柄和待清除的事件类型，对事件对应位进行清 0 操作。事件不与任务相关联，事件相互独立，一个 32 位的变量就是事件的集合，用于标识该任务发生的事件类型，其中每一位表示一种事件类型（0 表示该事件类型未发生、1 表示该事件类型已经发生），一共 32 种事件类型（事件集合Flags（一个32 位的变量））具体见下图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625140425.png" alt="image-20200625140423228" style="zoom:67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625140425.png" width="600px" /> </div>
 
 事件唤醒机制：当任务因为等待某个或者多个事件发生而进入阻塞态，当事件发生的时候会被唤醒。事件唤醒任务示意图 ：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626115658.png" alt="image-20200625140509715" style="zoom: 50%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626115658.png" width="450px" /> </div>
 
 任务 1 对事件 3 或事件 5 感兴趣（逻辑或），当发生其中的某一个事件都会被唤醒，并且执行相应操作。而任务 2 对事件 3 与事件 5 感兴趣（逻辑与），当且仅当事件 3 与事件 5 都发生的时候，任务 2 才会被唤醒，如果只有一个其中一个事件发生，那么任务还是会继续等待事件发 生 。 如果在接收事件函数中设置了清除事件位选项 OS_OPT_PEND_FLAG_CONSUME，那么当任务唤醒后将把事件 3 和事件 5 的事件标志清零，否则事件标志将依然存在。
 
@@ -2432,7 +2432,7 @@ uCOS 的事件用于事件类型的通讯，无数据传输，也就是说，我
 
 uCOS 的事件由多个元素组成，在事件被创建时，需要由我们自己定义事件（也可以称之为事件句柄），用于保存事件的一些信息，其数据结构 OS_FLAG_GRP 中除了事件必须的一些基本信息外，还有 PendList 链表与一个 32 位的事件组变量 Flags 等，为的是方便系统来管理事件。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625140813.png" alt="image-20200625140808816" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200625140813.png" width="200px" /> </div>
 
 ```c
 struct  os_flag_grp {                 /* Event Flag Group                                       */
@@ -3278,7 +3278,7 @@ uCOS 提供的软件定时器支持**单次模式和周期模式**，单次模�
 - 单次模式：当用户创建了定时器并启动了定时器后，定时时间到了，只执行一次回调函数之后就将不再重复执行，当然用户还是可以调用软件定时器启动函数 OSTmrStart() 来启动一次软件定时器。 
 - 周期模式：这个定时器会按照设置的定时时间循环执行回调函数，直到用户将定时器删除。 
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626102733.png" alt="image-20200626102724406" style="zoom:67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626102733.png" width="600px" /> </div>
 
 当然，uCOS 中软件定时器的周期模式也分为两种，一种是**有初始化延迟的周期模式**，另一种是**无初始化延迟的周期模式**，由 OSTmrCreate()中的“dly”参数设置，这两种周期模式基本是一致的，但是有个细微的差别。 
 
@@ -3287,7 +3287,7 @@ uCOS 提供的软件定时器支持**单次模式和周期模式**，单次模�
 
 比如我们创建两个周期定时器，定时器 1 是无初始化延迟的定时器，周期为 100 个tick（时钟节拍），定时器 2 是有初始化延迟的定时器，其初始化延迟的 dly 参数为 150 个tick，周期为 100 个 tick，从 tick 为 0 的时刻就启动了两个软件定时器。定时器 1 从始至终都按照正常的周期运行，但是定时器 2 则在第一个周期中的运行周期为 dly，从第二个运行周期开始按照正常的100 个tick 来运行。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626102933.png" alt="image-20200626102931420" style="zoom:67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626102933.png" width="600px" /> </div>
 
 uCOS 通过一个 **OS_TmrTask** 任务（也叫软件定时器任务）来管理软定时器，它是在**系统初始化时（OSInit()函数中）自动创建**的，为了满足用户定时需求。TmrTask 任务会在定时器节拍到来的时候检查定时器列表，看看是否有定时器时间到了，如果到了就调用其回调函数。
 
@@ -3314,7 +3314,7 @@ uCOS 软件定时器的精度（分辨率）**决定于系统时基频率**，�
 
 uCOS 的软件定时器也属于内核对象，是一个可以裁剪的功能模块，同样在系统中由一个控制块管理其相关信息，软件定时器的控制块中包含创建的软件定时器基本信息，在使用定时器前我们需要通过 OSTmrCreate()函数创建一个软件定时器，但是在创建前需要我们定义一个定时器的句柄（控制块）。
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626104359.png" alt="image-20200626104356015" style="zoom: 80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626104359.png" width="200px" /> </div>
 
 ```c
 struct  os_tmr {
@@ -3687,7 +3687,7 @@ OSTmrStart ((OS_TMR   *)&my_tmr, //软件定时器对象
 
 有些情况下，当系统中有多个软件定时器的时候，uCOS 可能要维护上百个定时器。使用定时器列表会大大降低更新定时器列表所占用的 CPU 时间，一个一个检测是否到期效率很低，有没有什么办法让系统快速查找到到期的软件定时器？uCOS 对软件定时器列表的管理就跟时间节拍一样，采用哈希算法。OS_TmrLink 将不同的定时器变量根据其对 OSCfg_TmrWheelSize 余数的不同插入到数 组OSCfg_TmrWheel[OS_CFG_TMR_WHEEL_SIZE]中去，uCOS 的软件定时器列表示意图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626110813.png" alt="image-20200626110811512" style="zoom:80%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626110813.png" width="450px" /> </div>
 
 定时器列表中包含 OS_CFG_TMR_WHEEL_SIZE 条记录，该值是一个宏定义，由用户指定，在 os_cfg_app.h 文件中。能记录定时器的多少仅限于处理器的 RAM 空间，推荐的设置值为定时器数/4。定时器列表的每个记录都由 3 部分组成：
 
@@ -3699,13 +3699,13 @@ OSTmrStart ((OS_TMR   *)&my_tmr, //软件定时器对象
 
 下面举个例子来讲述软件定时器采用哈希算法插入到对应的定时器列表中的过程：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626111017.png" alt="image-20200626111014761" style="zoom: 67%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626111017.png" width="700px" /> </div>
 
 先假定此时的定时器列表是空的，设置的宏定义 OS_CFG_TMR_WHEEL_SIZE 为 9，当前的 OSTmrTickCtr 为 12。我们调用 OSTmrStart() 函数将定时器插入定时器列表。假定定时器创建时 dly 的值为 1，并且这个任务是单次定时模式。因为STmrTickCtr 的值为 12，定时器的定时值为 1，那么在插入定时器列表的时候，定时器的唤醒时间 Match 为 13（Match = Dly + OSTmrTickCtr），经过哈希算法，得到 spoke = 4，该定时器会被放入定时器会被插入 OSCfg_TmrWheel[4] 列表中，因为当前定时器列表是空的，OS_TMR 会被放在队列中的首位置 (OSCfg_TmrWheel[4] 中成员变量FirstPtr 将 指向这个 OS_TMR)，并且索引 4 的计数值加一（OSCfg_TmrWheel[4]的成员变量 NbrEntries 为 1）。定时器的匹配值 Match 被放在 OS_TMR 的 Match 成员变量中。因为新插入的定时器是索引 4 的唯一一个定时器，所有定时器的 NextPtr 和 PrevPtr 都指向NULL（也就是 0）
 
 如果系统此时再插入一个周期 Period 为 10 的定时器定时器，定时器的唤醒时间 Match为 22（Match = Period + OSTmrTickCtr），那么经过哈希算法，得到 spoke = 4，该定时器会被放入定时器会被插入 OSCfg_TmrWheel[4]列表中，但是由于 OSCfg_TmrWheel[4]列表已有一个软件定时器，那么第二个软件定时器会根据 Remain 的值按照升序进行插入操作，插入完成示意图：
 
-<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626115612.png" alt="image-20200626111253638" style="zoom:70%;" />
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626115612.png" width="800px" /> </div>
 
 
 
@@ -4151,11 +4151,370 @@ if (OSTmrUpdateCtr == (OS_CTR)0u)
 
 ## 任务信号量的基本概念
 
+uCOS 提供任务信号量这个功能，**每个任务都有一个 32 位**（用户可以自定义位宽，我们使用 32 位的 CPU，此处就是 32 位）的**信号量值 SemCtr**，这个信号量值是**「在任务控制块中包含的」**，是任务独有的一个信号量通知值，在大多数情况下，任务信号量可以替代内核对象的二值信号量、计数信号量等。 
+
+相对于前面使用 uCOS 内核通信的资源，必须创建二进制信号量、计数信号量等情况，使用任务信号量显然更灵活。
+
+**任务信号量的优点**：
+
+- 使用任务信号量比通过内核对象信号量通信方式解除阻塞的任务的**「速度快」**
+- 并且更加**「节省 RAM」** 内存空间
+- 任务信号量的使用**「无需单独创建信号量」**
+
+通过对任务信号量的合理使用，可以在一定场合下替代 uCOS 的信号量，用户只需向任务内部的信号量发送一个信号而不用通过外部的信号量进行发送，这样子处理就会很方便并且更加高效。
+
+**任务信号量的缺点**：
+
+**「只能有一个任务接收任务信号量」**，因为必须指定接收信号量的任务，才能正确发送信号量；而内核对象的信号量则没有这个限制，用户在释放信号量，可以采用广播的方式，让所有等待信号量的任务都获取到信号量。
+
+
+
+在实际任务间的通信中，一个或多个任务发送一个信号量给另一个任务是非常常见的， 而一个任务给多个任务发送信号量的情况相对比较少。**「一个或多个任务发送一个信号量给另一个任务的情况就很适合采用任务信号量进行传递信号」**，如果任务信号量可以满足设计需求，那么尽量不要使用普通信号量，这样设计的系统会更加高效。
+
+
+
 ## 任务信号量的函数接口
 
 ### 任务信号量释放函数OSTaskSemPost()
 
+函数 OSTaskSemPost()用来释放任务信号量，虽然只有拥有任务信号量的任务才可以等待该任务信号量，但是其他所有的任务或者中断都可以向该任务释放信号量。
+
+OSTaskSemPost() 源码：
+
+```c
+OS_SEM_CTR  OSTaskSemPost (OS_TCB  *p_tcb,   //目标任务
+                           OS_OPT   opt,     //选项
+                           OS_ERR  *p_err)   //返回错误类型
+{
+    OS_SEM_CTR  ctr;
+    CPU_TS      ts;
+
+
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果 p_err 为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((OS_SEM_CTR)0);         //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                  //如果使能（默认使能）了参数检测功能
+    switch (opt) {                          //根据选项分类处理
+        case OS_OPT_POST_NONE:              //如果选项在预期之内
+        case OS_OPT_POST_NO_SCHED:
+             break;                         //跳出
+
+        default:                            //如果选项超出预期
+            *p_err =  OS_ERR_OPT_INVALID;   //错误类型为“选项非法”
+             return ((OS_SEM_CTR)0u);       //返回0（有错误），停止执行
+    }
+#endif
+
+    ts = OS_TS_GET();                                      //获取时间戳
+
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u                       //如果使能了中断延迟发布
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {             //如果该函数是在中断中被调用
+        OS_IntQPost((OS_OBJ_TYPE)OS_OBJ_TYPE_TASK_SIGNAL,  //将该信号量发布到中断消息队列
+                    (void      *)p_tcb,
+                    (void      *)0,
+                    (OS_MSG_SIZE)0,
+                    (OS_FLAGS   )0,
+                    (OS_OPT     )0,
+                    (CPU_TS     )ts,
+                    (OS_ERR    *)p_err);
+        return ((OS_SEM_CTR)0);                           //返回0（尚未发布）   
+    }
+#endif
+
+    ctr = OS_TaskSemPost(p_tcb,                          //将信号量按照普通方式处理
+                         opt,
+                         ts,
+                         p_err);
+
+    return (ctr);                                       //返回信号的当前计数值
+}
+```
+
+- 如果使能了中断延迟发布，并且该函数在中断中被调用，那就将信号量发布到中断消息队列，由中断消息队列发布任务信号量。
+
+- 调用 OS_TaskSemPost() 函数将信号量发布到任务中。
+
+OS_TaskSemPost() 源码：
+
+```c
+OS_SEM_CTR  OS_TaskSemPost (OS_TCB  *p_tcb,   //目标任务
+                            OS_OPT   opt,     //选项
+                            CPU_TS   ts,      //时间戳
+                            OS_ERR  *p_err)   //返回错误类型
+{
+    OS_SEM_CTR  ctr;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+    OS_CRITICAL_ENTER();                               //进入临界段
+    if (p_tcb == (OS_TCB *)0) {                        //如果 p_tcb 为空
+        p_tcb = OSTCBCurPtr;                           //将任务信号量发给自己（任务）
+    }
+    p_tcb->TS = ts;                                    //记录信号量被发布的时间戳
+   *p_err     = OS_ERR_NONE;                           //错误类型为“无错误”
+    switch (p_tcb->TaskState) {                        //跟吴目标任务的任务状态分类处理
+        case OS_TASK_STATE_RDY:                        //如果目标任务没有等待状态
+        case OS_TASK_STATE_DLY:
+        case OS_TASK_STATE_SUSPENDED:
+        case OS_TASK_STATE_DLY_SUSPENDED:
+             switch (sizeof(OS_SEM_CTR)) {                        //判断是否将导致该信
+                 case 1u:                                         //号量计数值溢出，如
+                      if (p_tcb->SemCtr == DEF_INT_08U_MAX_VAL) { //果溢出，则开中断，
+                          OS_CRITICAL_EXIT();                     //返回错误类型为“计
+                         *p_err = OS_ERR_SEM_OVF;                 //数值溢出”，返回0
+                          return ((OS_SEM_CTR)0);                 //（有错误），不继续
+                      }                                           //执行。
+                      break;                                      
+
+                 case 2u:
+                      if (p_tcb->SemCtr == DEF_INT_16U_MAX_VAL) {
+                          OS_CRITICAL_EXIT();
+                         *p_err = OS_ERR_SEM_OVF;
+                          return ((OS_SEM_CTR)0);
+                      }
+                      break;
+
+                 case 4u:
+                      if (p_tcb->SemCtr == DEF_INT_32U_MAX_VAL) {
+                          OS_CRITICAL_EXIT();
+                         *p_err = OS_ERR_SEM_OVF;
+                          return ((OS_SEM_CTR)0);
+                      }
+                      break;
+
+                 default:
+                      break;
+             }
+             p_tcb->SemCtr++;                              //信号量计数值不溢出则加1
+             ctr = p_tcb->SemCtr;                          //获取信号量的当前计数值
+             OS_CRITICAL_EXIT();                           //退出临界段
+             break;                                        //跳出
+
+        case OS_TASK_STATE_PEND:                           //如果任务有等待状态
+        case OS_TASK_STATE_PEND_TIMEOUT:
+        case OS_TASK_STATE_PEND_SUSPENDED:
+        case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:
+             if (p_tcb->PendOn == OS_TASK_PEND_ON_TASK_SEM) { //如果正等待任务信号量
+                 OS_Post((OS_PEND_OBJ *)0,                    //发布信号量给目标任务
+                         (OS_TCB      *)p_tcb,
+                         (void        *)0,
+                         (OS_MSG_SIZE  )0u,
+                         (CPU_TS       )ts);
+                 ctr = p_tcb->SemCtr;                         //获取信号量的当前计数值
+                 OS_CRITICAL_EXIT_NO_SCHED();                 //退出临界段（无调度）
+                 if ((opt & OS_OPT_POST_NO_SCHED) == (OS_OPT)0) { //如果选择了调度任务
+                     OSSched();                               //调度任务
+                 }
+             } else {                                         //如果没等待任务信号量
+                 switch (sizeof(OS_SEM_CTR)) {                         //判断是否将导致
+                     case 1u:                                          //该信号量计数值
+                          if (p_tcb->SemCtr == DEF_INT_08U_MAX_VAL) {  //溢出，如果溢出，
+                              OS_CRITICAL_EXIT();                      //则开中断，返回
+                             *p_err = OS_ERR_SEM_OVF;                  //错误类型为“计
+                              return ((OS_SEM_CTR)0);                  //数值溢出”，返
+                          }                                            //回0（有错误），
+                          break;                                       //不继续执行。
+
+                     case 2u:
+                          if (p_tcb->SemCtr == DEF_INT_16U_MAX_VAL) {
+                              OS_CRITICAL_EXIT();
+                             *p_err = OS_ERR_SEM_OVF;
+                              return ((OS_SEM_CTR)0);
+                          }
+                          break;
+
+                     case 4u:
+                          if (p_tcb->SemCtr == DEF_INT_32U_MAX_VAL) {
+                              OS_CRITICAL_EXIT();
+                             *p_err = OS_ERR_SEM_OVF;
+                              return ((OS_SEM_CTR)0);
+                          }
+                          break;
+
+                     default:
+                          break;
+                 }
+                 p_tcb->SemCtr++;                            //信号量计数值不溢出则加1
+                 ctr = p_tcb->SemCtr;                        //获取信号量的当前计数值
+                 OS_CRITICAL_EXIT();                         //退出临界段
+             }
+             break;                                          //跳出
+
+        default:                                             //如果任务状态超出预期
+             OS_CRITICAL_EXIT();                             //退出临界段
+            *p_err = OS_ERR_STATE_INVALID;                   //错误类型为“状态非法”
+             ctr   = (OS_SEM_CTR)0;                          //清零 ctr
+             break;                                          //跳出
+    }
+    return (ctr);                                            //返回信号量的当前计数值
+}
+```
+
+- 如果目标任务为空，则表示将任务信号量释放给自己，那么 p_tcb 就指向当前任务。
+
+
+
+在释放任务信号量的时候，系统**首先判断目标任务的状态**，**只有处于等待状态并且等待的是任务信号量那就调用 OS_Post() 函数让等待的任务就绪**（如果内核对象信号量的话，还会让任务脱离等待列表），所以任务信号量的操作是非常高效的；如果没有处于等待状态或者等待的不是任务信号量，那就直接将任务控制块的元素 SemCtr 加 1。最后返回任务信号量计数值。 
+
+其实，不管是否使能了中断延迟发布，**最终都是调用 OS_TaskSemPost() 函数进行释放任务信号量**。只是使能了中断延迟发布的释放过程会比较曲折，中间会有许多插曲，这是中断管理范畴的内容，留到后面再作介绍。在 OS_TaskSemPost() 函数中，又会调用 OS_Post() 函数释放内核对象。OS_Post() 函数是一个底层的释放（发布）函数，它不仅仅用来释放（发布）任务信号量，还可以释放信号量、互斥信号量、消息队列、事件标志组或任务消息队列。注意：在这里，OS_Post()函数将任务信号量直接释放给目标任务。
+
+
+
+OSTaskSemPost() 使用实例：
+
+```c
+OSTaskSemPost((OS_TCB  *)&AppTaskPendTCB,          //目标任务 
+              (OS_OPT   )OS_OPT_POST_NONE,        //没选项要求 
+              (OS_ERR  *)&err);                   //返回错误类型
+```
+
+
+
 ### 获取任务信号量函数OSTaskSemPend()
+
+与 OSTaskSemPost() 任务信号量释放函数相对应，OSTaskSemPend() 函数用于获取一个任务信号量，参数中没有指定某个任务去获取信号量，**实际上就是当前运行任务获取它自己拥有的任务信号量**，代码中通过 OSTCBCurPtr 获取当前正在运行的任务。
+
+OSTaskSemPend() 源码：
+
+```c
+OS_SEM_CTR  OSTaskSemPend (OS_TICK   timeout,  //等待超时时间
+                           OS_OPT    opt,      //选项
+                           CPU_TS   *p_ts,     //返回时间戳
+                           OS_ERR   *p_err)    //返回错误类型
+{
+    OS_SEM_CTR    ctr;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL                //如果使能了安全检测
+    if (p_err == (OS_ERR *)0) {          //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();  //执行安全检测异常函数
+        return ((OS_SEM_CTR)0);          //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u          //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {  //如果该函数在中断中被调用
+       *p_err = OS_ERR_PEND_ISR;                //返回错误类型为“在中断中等待”
+        return ((OS_SEM_CTR)0);                 //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                  //如果使能了参数检测
+    switch (opt) {                          //根据选项分类处理
+        case OS_OPT_PEND_BLOCKING:          //如果选项在预期内
+        case OS_OPT_PEND_NON_BLOCKING:
+             break;                         //直接跳出
+
+        default:                            //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;    //错误类型为“选项非法”
+             return ((OS_SEM_CTR)0);        //返回0（有错误），停止执行
+    }
+#endif
+
+    if (p_ts != (CPU_TS *)0) {      //如果 p_ts 非空
+       *p_ts  = (CPU_TS  )0;        //清零（初始化）p_ts
+    }
+
+    CPU_CRITICAL_ENTER();                        //关中断  
+    if (OSTCBCurPtr->SemCtr > (OS_SEM_CTR)0) {   //如果任务信号量当前可用
+        OSTCBCurPtr->SemCtr--;                   //信号量计数器减1
+        ctr    = OSTCBCurPtr->SemCtr;            //获取信号量的当前计数值
+        if (p_ts != (CPU_TS *)0) {               //如果 p_ts 非空
+           *p_ts  = OSTCBCurPtr->TS;             //返回信号量被发布的时间戳
+        }
+#if OS_CFG_TASK_PROFILE_EN > 0u                  //如果使能了任务控制块的简况变量
+        OSTCBCurPtr->SemPendTime = OS_TS_GET() - OSTCBCurPtr->TS;     //更新任务等待
+        if (OSTCBCurPtr->SemPendTimeMax < OSTCBCurPtr->SemPendTime) { //任务信号量的
+            OSTCBCurPtr->SemPendTimeMax = OSTCBCurPtr->SemPendTime;   //最长时间记录。
+        }
+#endif
+        CPU_CRITICAL_EXIT();                     //开中断            
+       *p_err = OS_ERR_NONE;                     //错误类型为“无错误”
+        return (ctr);                            //返回信号量的当前计数值
+    }
+    /* 如果任务信号量当前不可用 */
+    if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) {  //如果选择了不阻塞任务
+        CPU_CRITICAL_EXIT();                              //开中断
+       *p_err = OS_ERR_PEND_WOULD_BLOCK;                  //错误类型为“缺乏阻塞”
+        return ((OS_SEM_CTR)0);                           //返回0（有错误），停止执行
+    } else {                                              //如果选择了阻塞任务
+        if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) {  //如果调度器被锁
+            CPU_CRITICAL_EXIT();                          //开中断
+           *p_err = OS_ERR_SCHED_LOCKED;                  //错误类型为“调度器被锁”
+            return ((OS_SEM_CTR)0);                       //返回0（有错误），停止执行
+        }
+    }
+    /* 如果调度器未被锁 */
+    OS_CRITICAL_ENTER_CPU_EXIT();                         //锁调度器，重开中断                      
+    OS_Pend((OS_PEND_DATA *)0,                            //阻塞任务，等待信号量。
+            (OS_PEND_OBJ  *)0,                            //不需插入等待列表。
+            (OS_STATE      )OS_TASK_PEND_ON_TASK_SEM,
+            (OS_TICK       )timeout);
+    OS_CRITICAL_EXIT_NO_SCHED();                          //开调度器（无调度）
+
+    OSSched();                                            //调度任务
+    /* 任务获得信号量后得以继续运行 */
+    CPU_CRITICAL_ENTER();                                 //关中断
+    switch (OSTCBCurPtr->PendStatus) {                    //根据任务的等待状态分类处理
+        case OS_STATUS_PEND_OK:                           //如果任务成功获得信号量
+             if (p_ts != (CPU_TS *)0) {                   //返回信号量被发布的时间戳
+                *p_ts                    =  OSTCBCurPtr->TS;
+#if OS_CFG_TASK_PROFILE_EN > 0u                           //更新最长等待时间记录
+                OSTCBCurPtr->SemPendTime = OS_TS_GET() - OSTCBCurPtr->TS;
+                if (OSTCBCurPtr->SemPendTimeMax < OSTCBCurPtr->SemPendTime) {
+                    OSTCBCurPtr->SemPendTimeMax = OSTCBCurPtr->SemPendTime;
+                }
+#endif
+             }
+            *p_err = OS_ERR_NONE;                         //错误类型为“无错误”
+             break;                                       //跳出
+
+        case OS_STATUS_PEND_ABORT:                        //如果等待被中止
+             if (p_ts != (CPU_TS *)0) {                   //返回被终止时的时间戳
+                *p_ts  =  OSTCBCurPtr->TS;
+             }
+            *p_err = OS_ERR_PEND_ABORT;                   //错误类型为“等待被中止”
+             break;                                       //跳出
+
+        case OS_STATUS_PEND_TIMEOUT:                      //如果等待超时
+             if (p_ts != (CPU_TS *)0) {                   //返回时间戳为0
+                *p_ts  = (CPU_TS  )0;
+             }
+            *p_err = OS_ERR_TIMEOUT;                      //错误类型为“等待超时”
+             break;                                       //跳出
+
+        default:                                          //如果等待状态超出预期
+            *p_err = OS_ERR_STATUS_INVALID;               //错误类型为“状态非法”
+             break;                                       //跳出
+    }                                                     
+    ctr = OSTCBCurPtr->SemCtr;                            //获取信号量的当前计数值
+    CPU_CRITICAL_EXIT();                                  //开中断
+    return (ctr);                                         //返回信号量的当前计数值
+}
+```
+
+- 如果调度器未被锁，锁调度器，重开中断，调用 OS_Pend()函数将当前任务进入阻塞状态以等待任务信号量。
+
+在调用该函数的时候，系统先判断任务信号量是否可用，即检查任务信号量的计数值是否大于 0，如果大于 0，即表示可用，这个时候获取信号量，即将计数值减 1 后直接返回。如果信号量不可用，且当调度器没有被锁住时，用户希望在任务信号量不可用的时候进行阻塞任务以等待任务信号量可用，那么系统就会调用 OS_Pend()函数将任务脱离就绪列表，如果用户有指定超时时间，系统还要将该任务插入节拍列表。注意：**此处系统并没有将任务插入等待列表**。然后切换任务，处于就绪列表中最高优先级的任务通过任务调度获得 CPU 使用权，等到出现任务信号量被释放、任务等待任务信号量被强制停止、等待超时等情况，任务会从阻塞中恢复，等待任务信号量的任务重新获得 CPU 使用权，返回相关错误代码和任务信号量计数值，用户可以根据返回的错误知道任务退出等待状态的情况。
+
+
+
+OSTaskSemPend() 使用实例：
+
+```c
+OSTaskSemPend ((OS_TICK   )0,                     //无期限等待 
+               (OS_OPT    )OS_OPT_PEND_BLOCKING,  //如果信号量不可用就等待 
+               (CPU_TS   *)&ts,                   //获取信号量被发布的时间戳 
+               (OS_ERR   *)&err);                 //返回错误类型
+```
 
 
 
@@ -4163,11 +4522,362 @@ if (OSTmrUpdateCtr == (OS_CTR)0u)
 
 ## 任务消息队列的基本概念
 
+任务消息队列跟任务信号量一样，均**隶属于某一个特定任务，不需单独创建**，任务在则任务消息队列在，**只有该任务才可以获取（接收）这个任务消息队列的消息，其他任务只能给这个任务消息队列发送消息，却不能获取**。任务消息队列与前面讲解的（普通）消息队列极其相似，只是任务消息队列已隶属于一个特定任务，所以它**不具有等待列表**，在操作的过程中省去了等待任务插入和移除列表的动作，所以工作原理相对更简单一点，**效率也比较高一些**。
+
+**任务消息队列的优点**：任务消息队列**「处理更快」**，**「RAM 开销更小」**
+
+​	通过对任务消息队列的合理使用，可以在一定场合下替代 uCOS 的消息队列，用户只需向任务内部的消息队列发送一个消息而	不用通过外部的消息队列进行发送，这样子处理就会很方便并且更加高效。
+
+**任务消息队列的缺点** ：只能指定消息发送的对象，**「有且只有一个任务接收消息」**
+
+​	而内核对象的消息队列则没有这个限制，用户在发送消息的时候，可以采用广播消息的方式，让所有等待该消息的任务都获取	到消息。 
+
+在实际任务间的通信中，一个或多个任务发送一个消息给另一个任务是非常常见的，而一个任务给多个任务发送消息的情况相对比较少。**一个或多个任务发送一个消息给另一个任务就很适合采用任务消息队列进行传递消息**，如果任务消息队列可以满足设计需求，那么尽量不要使用普通消息队列，这样子设计的系统会更加高效。 
+
+内核对象消息队列是用结构体 OS_Q 来管理的，包含了管理消息的元素 MsgQ 和管理等待列表的元素 PendList 等。而任务消息队列的结构体成员变量就少了 PendList，因为等待任务消息队列只有拥有任务消息队列本身的任务才可以进行获取，故任务消息队列不需要等待列表的相关数据结构。
+
+
+
+任务消息队列数据结构：
+
+```c
+struct  os_msg_q 
+{ 
+    OS_MSG *InPtr; // 任务消息队列中进消息指针
+    OS_MSG *OutPtr; // 任务消息队列中出消息指针
+    OS_MSG_QTY NbrEntriesSize; // 任务消息队列中最大可用的消息个数
+    OS_MSG_QTY NbrEntries; // 记录任务消息队列中当前的消息个数
+    OS_MSG_QTY NbrEntriesMax; // 记录任务消息队列最多的时候拥有的消息个数
+};
+```
+
+- NbrEntries 记录任务消息队列中当前的消息个数，每当发送一个消息到任务消息队列的时候，若任务没有在等待该消息，那么新发送的消息被插入任务消息队列后此值加 1，NbrEntries 的大小不能超过 NbrEntriesSize
+
+
+
 ## 任务消息队列的函数接口
 
 ### 任务消息队列发送函数OSTaskQPost()
 
+函数 OSTaskQPost()用来发送任务消息队列，参数中有指向消息要发送给的任务控制块的指针，任何任务都可以发送消息给拥有任务消息队列的任务（任务在被创建的时候，要设置参数 q_size 大于 0）。
+
+OSTaskQPost() 源码：
+
+```c
+#if OS_CFG_TASK_Q_EN > 0u                  //如果使能了任务消息队列
+void  OSTaskQPost (OS_TCB       *p_tcb,    //目标任务
+                   void         *p_void,   //消息内容地址
+                   OS_MSG_SIZE   msg_size, //消息长度
+                   OS_OPT        opt,      //选项
+                   OS_ERR       *p_err)    //返回错误类型
+{
+    CPU_TS   ts;
+
+
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                //如果使能了参数检测
+    switch (opt) {                        //根据选项分类处理
+        case OS_OPT_POST_FIFO:            //如果选项在预期内
+        case OS_OPT_POST_LIFO:
+        case OS_OPT_POST_FIFO | OS_OPT_POST_NO_SCHED:
+        case OS_OPT_POST_LIFO | OS_OPT_POST_NO_SCHED:
+             break;                       //直接跳出
+
+        default:                          //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;  //错误类型为“选项非法”
+             return;                      //返回，停止执行
+    }
+#endif
+
+    ts = OS_TS_GET();                                  //获取时间戳
+
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u                   //如果使能了中断延迟发布
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {         //如果该函数在中断中被调用
+        OS_IntQPost((OS_OBJ_TYPE)OS_OBJ_TYPE_TASK_MSG, //将消息先发布到中断消息队列  
+                    (void      *)p_tcb,
+                    (void      *)p_void,
+                    (OS_MSG_SIZE)msg_size,
+                    (OS_FLAGS   )0,
+                    (OS_OPT     )opt,
+                    (CPU_TS     )ts,
+                    (OS_ERR    *)p_err);
+        return;                                         //返回
+    }
+#endif
+
+    OS_TaskQPost(p_tcb,                                 //将消息直接发布
+                 p_void,
+                 msg_size,
+                 opt,
+                 ts,
+                 p_err);
+}
+#endif
+```
+
+- 如果使能了中断延迟发布，并且如果该函数在中断中被调用，就先将消息先发布到中断消息队列。
+
+- 调用 OS_TaskQPost() 函数将消息直接发送。
+
+
+
+OS_TaskQPost() 源码：
+
+```c
+#if OS_CFG_TASK_Q_EN > 0u                   //如果使能了任务消息队列
+void  OS_TaskQPost (OS_TCB       *p_tcb,    //目标任务
+                    void         *p_void,   //消息内容地址
+                    OS_MSG_SIZE   msg_size, //消息长度
+                    OS_OPT        opt,      //选项
+                    CPU_TS        ts,       //时间戳
+                    OS_ERR       *p_err)    //返回错误类型
+{
+    CPU_SR_ALLOC();  //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+									   //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+									   // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+    OS_CRITICAL_ENTER();                                   //进入临界段
+    if (p_tcb == (OS_TCB *)0) {                            //如果 p_tcb 为空
+        p_tcb = OSTCBCurPtr;                               //目标任务为自身
+    }
+   *p_err  = OS_ERR_NONE;                                  //错误类型为“无错误”
+    switch (p_tcb->TaskState) {                            //根据任务状态分类处理
+        case OS_TASK_STATE_RDY:                            //如果目标任务没等待状态
+        case OS_TASK_STATE_DLY:
+        case OS_TASK_STATE_SUSPENDED:
+        case OS_TASK_STATE_DLY_SUSPENDED:
+             OS_MsgQPut(&p_tcb->MsgQ,                      //把消息放入任务消息队列
+                        p_void,
+                        msg_size,
+                        opt,
+                        ts,
+                        p_err);
+             OS_CRITICAL_EXIT();                           //退出临界段
+             break;                                        //跳出
+
+        case OS_TASK_STATE_PEND:                           //如果目标任务有等待状态 
+        case OS_TASK_STATE_PEND_TIMEOUT:
+        case OS_TASK_STATE_PEND_SUSPENDED:
+        case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:
+             if (p_tcb->PendOn == OS_TASK_PEND_ON_TASK_Q) {//如果等的是任务消息队列
+                 OS_Post((OS_PEND_OBJ *)0,                 //把消息发布给目标任务
+                         p_tcb,
+                         p_void,
+                         msg_size,
+                         ts);
+                 OS_CRITICAL_EXIT_NO_SCHED();              //退出临界段（无调度）
+                 if ((opt & OS_OPT_POST_NO_SCHED) == (OS_OPT)0u) { //如果要调度任务
+                     OSSched();                                    //调度任务
+                 }
+             } else {                                      //如果没在等待任务消息队列
+                 OS_MsgQPut(&p_tcb->MsgQ,                  //把消息放入任务消息队列
+                            p_void,                        
+                            msg_size,
+                            opt,
+                            ts,
+                            p_err);
+                 OS_CRITICAL_EXIT();                      //退出临界段
+             }
+             break;                                       //跳出
+
+        default:                                          //如果状态超出预期
+             OS_CRITICAL_EXIT();                          //退出临界段
+            *p_err = OS_ERR_STATE_INVALID;                //错误类型为“状态非法”
+             break;                                       //跳出
+    }
+}
+#endif
+```
+
+- 如果目标任务为空，则表示将任务消息释放给自己，那么 p_tcb 就指向当前任务。
+- 如果目标任务没等待状态，就调用 OS_MsgQPut()函数将消息放入队列中，执行完毕就退出。
+- 如果目标任务有等待状态，那就看是不是在等待任务消息队列，如果是的话，调用 OS_Post() 函数把任务消息发送给目标任务。
+- 如果任务并不是在等待任务消息队列，那么调用 OS_MsgQPut() 函数将消息放入任务消息队列中即可。
+
+任务消息队列的发送过程是跟消息队列发送过程差不多，先检查目标任务的状态，如果该任务刚刚好在等待任务消息队列的消息，那么直接让任务脱离等待状态即可。如果任务没有在等待任务消息队列的消息，那么就将消息插入到要发送消息的任务消息队列。 
+
+
+
+OSTaskQPost() 使用实例：
+
+```c
+OS_ERR      err; 
+
+/* 发布消息到任务 AppTaskPend */ 
+OSTaskQPost ((OS_TCB      *)&AppTaskPendTCB,              //目标任务的控制块 
+             (void        *)"YeHuo uCOS-III",             //消息内容 
+             (OS_MSG_SIZE  )sizeof ( "YeHuo uCOS-III" ),  //消息长度 
+             (OS_OPT       )OS_OPT_POST_FIFO,   
+             //发布到任务消息队列的入口端 
+             (OS_ERR      *)&err);                        //返回错误类型
+```
+
+
+
 ### 任务消息队列获取函数OSTaskQPend()
+
+与 OSTaskQPost()任务消息队列发送函数相对应，OSTaskQPend()函数用于获取一个任务消息队列，函数的参数中没有指定哪个任务获取任务消息，实际上就是当前执行的任务，当任务调用了这个函数就表明这个任务需要获取任务消息。
+
+OSTaskQPend() 源码：
+
+```c
+#if OS_CFG_TASK_Q_EN > 0u                     //如果使能了任务消息队列
+void  *OSTaskQPend (OS_TICK       timeout,    //等待期限（单位：时钟节拍）
+                    OS_OPT        opt,        //选项
+                    OS_MSG_SIZE  *p_msg_size, //返回消息长度
+                    CPU_TS       *p_ts,       //返回时间戳
+                    OS_ERR       *p_err)      //返回错误类型
+{
+    OS_MSG_Q     *p_msg_q;
+    void         *p_void;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return ((void *)0);             //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u          //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {  //如果该函数在中断中被调用
+       *p_err = OS_ERR_PEND_ISR;                //错误类型为“在中断中中止等待”
+        return ((void *)0);                     //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                   //如果使能了参数检测
+    if (p_msg_size == (OS_MSG_SIZE *)0) {    //如果 p_msg_size 为空
+       *p_err = OS_ERR_PTR_INVALID;          //错误类型为“指针不可用”
+        return ((void *)0);                  //返回0（有错误），停止执行
+    }
+    switch (opt) {                           //根据选项分类处理
+        case OS_OPT_PEND_BLOCKING:           //如果选项在预期内
+        case OS_OPT_PEND_NON_BLOCKING:
+             break;                          //直接跳出
+
+        default:                             //如果选项超出预期
+            *p_err = OS_ERR_OPT_INVALID;     //错误类型为“选项非法”
+             return ((void *)0);             //返回0（有错误），停止执行
+    }
+#endif
+
+    if (p_ts != (CPU_TS *)0) {    //如果 p_ts 非空
+       *p_ts  = (CPU_TS  )0;      //初始化（清零）p_ts，待用于返回时间戳
+    }
+
+    CPU_CRITICAL_ENTER();                                  //关中断
+    p_msg_q = &OSTCBCurPtr->MsgQ;                          //获取当前任务的消息队列
+    p_void  = OS_MsgQGet(p_msg_q,                          //从队列里获取一个消息
+                         p_msg_size,
+                         p_ts,
+                         p_err);
+    if (*p_err == OS_ERR_NONE) {                          //如果获取消息成功
+#if OS_CFG_TASK_PROFILE_EN > 0u                        //如果使能了任务控制块的简况变量
+        if (p_ts != (CPU_TS *)0) {                                         //如果 p_ts 
+            OSTCBCurPtr->MsgQPendTime = OS_TS_GET() - *p_ts;               //非空，更新
+            if (OSTCBCurPtr->MsgQPendTimeMax < OSTCBCurPtr->MsgQPendTime) {//等待任务消
+                OSTCBCurPtr->MsgQPendTimeMax = OSTCBCurPtr->MsgQPendTime;  //息队列的最
+            }                                                              //长时间记录。
+        }
+#endif
+        CPU_CRITICAL_EXIT();                             //开中断 
+        return (p_void);                                 //返回消息内容
+    }
+    /* 如果获取消息不成功（队列里没有消息） */
+    if ((opt & OS_OPT_PEND_NON_BLOCKING) != (OS_OPT)0) { //如果选择了不堵塞任务
+       *p_err = OS_ERR_PEND_WOULD_BLOCK;                 //错误类型为“缺乏阻塞”
+        CPU_CRITICAL_EXIT();                             //开中断
+        return ((void *)0);                              //返回0（有错误），停止执行
+    } else {                                             //如果选择了堵塞任务
+        if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) { //如果调度器被锁
+            CPU_CRITICAL_EXIT();                         //开中断
+           *p_err = OS_ERR_SCHED_LOCKED;                 //错误类型为“调度器被锁”
+            return ((void *)0);                          //返回0（有错误），停止执行
+        }
+    }
+    /* 如果调度器未被锁 */                                                       
+    OS_CRITICAL_ENTER_CPU_EXIT();                        //锁调度器，重开中断
+    OS_Pend((OS_PEND_DATA *)0,                           //阻塞当前任务，等待消息 
+            (OS_PEND_OBJ  *)0,
+            (OS_STATE      )OS_TASK_PEND_ON_TASK_Q,
+            (OS_TICK       )timeout);
+    OS_CRITICAL_EXIT_NO_SCHED();                         //解锁调度器（无调度）
+
+    OSSched();                                           //调度任务
+    /* 当前任务（获得消息队列的消息）得以继续运行 */
+    CPU_CRITICAL_ENTER();                                //关中断
+    switch (OSTCBCurPtr->PendStatus) {                   //根据任务的等待状态分类处理
+        case OS_STATUS_PEND_OK:                          //如果任务已成功获得消息
+             p_void      = OSTCBCurPtr->MsgPtr;          //提取消息内容地址
+            *p_msg_size  = OSTCBCurPtr->MsgSize;         //提取消息长度
+             if (p_ts != (CPU_TS *)0) {                  //如果 p_ts 非空
+                *p_ts  = OSTCBCurPtr->TS;                //获取任务等到消息时的时间戳
+#if OS_CFG_TASK_PROFILE_EN > 0u                          //如果使能了任务控制块的简况变量
+                OSTCBCurPtr->MsgQPendTime = OS_TS_GET() - OSTCBCurPtr->TS;     //更新等待
+                if (OSTCBCurPtr->MsgQPendTimeMax < OSTCBCurPtr->MsgQPendTime) {//任务消息
+                    OSTCBCurPtr->MsgQPendTimeMax = OSTCBCurPtr->MsgQPendTime;  //队列的最
+                }                                                              //长时间记
+#endif                                                                         //录。
+             }
+            *p_err = OS_ERR_NONE;                        //错误类型为“无错误”
+             break;                                      //跳出
+
+        case OS_STATUS_PEND_ABORT:                       //如果等待被中止
+             p_void     = (void      *)0;                //返回消息内容为空
+            *p_msg_size = (OS_MSG_SIZE)0;                //返回消息大小为0
+             if (p_ts  != (CPU_TS *)0) {                 //如果 p_ts 非空
+                *p_ts   = (CPU_TS  )0;                   //清零 p_ts
+             }
+            *p_err      =  OS_ERR_PEND_ABORT;            //错误类型为“等待被中止”
+             break;                                      //跳出
+
+        case OS_STATUS_PEND_TIMEOUT:                     //如果等待超时，
+        default:                                         //或者任务状态超出预期。
+             p_void     = (void      *)0;                //返回消息内容为空
+            *p_msg_size = (OS_MSG_SIZE)0;                //返回消息大小为0
+             if (p_ts  != (CPU_TS *)0) {                 //如果 p_ts 非空
+                *p_ts   =  OSTCBCurPtr->TS;
+             }
+            *p_err      =  OS_ERR_TIMEOUT;               //错误类为“等待超时”
+             break;                                      //跳出
+    }
+    CPU_CRITICAL_EXIT();                                 //开中断
+    return (p_void);                                     //返回消息内容地址
+}
+#endif
+```
+
+- 如果调度器未被锁，系统会锁调度器，重开中断。
+- 调用 OS_Pend()函数将当前任务脱离就绪列表，并根据用户指定的阻塞时间插入到节拍列表，但是不会插入队列等待列表，然后打开调度器，但不进行调度。
+- 如果任务状态是 OS_STATUS_PEND_OK，则表示任务获取到消息了，那么就从任务控制块中提取消息，这是因为在发送消息给任务的时候，会将消息放入任务控制块的 MsgPtr 成员变量中，然后继续提取消息大小，如果 p_ts 非空，记录获取任务等到消息时的时间戳，返回错误类型为“无错误”的错误代码，跳出 switch 语句。
+- 如果任务在等待（阻塞）中被中止，则返回消息内容为空，返回消息大小为 0，返回错误类型为“等待被中止”的错误代码，跳出 switch 语句。
+- 如果任务等待（阻塞）超时，说明等待的时间过去了，任务也没获取到消息，则返回消息内容为空，返回消息大小为 0，返回错误类型为“等待超时”的错误代码，跳出 switch 语句。
+
+
+
+OSTaskQPend() 使用实例：
+
+```c
+char * pMsg;
+OS_ERR         err;
+OS_MSG_SIZE    msg_size; 
+CPU_TS         ts;
+pMsg = OSTaskQPend ((OS_TICK        )0,                    //无期限等待
+                    (OS_OPT         )OS_OPT_PEND_BLOCKING, //没有消息就阻塞任务
+                    (OS_MSG_SIZE   *)&msg_size,            //返回消息长度
+                    (CPU_TS        *)&ts,                  //返回消息被发送的时间戳
+                    (OS_ERR        *)&err);                //返回错误类型
+```
 
 
 
@@ -4175,17 +4885,353 @@ if (OSTmrUpdateCtr == (OS_CTR)0u)
 
 ## 内存管理的基本概念
 
+在嵌入式系统设计中，内存分配应该是根据所设计系统的特点来决定选择使用动态内存分配还是静态内存分配算法，一些可靠性要求非常高的系统应选择使用静态的，而普通的业务系统可以使用动态来提高内存使用效率。**静态可以保证设备的可靠性但是需要考虑内存上限，内存使用效率低，而动态则是相反**。
+
+uCOS 的内存管理是采用**「内存池」**的方式进行管理，也就是创建一个内存池，**静态划分一大块连续空间作为内存管理的空间**，里面划分为很多个内存块，我们在使用的时候就从这个内存池中获取一个内存块，使用完毕的时候用户可以将其放回内存池中，这样子就不会导致内存碎片的产生。uCOS 内存管理模块用于管理系统中内存资源，它是操作系统的核心模块之一，主要**包括内存池的创建、分配以及释放**。
+
+在嵌入式实时操作系统中，调用 malloc() 和 free() 是危险的：
+
+- 这些函数在小型嵌入式系统中并不总是可用的，小型嵌入式设备中的 RAM 不足。 
+- 它们的**实现可能占据了相当大的代码空间**。
+- 它们几乎都**不是安全的**。
+- 它们并**不是确定的**，每次调用这些函数**「执行的时间可能都不一样」**。
+- 它们有**「可能产生碎片」**。
+- 这两个函数会使得链接器配置得复杂。
+- 如果允许堆空间的生长方向覆盖其他变量占据的内存，它们会成为 debug 的灾难。
+
+在一般的实时嵌入式系统中，由于实时性的要求，很少使用虚拟内存机制。**所有的内存都需要用户参与分配，直接操作物理内存，所分配的内存不能超过系统的物理内存，所有的系统堆栈的管理，都由用户自己管理**。
+
+同时，在嵌入式实时操作系统中，对内存的分配时间要求更为苛刻，**分配内存的时间必须是确定的**。一般内存管理算法是根据需要存储的数据的长度在内存中去寻找一个与这段数据相适应的空闲内存块，然后将数据存储在里面，而寻找这样一个空闲内存块所耗费的时间是不确定的，因此对于实时系统来说，这就是不可接受的，**实时系统必须要保证内存块的分配过程在可预测的确定时间内完成，否则实时任务对外部事件的响应也将变得不可确定**。
+
+uCOS 提供的内存分配算法是**「只允许用户分配固定大小的内存块」**，当使用完成就将其放回内存池中，这样子**「分配效率极高，时间复杂度是 O(1)」**，也就是一个固定的时间常数，并不会因为系统内存的多少而增加遍历内存块列表的时间，并且还**「不会导致内存碎片」**的出现，但是这样的内存分配机制**「会导致内存利用率的下降以及申请内存大小的限制」**。 
+
+
+
 ## 内存管理的运作机制
 
+内存池（Memory Pool）是一种用于分配大量大小相同的内存对象的技术，它可以极大加快内存分配/释放的速度。 
+
+在系统**编译的时候**，编译器就静态划分了一个大数组作为系统的内存池，然后**在初始化的时候将其分成大小相等的多个内存块，内存块直接通过链表连接起来（此链表也称为空闲内存块列表）**。每次**分配的时候，从空闲内存块列表中取出表头上第一个内存块，提供给申请者**。物理内存中允许存在多个大小不同的内存池，每一个内存池又由多个大小相同的空闲内存块组成。
+
+必须先创建内存池才能去使用内存池里面的内存块，**在创建的时候，必须定义一个内存池控制块**，然后进行相关初始化，内存控制块的参数包括内存池名称，内存池起始地址，内存块大小，内存块数量等信息，在以后需要从内存池取出内存块或者释放内存块的时候，只需根据内存控制块的信息就能很轻易做到。
+
+内存控制块 os_mem：
+
+```c
+struct os_mem {                                             /* MEMORY CONTROL BLOCK */
+    OS_OBJ_TYPE          Type;                              /* 内核对象类型 OS_OBJ_TYPE_MEM */
+    void                *AddrPtr;                           /* 内存池的起始地址 */
+    CPU_CHAR            *NamePtr;
+    void                *FreeListPtr;                       /* 空闲内存块列表 */
+    OS_MEM_SIZE          BlkSize;                           /* 内存块大小 */
+    OS_MEM_QTY           NbrMax;                            /* 内存池中内存块的总数量 */
+    OS_MEM_QTY           NbrFree;                           /* 空闲内存块数量 */
+#if OS_CFG_DBG_EN > 0u
+    OS_MEM              *DbgPrevPtr;
+    OS_MEM              *DbgNextPtr;
+#endif
+};
+```
+
+
+
+静态内存示意图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626160225.png" width="700px" /> </div>
+
+注意：内存池中的内存块是通过单链表连接起来的，类似于消息池，内存池在创建的时候内存块地址是连续的，但是经过多次申请以及释放后，空闲内存块列表的内存块在地址上不一定是连续的。
+
+
+
 ## 内存管理的应用场景
+
+内存管理的主要工作是**「动态划分并管理用户分配好的内存区间」**，主要是**「在用户需要使用大小不等的内存块的场景中使用」**，当用户需要分配内存时，可以通过操作系统的内存申请函数索取指定大小内存块，一旦使用完毕，通过动态内存释放函数归还所占用内存，使之**「可以重复使用」**（heap_1.c 的内存管理除外）。
+
+例如我们需要定义一个 float 型数组：floatArr[]; 
+
+但是，在使用数组的时候，总有一个问题困扰着我们：数组应该有多大？在很多的情况下，你并**不能确定要使用多大的数组**，可能为了避免发生错误你就需要把数组定义得足够大。即使你知道想利用的空间大小，但是如果因为某种特殊原因空间利用的大小有增加或者减少，你又必须重新去修改程序，扩大数组的存储范围。这种分配固定大小的内存分配方法称之为静态内存分配。这种内存分配的方法存在比较严重的缺陷，在大多数情况下会浪费大量的内存空间，在少数情况下，当你定义的数组不够大时，可能引起下标越界错误，甚至导致严重后果。
+
+uCOS 将系统静态分配的大数组作为内存池，然后进行内存池的初始化，然后分配固定大小的内存块。
+
+注意：uCOS 也不能很好解决这种问题，因为内存块的大小是固定的，**「无法解决这种弹性很大的内存需求」**，只能按照最大的内存块进行分配。但是 **「uCOS 的内存分配能解决内存利用率的问题」**，在**不需要使用内存的时候，将内存释放到内存池中，让其他任务能正常使用该内存块**。
+
+
 
 ## 内存管理函数接口
 
 ### 内存池创建函数OSMemCreate()
 
+在使用内存池的时候首先要创建一个内存池，需要用户静态分配一个数组空间作为系统的内存池，且用户还需定义一个内存控制块。创建内存池后，任务才可以通过系统的内存申请、释放函数从内存池中申请或释放内存。
+
+OSMemCreate() 源码：
+
+```c
+void  OSMemCreate (OS_MEM       *p_mem,    //内存分区控制块
+                   CPU_CHAR     *p_name,   //命名内存分区
+                   void         *p_addr,   //内存分区首地址
+                   OS_MEM_QTY    n_blks,   //内存块数目
+                   OS_MEM_SIZE   blk_size, //内存块大小（单位：字节）
+                   OS_ERR       *p_err)    //返回错误类型
+{
+#if OS_CFG_ARG_CHK_EN > 0u      
+    CPU_DATA       align_msk;
+#endif
+    OS_MEM_QTY     i;
+    OS_MEM_QTY     loops;
+    CPU_INT08U    *p_blk;
+    void         **p_link;               //二级指针，存放指针的指针
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL                //如果使能了安全检测
+    if (p_err == (OS_ERR *)0) {          //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();  //执行安全检测异常函数
+        return;                          //返回，停止执行
+    }
+#endif
+
+#ifdef OS_SAFETY_CRITICAL_IEC61508               //如果使能了安全关键
+    if (OSSafetyCriticalStartFlag == DEF_TRUE) { //如果在调用OSSafetyCriticalStart()后创建
+       *p_err = OS_ERR_ILLEGAL_CREATE_RUN_TIME;  //错误类型为“非法创建内核对象”
+        return;                                  //返回，停止执行
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u         //如果使能了中断中非法调用检测
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) { //如果该函数是在中断中被调用
+       *p_err = OS_ERR_MEM_CREATE_ISR;         //错误类型为“在中断中创建对象”
+        return;                                //返回，停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                             //如果使能了参数检测
+    if (p_addr == (void *)0) {                         //如果 p_addr 为空      
+       *p_err   = OS_ERR_MEM_INVALID_P_ADDR;           //错误类型为“分区地址非法”
+        return;                                        //返回，停止执行
+    }
+    if (n_blks < (OS_MEM_QTY)2) {                      //如果分区的内存块数目少于2
+       *p_err = OS_ERR_MEM_INVALID_BLKS;               //错误类型为“内存块数目非法”
+        return;                                        //返回，停止执行
+    }
+    if (blk_size < sizeof(void *)) {                   //如果内存块空间小于指针的
+       *p_err = OS_ERR_MEM_INVALID_SIZE;               //错误类型为“内存空间非法”
+        return;                                        //返回，停止执行
+    }
+    align_msk = sizeof(void *) - 1u;                   //开始检查内存地址是否对齐
+    if (align_msk > 0u) {
+        if (((CPU_ADDR)p_addr & align_msk) != 0u){     //如果分区首地址没对齐
+           *p_err = OS_ERR_MEM_INVALID_P_ADDR;         //错误类型为“分区地址非法”
+            return;                                    //返回，停止执行
+        }
+        if ((blk_size & align_msk) != 0u) {            //如果内存块地址没对齐     
+           *p_err = OS_ERR_MEM_INVALID_SIZE;           //错误类型为“内存块大小非法”
+            return;                                    //返回，停止执行
+        }
+    }
+#endif
+    /* 将空闲内存块串联成一个单向链表 */
+    p_link = (void **)p_addr;                          //内存分区首地址转为二级指针 ★
+    p_blk  = (CPU_INT08U *)p_addr;                     //首个内存块地址
+    loops  = n_blks - 1u;
+    for (i = 0u; i < loops; i++) {                     //将内存块逐个串成单向链表
+        p_blk +=  blk_size;                            //下一内存块地址
+       *p_link = (void  *)p_blk;                       //在当前内存块保存下一个内存块地址 ★
+        p_link = (void **)(void *)p_blk;               //下一个内存块的地址转为二级指针 ★
+    }
+   *p_link             = (void *)0;                    //最后一个内存块指向空
+
+    OS_CRITICAL_ENTER();                               //进入临界段
+    p_mem->Type        = OS_OBJ_TYPE_MEM;              //设置对象的类型   
+    p_mem->NamePtr     = p_name;                       //保存内存分区的命名     
+    p_mem->AddrPtr     = p_addr;                       //存储内存分区的首地址     
+    p_mem->FreeListPtr = p_addr;                       //初始化空闲内存块池的首地址 
+    p_mem->NbrFree     = n_blks;                       //存储空闲内存块的数目   
+    p_mem->NbrMax      = n_blks;                       //存储内存块的总数目
+    p_mem->BlkSize     = blk_size;                     //存储内存块的空间大小  
+
+#if OS_CFG_DBG_EN > 0u            //如果使能了调试代码和变量 
+    OS_MemDbgListAdd(p_mem);      //将内存管理对象插入内存管理双向调试列表
+#endif
+
+    OSMemQty++;                   //内存管理对象数目加1
+
+    OS_CRITICAL_EXIT_NO_SCHED();  //退出临界段（无调度）
+   *p_err = OS_ERR_NONE;          //错误类型为“无错误”
+}
+```
+
+- 如果内存池的内存块数目少于 2，返回错误类型为“内存块数目非法”错误代码。
+
+- 如果内存块空间小于一个指针的大小（在 stm32 上是 4 字节），返回错误类型为“内存空间非法”的错误代码。
+
+- 需要检查内存地址是否对齐，如果内存池首地址没对齐，返回错误类型为“内存池地址非法”的错误代码。
+
+- 如果内存块地址没对齐，返回错误类型为“内存块大小非法”的错误代码。
+
+- 「for (i = 0u; i < loops; i++)」将空闲内存块逐个连接成一个单向链表，根据内存块起始地址与内存块大小获取下一个内存块的地址，然后在当前内存块中保存下一个内存块的地址，再将下一个内存块的地址转为二级指针，将这些内存块连接成一个单链表，也就是空闲内存块链表。
+
+  一个内存块的操作是先计算是下一个内存块的地址，因为**此时数组元素的地址是连续的**，所以开始的时候只要在前一个内存块的首地址加上内存块字节大小即可得到下一个内存块的首地址，然后把下一个内存块的首地址放在前一个内存块中，就将他们串起来了，如此循环反复即可串成空闲内存块列表。 
+
+- 「*p_link             = (void *)0;」将最后一个内存块存储的地址为空，表示到达空闲内存块列表尾部。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626161703.png" width="500px" /> </div>
+
+内存池创建完成示意图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626161752.png" width="700px" /> </div>
+
+OSMemCreate() 使用实例：
+
+```c
+OS_MEM  mem;                    //声明内存管理对象 
+uint8_t ucArray [ 3 ] [ 20 ];   //声明内存池大小 
+
+OS_ERR      err; 
+/* 创建内存管理对象 mem */ 
+OSMemCreate ((OS_MEM      *)&mem,             //指向内存管理对象 
+             (CPU_CHAR    *)"Mem For Test",   //命名内存管理对象 
+             (void        *)ucArray,          //内存池的首地址 
+             (OS_MEM_QTY   )3,                //内存池中内存块数目 
+             (OS_MEM_SIZE  )20,               //内存块的字节数目 
+             (OS_ERR      *)&err);            //返回错误类型
+```
+
+
+
 ### 内存申请函数OSMemGet()
 
+这个函数用于申请固定大小的内存块，**从指定的内存池中分配一个内存块给用户使用**，该内存块的大小在内存池初始化的时候就已经决定的。如果内存池中有可用的内存块，则从内存池的空闲内存块列表上取下一个内存块并且返回对应的内存地址；如果内存池中已经没有可用内存块，则返回 0 与对应的错误代码 OS_ERR_MEM_NO_FREE_BLKS。
+
+OSMemGet() 源码：
+
+```c
+void  *OSMemGet (OS_MEM  *p_mem, //内存管理对象
+                 OS_ERR  *p_err) //返回错误类型
+{
+    void    *p_blk;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL                //如果使能了安全检测
+    if (p_err == (OS_ERR *)0) {          //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();  //执行安全检测异常函数
+        return ((void *)0);              //返回0（有错误），停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                 //如果使能了参数检测
+    if (p_mem == (OS_MEM *)0) {            //如果 p_mem 为空            
+       *p_err  = OS_ERR_MEM_INVALID_P_MEM; //错误类型为“内存分区非法”
+        return ((void *)0);                //返回0（有错误），停止执行
+    }
+#endif
+
+    CPU_CRITICAL_ENTER();                    //关中断
+    if (p_mem->NbrFree == (OS_MEM_QTY)0) {   //如果没有空闲的内存块
+        CPU_CRITICAL_EXIT();                 //开中断
+       *p_err = OS_ERR_MEM_NO_FREE_BLKS;     //错误类型为“没有空闲内存块”  
+        return ((void *)0);                  //返回0（有错误），停止执行
+    }
+    p_blk              = p_mem->FreeListPtr; //如果还有空闲内存块，就获取它
+    p_mem->FreeListPtr = *(void **)p_blk;    //调整空闲内存块指针
+    p_mem->NbrFree--;                        //空闲内存块数目减1
+    CPU_CRITICAL_EXIT();                     //开中断
+   *p_err = OS_ERR_NONE;                     //错误类型为“无错误”
+    return (p_blk);                          //返回获取到的内存块
+}
+```
+
+- 判断一下内存池控制块中NbrFree 的值，如果没有空闲的内存块，就没法申请内存，保存错误类型为“没有空闲内存块”的错误代码，返回 0 表示没申请到内存块。 
+- 如果内存池中还有空闲内存块，就获取它，获取的过程就是从空闲内存块中取出一个内存块，并且返回该内存块的地址。
+- 调整内存池控制块的空闲内存块指针，指向下一个可用的内存块。
+
+假设我们在内存池创建完成后就调用 OSMemGet()函数申请一个内存块，那么申请完毕后的内存块示意图如下，被申请出去的内存块会脱离空闲内存块列表，并且内存控制块中的 NbrFree 变量会减一。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626162132.png" width="700px" /> </div>
+
+
+
+OSMemGet() 使用实例：
+
+```c
+OS_MEM  mem;                    //声明内存管理对象 
+OS_ERR      err; 
+/* 向 mem 获取内存块 */ 
+p_mem_blk = OSMemGet ((OS_MEM      *)&mem,              //指向内存管理对象 
+                      (OS_ERR      *)&err);             //返回错误类型 
+```
+
+
+
 ### 内存释放函数OSMemPut()
+
+嵌入式系统的内存对我们来说是十分珍贵的，任何内存块使用完后都必须被释放，否则会造成内存泄露，导致系统发生致命错误。uCOS 提供了 OSMemPut()函数进行内存的释放管理，使用该函数接口时，根据指定的内存控制块对象，将内存块插入内存池的空闲内存块列表中，然后增加该内存池的可用内存块数目。
+
+OSMemPut() 源码：
+
+```c
+void  OSMemPut (OS_MEM  *p_mem,   //内存管理对象
+                void    *p_blk,   //要退回的内存块
+                OS_ERR  *p_err)   //返回错误类型
+{
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+#ifdef OS_SAFETY_CRITICAL                //如果使能了安全检测
+    if (p_err == (OS_ERR *)0) {          //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();  //执行安全检测异常函数
+        return;                          //返回，停止执行
+    }
+#endif
+
+#if OS_CFG_ARG_CHK_EN > 0u                  //如果使能了参数检测
+    if (p_mem == (OS_MEM *)0) {             //如果 p_mem 为空                
+       *p_err  = OS_ERR_MEM_INVALID_P_MEM;  //错误类型为“内存分区非法”
+        return;                             //返回，停止执行
+    }
+    if (p_blk == (void *)0) {               //如果内存块为空
+       *p_err  = OS_ERR_MEM_INVALID_P_BLK;  //错误类型为"内存块非法"
+        return;                             //返回，停止执行
+    }
+#endif
+
+    CPU_CRITICAL_ENTER();                    //关中断
+    if (p_mem->NbrFree >= p_mem->NbrMax) {   //如果内存池已满 ★            
+        CPU_CRITICAL_EXIT();                 //开中断
+       *p_err = OS_ERR_MEM_FULL;             //错误类型为“内存分区已满”
+        return;                              //返回，停止执行
+    }
+    *(void **)p_blk    = p_mem->FreeListPtr; //把内存块插入空闲内存块链表 ★
+    p_mem->FreeListPtr = p_blk;              //内存块退回到链表的最前端 ★
+    p_mem->NbrFree++;                        //空闲内存块数目加1
+    CPU_CRITICAL_EXIT();                     //开中断
+   *p_err              = OS_ERR_NONE;        //错误类型为“无错误”
+}
+```
+
+- 如果内存池已经满了，那是无法进行释放的，返回错误类型为“内存池已满”的错误代码。
+- 如果内存池没满，那么释放内存块到内存池中，把内存块插入空闲内存块列表。 内存块退回到链表的最前端。
+
+在释放一个内存块的时候，我们会将内存插入内存池中空闲内存块列表的**首部**，然后增加内存池中空闲内存块的数量。
+
+
+
+OSMemPut() 使用实例：
+
+```c
+OS_MEM  mem;                    //声明内存管理对象 
+OS_ERR      err; 
+
+/* 释放内存块 */ 
+OSMemPut ((OS_MEM  *)&mem,                        //指向内存管理对象 
+          (void    *)pMsg,                        //内存块的首地址 
+          (OS_ERR  *)&err);                       //返回错误类型 
+```
+
+**注意：OSMemCreate() 只能在任务级被调用，但是 OSMemGet() 和OSMemPut() 可以在中断中被调用。**
 
 
 
@@ -4193,12 +5239,589 @@ if (OSTmrUpdateCtr == (OS_CTR)0u)
 
 ## 异常与中断的基本概念
 
+异常是**导致处理器脱离正常运行转向执行特殊代码**的任何**事件**，如果不及时进行处理，轻则系统出错，重则会导致系统毁灭性瘫痪。所以正确地处理异常，避免错误的发生是提高软件鲁棒性（稳定性）非常重要的一环，对于实时系统更是如此。 
+
+**「异常是指任何打断处理器正常执行，并且迫使处理器进入一个由有特权的特殊指令执行的事件」**。异常通常可以分成两类：**同步异常和异步异常**。
+
+- 同步异常是指**由内部事件（像处理器指令运行产生的事件）引起的异常**，例如造成被零除的算术运算引发一个异常，又如在某些处理器体系结构中，对于确定的数据尺寸必须从内存的偶数地址进行读和写操作。从一个奇数内存地址的读或写操作将引起存储器存取一个错误事件并引起一个异常（称为校准异常）。
+- 异步异常主要是指**由外部异常源产生的异常**，是一个由外部硬件装置产生的事件引起的异步异常。
+
+同步异常和异步异常的区别：
+
+- 同步异常不同于异步异常的地方是**事件的来源**，同步异常事件是由于执行某些指令而从处理器内部产生的，而异步异常事件的来源是外部硬件装置。例如按下设备某个按钮产生的事件。
+- 同步异常与异步异常的区别还在于，同步异常触发后，系统**必须立刻进行处理**而不能够依然执行原有的程序指令步骤；而异步异常则**可以延缓处理甚至是忽略**，例如按键中断异常，虽然中断异常触发了，但是系统可以忽略它继续运行（同样也忽略了相应的按键事件）。
+
+**「中断属于异步异常」**。所谓中断是**指中央处理器 CPU 正在处理某件事的时候，外部发生了某一事件，请求 CPU 迅速处理，CPU 暂时中断当前的工作，转入处理所发生的事件，处理完后，再回到原来被中断的地方，继续原来的工作，这样的过程称为中断**。「中断能打断任务的运行，无论该任务具有什么样的优先级」，因此中断一般用于处理比较紧急的事件，而且只做简单处理，例如标记该事件，在使用 uCOS 系统时，一般建议使用信号量、消息或事件标志组等标志中断的发生，将这些内核对象发布给处理任务，处理任务再做具体处理。 
+
+通过中断机制，**在外设不需要 CPU 介入时，CPU 可以执行其他任务，而当外设需要 CPU 时通过产生中断信号使 CPU 立即停止当前任务转而来响应中断请求**。这样可以使CPU**「避免把大量时间耗费在等待、查询外设状态的操作上」**，因此将**「大大提高系统实时性以及执行效率」**。 
+
+uCOS 源码中有许多处临界段的地方，**临界段虽然保护了关键代码的执行不被打断，但也会影响系统的实时，任何使用了操作系统的中断响应都不会比裸机快**。比如，某个时候有一个任务在运行中，并且该任务部分程序将中断屏蔽掉，也就是进入临界段中，这个时候如果有一个紧急的中断事件被触发，这个中断就会被挂起，不能得到及时响应，必须等到中断开启才可以得到响应，如果屏蔽中断时间超过了紧急中断能够容忍的限度，危害是可想而知的。操作系统的中断在某些时候会产生必要的中断延迟，因此**调用中断屏蔽函数进入临界段的时候，也需快进快出**。
+
+UCOS 的中断管理支持： 
+
+- 开/关中断
+- 恢复中断
+- 中断使能
+- 中断屏蔽
+- 中断嵌套
+- 中断延迟发布
+
+
+
+### 中断的介绍
+
+与中断相关的硬件可以划分为三类：外设、中断控制器、CPU 本身。
+
+- 外设：当外设需要请求 CPU 时，产生一个中断信号，该信号连接至中断控制器。
+- 中断控制器：中断控制器是 **CPU 众多外设中的一个**，它一方面接收其他外设中断信号的输入，另一方面，它会发出中断信号给 CPU。可以通过对中断控制器编程实现对中断源的优先级、触发方式、打开和关闭源等设置操作。在 Cortex-M 系列控制器中常用的中断控制器是 **NVIC**（内嵌向量中断控制器 Nested Vectored Interrupt Controller）。 
+- CPU：CPU 会响应中断源的请求，中断当前正在执行的任务，转而执行中断处理程序。NVIC 最多支持 240 个中断，每个中断最多 256 个优先级。 
+
+
+
+### 和中断相关的名词解释
+
+中断号：每个中断请求信号都会有特定的标志，使得计算机能够判断是哪个设备提出的中断请求，这个标志就是中断号。 
+
+中断请求：“紧急事件” 需向 CPU 提出申请，要求 CPU 暂停当前执行的任务，转而处理该 “紧急事件”，这一过程称为中断请求。
+
+中断优先级：为使系统能够及时响应并处理所有中断，系统根据中断时间的重要性和紧迫程度，将中断源分为若干个级别。
+
+中断处理程序：当外设产生中断请求后，CPU 暂停当前的任务，转而响应中断申请，即执行中断处理程序。 
+
+中断触发：中断源向 CPU 发出控制信号，将中断触发器置 “1”，表明该中断源产生了中断，要求 CPU 去响应该中断，CPU 暂停当前任务，执行相应的中断处理程序。中断触发类型：外部中断申请通过一个物理信号发送到 NVIC，可以是电平触发或边沿触发。
+
+中断向量：**中断服务程序的入口地址**。
+
+中断向量表：**存储中断向量的存储区**，中断向量与中断号对应，中断向量在中断向量表中按照中断号顺序存储。
+
+临界段：代码的临界段也称为临界区，一旦这部分代码开始执行，则不允许任何中断打断。为确保临界段代码的执行不被中断，在进入临界段之前须关中断，而临界段代码执行完毕后，要立即开中断。 
+
+
+
 ## 中断的运作机制
+
+当中断产生时，处理机将按如下的顺序执行： 
+1. 保存当前处理机状态信息 
+2. 载入异常或中断处理函数到 PC 寄存器 
+3. 把控制权转交给处理函数并开始执行 
+4. 当处理函数执行完成时，恢复处理器状态信息 
+5. 从异常或中断中返回到前一个程序执行点 
+
+**中断使得 CPU 可以在事件发生时才给予处理，而不必让 CPU 连续不断地查询是否有相应的事件发生**。通过两条特殊指令：**关中断和开中断**可以让处理器不响应或响应中断，在关闭中断期间，通常处理器会把新产生的中断挂起，当中断打开时立刻进行响应，所以**会有适当的延时响应中断**，故用户在**进入临界区的时候应快进快出**。 
+
+中断发生的环境有两种情况：在任务的上下文中，在中断服务函数处理上下文中。
+
+- 任务在工作的时候，如果此时发生了一个中断，无论中断的优先级是多大，都会打断当前任务的执行，从而转到对应的中断服务函数中执行。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626210245.png" width="600px" /> </div>
+
+​		(1)、(3)：在任务运行的时候发生了中断，那么中断会打断任务的运行，那么操作系统将先保存当前任务的上下文环境，转而		去处理中断服务函数。
+
+​		(2)、(4)：当且仅当中断服务函数处理完的时候才恢复任务的上下文环境，继续运行任务。 
+
+- 在执行中断服务例程的过程中，如果有更高优先级别的中断源触发中断，由于当前处于中断处理上下文环境中，根据不同的处理器构架可能有不同的处理方式，比如新的中断挂起直到当前中断处理离开后再进行响应；或新的高优先级中断打断当前中断处理过程，而去直接响应这个更高优先级的新中断源。后面这种情况，称之为**中断嵌套**。在硬实时环境中，前一种情况是不允许发生的，因为这样不能使响应中断的时间尽量的短。而在软实时环境上，**uCOS 允许中断嵌套，即在一个中断服务例程期间，处理器可以响应另外一个优先级更高的中断**。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626210417.png" width="500px" /> </div>
+
+​		(1)：当中断 1 的服务函数在处理的时候发生了中断 2，由于中断 2 的优先级比中断 1 更高，所以发生了中断嵌套，那么操作		系统将先保存当前中断服务函数的上下文，并且转向处理中断 2，当且仅当中断 2 执行完的时候 (2) 才能继续执行中断1。
+
+
 
 ## 中断延迟的概念
 
+即使操作系统的响应很快了，但对于中断的处理仍然存在着中断延迟响应的问题，我们称之为中断延迟(Interrupt Latency) 。中断延迟是**指从硬件中断发生到开始执行中断处理程序第一条指令之间的这段时间**。也就是：系统接收到中断信号到操作系统作出响应，并完成换到转入中断服务程序的时间也可以简单地理解为：（外部）硬件（设备）发生中断，到系统执行中断服务子程序
+（ISR，interrupt service routine）的第一条指令的时间。 
+
+中断的处理过程是：外界硬件发生了中断后，CPU 到中断处理器读取中断向量，并且查找中断向量表，找到对应的中断服务子程序（ISR）的首地址，然后跳转到对应的 ISR 去做相应处理。这部分时间，称之为**识别中断时间**。
+
+在允许中断嵌套的实时操作系统中，中断也是基于优先级的，允许高优先级中断抢断正在处理的低优先级中断，所以，如果当前正在处理更高优先级的中断，即使此时有低优先级的中断，也系统不会立刻响应，而是等到高优先级的中断处理完之后，才会响应。而即使在不支持中断嵌套，即中断是没有优先级的，中断是不允许被中断的，所以，如果当前系统正在处理一个中断，而此时另一个中断到来了，系统也是不会立即响应的，而只是等处理完当前的中断之后，才会处理后来的中断。此部分时间，我称其为：**等待中断打开时间**。 
+
+在操作系统中，很多时候我们会主动进入临界段，系统不允许当前状态被中断打断，故而在临界区发生的中断会被挂起，直到退出临界段时候打开中断。此部分时间称之为关闭中断时间。 
+
+中断延迟可以定义为，从中断开始的时刻到中断服务例程开始执行的时刻之间的时间段。**中断延迟 = 识别中断时间 + [等待中断打开时间] + [关闭中断时间]**。 注意：“[ ]”的时间是不一定都存在的，此处为最大可能的中断延迟时间。
+
+此外，中断恢复时间定义为：执行完 ISR 中最后一句代码后到恢复到任务级代码的这段时间。 任务延迟时间定义为：中断发生到恢复到任务级代码的这段时间。
+
+
+
 ## 中断的应用场景
+
+中断在嵌入式处理器中应用非常之多，没有中断的系统不是一个好系统，**因为有中断，才能启动或者停止某件事情，从而转去做另一间事情**。
+
+
 
 ## 中断管理讲解
 
+ARM Cortex-M 系列内核的中断是由硬件管理的，而 uCOS 是软件，它并不接管由硬件管理的相关中断（接管简单来说就是，所有的中断都由 RTOS 的软件管理，硬件来了中断时，由软件决定是否响应，可以挂起中断，延迟响应或者不响应），只支持简单的开关中断等，所以 **uCOS 中的中断使用其实跟裸机差不多的，需要我们自己配置中断，并且使能中断，编写中断服务函数**。在中断服务函数中使用内核 IPC 通信机制，一般**建议使用信号量、消息或事件标志组等标志事件的发生，将事件发布给处理任务，等退出中断后再由相关处理任务具体处理中断**，当然 uCOS 为了能让系统更快退出中断，它**支持中断延迟发布**，将中断级的发布变成任务级。 
+
+ARM Cortex-M NVIC 支持中断嵌套功能：当一个中断触发并且系统进行响应时，处理器硬件会**将当前运行的部分上下文寄存器自动压入中断栈中**，这部分的寄存器包括 **PSR，R0，R1，R2，R3 以及 R12** 寄存器。当系统正在服务一个中断时，如果有一个更高优先级的中断触发，那么处理器同样的会打断当前运行的中断服务例程，然后把老的中断服务例程上下文的 PSR，R0，R1，R2，R3 和 R12 寄存器自动保存到中断栈中。这些部分上下文寄存器保存到中断栈的行为完全是硬件行为，这一点是与其他 ARM 处理器最大的区别（以往都需要依赖于软件保存上下文）。 
+
+另外，在 ARM Cortex-M 系列处理器上，所有中断都采用**中断向量表**的方式进行处理，即当一个中断触发时，**处理器将直接判定是哪个中断源**，然后直接跳转到相应的固定位置进行处理。而在 ARM7、ARM9 中，一般是**先跳转进入 IRQ 入口**，然后**再由软件进行判断是哪个中断源触发**，获得了相对应的中断服务例程入口地址后，再进行后续的中断处理。ARM7、ARM9 的好处在于，所有中断它们都有统一的入口地址，便于 OS 的统一管理。而ARM Cortex-M 系列处理器则恰恰相反，每个中断服务例程必须排列在一起放在统一的地址上（这个地址必须要设置到 NVIC 的中断向量偏移寄存器中）。
+
+uCOS 在 Cortex-M 系列处理器上也遵循与裸机中断一致的方法，当用户需要使用自定义的中断服务例程时，只需要定义相同名称的函数覆盖弱化符号（weak）即可。所以，uCOS 在Cortex-M 系列处理器的中断控制其实与裸机没什么差别，不过在进入中断与退出中断的时候需要调用一下 OSIntEnter() 函数与OSIntExit() 函数，方便中断嵌套管理。
+
+
+
 ## 中断延迟发布
+
+### 中断延迟发布的概念
+
+uC/OS-III 有两种方法处理来自于中断的事件，直接发布（或者称为释放）和延迟发布。通过 os_cfg.h 中的 OS_CFG_ISR_POST_DEFERRED_EN 来选择，当设置为 0 时，uCOS 使用直接发布的方法。当设置为 1 时，使用延迟发布方法，用户可以根据自己设计系统的应用选择其中一种方法即可。
+
+使能中断延时发布，**可以将中断级发布转换成任务级发布**，而且**「在进入临界段时也可以使用锁调度器代替关中断，这就大大减小了关中断时间，有利于提高系统的实时性（能实时响应中断而不受中断屏蔽导致响应延迟）」**。在前面提到的 OSTimeTick() 、
+OSSemPost() 、 OSQPost() 、 OSFlagPost() 、 OSTaskSemPost() 、 OSTaskQPost() 、OSTaskSuspend()和 OSTaskResume() 等这些函数，如果没有使用中断延迟发布，那么调用这些函数意味着进入一段很长的临界段，也就要关中断很长时间。在使能中断延时发布后，如果在中断中调用这些函数，系统就会**将这些 post 提交函数必要的信息保存到中断延迟提交的变量中去**，为了配合中断延迟，μCOS 还将**创建优先级最高（优先级为 0）的任务——中断发布函数 OS_IntQTask，退出中断后根据之前保存的参数，在任务中再次进行 post 相关操作**。这个过程其实就是**「把中断中的临界段放到任务中来实现」**，这个时候进入临界段就可以用锁住调度器的方式代替关中断，因此大大减少了关中断的时间，系统将 post 操作延迟了，中断延迟就是这么来的。 
+
+**进入临界段的方式可以是「关中断或者锁住调度器」，「系统中有些变量不可能在中断中被访问，所以只要保证其他任务不要使用这些变量即可，这个时候就可以用<锁调度启动>的方式，用锁住调度代替关中断，大大减少了关中断的时间，也能达到进入临界段的目的」**。中断延迟就是利用这种思想，让本该在中断中完成的事情切换到任务中完成，而且进入临界段的方式是锁定调度器，这样子中断就不会被屏蔽，系统能随时响应中断，并且，整个中断延迟发布的过程是不影响 post 的效果，因为 **uCOS 已经设定中断发布任务的优先级为最高，在退出中断后会马上进行 post 操作，这与在中断中直接进行 post 操作的时间基本一致**。 
+
+注：操作系统内核相关函数一般为了保证其操作的完整性，一般都会进入或长或短的临界段，所以在中断的要尽量少调用内核函数，部分 μCOS 提供的函数是不允许在中断中调用的。 
+
+在直接发布方式中，uCOS 访问临界段时是采用**关中断**方式。 然而，在延迟提交方式中，uCOS 访问临界段时是采用**锁调度器**方式。在延迟提交方式中，**访问中断队列时 uCOS 仍需要关中断进入临界段**，但是这段关中断时间是非常短的且是固定的。
+
+
+
+### 中断延迟发布和直接发布的区别
+
+中断延迟发布示意图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626213357.png" width="600px" /> </div>
+
+(1)：进入中断，在中断中需要发布一个内核对象（如消息队列、信号量等），但是使用了中断延迟发布，在中断中值执行 OS_IntQPost() 函数，在这个函数中，采用关中断方式进入临界段，因此在这个时间段是不能响应中断的。 
+
+(2)：已经将内核对象发布到中断消息队列，那么将唤醒 OS_IntQTask 任务，因为**该任务是最高优先级任务**，所以能立即被唤醒，然后转到 OS_IntQTask 任务中发布内核对象，在该任务中，调用 OS_IntQRePost() 函数进行发布内核对象，进入临界段的方式采
+用锁调度器方式，那么**在这个阶段，中断是可以被响应的**。 
+
+(3)：系统正常运行，任务按优先级进行切换。 
+
+
+
+中断直接发布示意图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626213521.png" width="600px" /> </div>
+
+(1)、(2)：采用中断直接发布的情况是在中断中直接屏蔽中断以进入临界段，**这段时间中，都不会响应中断**，直到发布完成，系统任务正常运行才开启中断。
+(3)：系统正常运行，任务按照优先级正常切换从两个图中我们可以看出，很明显，**采用中断延迟发布的效果更好，将本该在中断中的处理转变成为在任务中处理，系统关中断的时间大大降低，使得系统能很好地响应外部中断**，如果在应用中关中断时间是关键性的，应用中有非常频繁的中断源，且应用不能接受直接发布方式那样较长的关中断时间，推荐使用中断延迟发布方式。 
+
+
+
+### 中断队列控制块
+
+如果使能中断延迟发布，在中断中调用内核对象发布（释放）函数，系统会将发布的内容存放在中断队列控制块中。
+
+```c
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u
+struct  os_int_q {
+    OS_OBJ_TYPE          Type;      /* 内核对象类型  */
+    OS_INT_Q            *NextPtr;   /* 指向下一个中断队列控制块 */
+    void                *ObjPtr;    /* 指向内核对象变量指针 */
+    void                *MsgPtr;    /* 指向发布消息的指针 */
+    OS_MSG_SIZE          MsgSize;   /* 记录发布的消息的字节大小 */
+    OS_FLAGS             Flags;     /* 事件的标志位 */
+    OS_OPT               Opt;       /* 记录发布内核对象时的选项 */
+    CPU_TS               TS;        /* 记录时间戳 */
+};
+#endif
+```
+
+
+
+### 中断延迟发布任务初始化OS_IntQTaskInit()
+
+在系统初始化的时候，如果我们使能了中断延迟发布，那么系统会根据我们自定义配置中断延迟发布任务的宏定义OS_CFG_INT_Q_SIZE 与 OS_CFG_INT_Q_TASK_STK_SIZE 进行相关初始化，这两个宏定义在 os_cfg_app.h 文件中。
+
+OS_IntQTaskInit() 源码：
+
+```c
+void  OS_IntQTaskInit (OS_ERR  *p_err) 
+{ 
+    OS_INT_Q      *p_int_q; 
+    OS_INT_Q      *p_int_q_next; 
+    OS_OBJ_QTY     i; 
+
+    #ifdef OS_SAFETY_CRITICAL 
+    if (p_err == (OS_ERR *)0) 
+    { 
+        OS_SAFETY_CRITICAL_EXCEPTION(); 
+        return; 
+    } 
+    #endif 
+
+    /* 清空延迟提交过程中溢出的计数值 */ 
+    OSIntQOvfCtr = (OS_QTY)0u; 
+
+    //延迟发布信息队列的基地址必须不为空指针 
+    if (OSCfg_IntQBasePtr == (OS_INT_Q *)0) (1) 
+    { 
+        *p_err = OS_ERR_INT_Q; 
+        return; 
+    } 
+
+    //延迟发布队列成员必须不小于 2 个 
+    if (OSCfg_IntQSize < (OS_OBJ_QTY)2u) (2) 
+    { 
+        *p_err = OS_ERR_INT_Q_SIZE; 
+        return; 
+    } 
+
+    //初始化延迟发布任务每次运行的最长时间记录变量 
+    OSIntQTaskTimeMax = (CPU_TS)0;  
+
+    //将定义的数据连接成一个单向链表
+    p_int_q = OSCfg_IntQBasePtr; (3) 
+    p_int_q_next      = p_int_q; 
+    p_int_q_next++; 
+    for (i = 0u; i < OSCfg_IntQSize; i++)  
+    { 
+        //每个信息块都进行初始化 
+        p_int_q->Type    =  OS_OBJ_TYPE_NONE; 
+        p_int_q->ObjPtr  = (void      *)0; 
+        p_int_q->MsgPtr  = (void      *)0; 
+        p_int_q->MsgSize = (OS_MSG_SIZE)0u; 
+        p_int_q->Flags   = (OS_FLAGS   )0u; 
+        p_int_q->Opt     = (OS_OPT     )0u; 
+        p_int_q->NextPtr = p_int_q_next; 
+        p_int_q++; 
+        p_int_q_next++; 
+    }  
+    //将单向链表的首尾相连组成一个“圈 
+    p_int_q--; 
+    p_int_q_next        = OSCfg_IntQBasePtr; 
+    p_int_q->NextPtr = p_int_q_next; (4) 
+
+    //队列出口和入口都指向第一个 
+    OSIntQInPtr         = p_int_q_next; 
+    OSIntQOutPtr = p_int_q_next; (5) 
+
+    //清空延迟发布队列中需要进行发布的内核对象个数 
+    OSIntQNbrEntries    = (OS_OBJ_QTY)0u; 
+    //清空延迟发布队列中历史发布的内核对象最大个数 
+    OSIntQNbrEntriesMax = (OS_OBJ_QTY)0u; 
+
+
+    if (OSCfg_IntQTaskStkBasePtr == (CPU_STK *)0) 
+    { 
+        *p_err = OS_ERR_INT_Q_STK_INVALID; 
+        return; 
+    } 
+
+    if (OSCfg_IntQTaskStkSize < OSCfg_StkSizeMin) 
+    { 
+        *p_err = OS_ERR_INT_Q_STK_SIZE_INVALID; 
+        return; 
+    } 
+    //创建延迟发布任务 
+    OSTaskCreate((OS_TCB     *)&OSIntQTaskTCB, 
+                 (CPU_CHAR   *)((void *)"uC/OS-III ISR Queue Task"), 
+                 (OS_TASK_PTR )OS_IntQTask, 
+                 (void       *)0, 
+                 (OS_PRIO     )0u,            //优先级最高 
+                 (CPU_STK    *)OSCfg_IntQTaskStkBasePtr, 
+                 (CPU_STK_SIZE)OSCfg_IntQTaskStkLimit, 
+                 (CPU_STK_SIZE)OSCfg_IntQTaskStkSize, 
+                 (OS_MSG_QTY  )0u, 
+                 (OS_TICK     )0u, 
+                 (void       *)0, 
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), 
+                 (OS_ERR *)p_err); (6) 
+} 
+
+#endif 
+```
+
+- 延迟发布信息队列的基地址必须不为空指针，uCOS 在编译的时候就已经静态分配一个存储的空间（大数组）。
+
+中断延迟发布队列存储空间（位于os_cfg_app.c）：
+
+```c
+#if (OS_CFG_ISR_POST_DEFERRED_EN > 0u) 
+OS_INT_Q       OSCfg_IntQ          [OS_CFG_INT_Q_SIZE]; 
+CPU_STK        OSCfg_IntQTaskStk   [OS_CFG_INT_Q_TASK_STK_SIZE]; 
+#endif 
+
+OS_INT_Q     * const  OSCfg_IntQBasePtr      = (OS_INT_Q   *)&OSCfg_IntQ[0]; 
+OS_OBJ_QTY     const  OSCfg_IntQSize         = (OS_OBJ_QTY  )OS_CFG_INT_Q_SIZE; 
+```
+
+- 延迟发布队列成员（OSCfg_IntQSize  = OS_CFG_INT_Q_SIZE）必须不小于 2 个，该宏在 os_cfg_app.h 文件中定义。 
+- 将定义的数据连接成一个单向链表，并且初始化每一个信息块的内容。  
+- 将单向链表的首尾相连组成一个“圈”，环形单链表，处理完成
+- 队列出口和入口都指向第一个信息块。
+- 创建延迟发布任务，任务的优先级是 0，是最高优先级任务不允许用户修改。
+
+
+
+中断延迟发布队列初始化完成示意图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200626214755.png" width="650px" /> </div>
+
+
+
+### 中断延迟发布过程OS_IntQPost()
+
+如果使能了中断延迟发布，并且发送消息的函数是在中断中被调用，此时就不该立即发送消息，而是将消息的发送放在指定发布任务中，此时系统就将消息发布到中断消息队列中，等待到中断发布任务唤醒再发送消息。
+
+OS_IntQPost() 源码：
+
+```c
+void  OS_IntQPost (OS_OBJ_TYPE   type,        //内核对象类型
+                   void         *p_obj,       //被发布的内核对象
+                   void         *p_void,      //消息队列或任务消息
+                   OS_MSG_SIZE   msg_size,    //消息的数目
+                   OS_FLAGS      flags,       //事件标志组
+                   OS_OPT        opt,         //发布内核对象时的选项
+                   CPU_TS        ts,          //发布内核对象时的时间戳
+                   OS_ERR       *p_err)       //返回错误类型
+{
+    CPU_SR_ALLOC();  //使用到临界段（在关/开中断时）时必需该宏，该宏声明和定义一个局部变
+                     //量，用于保存关中断前的 CPU 状态寄存器 SR（临界段关中断只需保存SR）
+                     //，开中断时将该值还原。 
+
+#ifdef OS_SAFETY_CRITICAL               //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {         //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION(); //执行安全检测异常函数
+        return;                         //返回，不继续执行
+    }
+#endif
+
+    CPU_CRITICAL_ENTER();                                   //关中断
+    if (OSIntQNbrEntries < OSCfg_IntQSize) {                //如果中断队列未占满   
+        OSIntQNbrEntries++;
+
+        if (OSIntQNbrEntriesMax < OSIntQNbrEntries) {       //更新中断队列的最大使用数目的历史记录
+            OSIntQNbrEntriesMax = OSIntQNbrEntries;
+        }
+        /* 将要重新提交的内核对象的信息放入到中断队列入口的信息记录块 */
+        OSIntQInPtr->Type       = type;                     //保存内核对象类型
+        OSIntQInPtr->ObjPtr     = p_obj;                    //保存被发布的内核对象
+        OSIntQInPtr->MsgPtr     = p_void;                   //保存消息内容指针
+        OSIntQInPtr->MsgSize    = msg_size;                 //保存消息大小
+        OSIntQInPtr->Flags      = flags;                    //保存事件标志组
+        OSIntQInPtr->Opt        = opt;                      //保存选项
+        OSIntQInPtr->TS         = ts;                       //保存对象被发布的时间错
+
+        OSIntQInPtr             =  OSIntQInPtr->NextPtr;    //指向下一个带处理成员
+        /* 让中断队列管理任务 OSIntQTask 就绪 */
+        OSRdyList[0].NbrEntries = (OS_OBJ_QTY)1;            //更新就绪列表上的优先级0的任务数为1个 
+        OSRdyList[0].HeadPtr    = &OSIntQTaskTCB;           //该就绪列表的头指针指向 OSIntQTask 任务
+        OSRdyList[0].TailPtr    = &OSIntQTaskTCB;           //该就绪列表的尾指针指向 OSIntQTask 任务
+        OS_PrioInsert(0u);                                  //在优先级列表中增加优先级0
+        if (OSPrioCur != 0) {                               //如果当前运行的不是 OSIntQTask 任务
+            OSPrioSaved         = OSPrioCur;                //保存当前任务的优先级
+        }
+
+       *p_err                   = OS_ERR_NONE;              //返回错误类型为“无错误”
+    } else {                                                //如果中断队列已占满
+        OSIntQOvfCtr++;                                     //中断队列溢出数目加1
+       *p_err                   = OS_ERR_INT_Q_FULL;        //返回错误类型为“无错误”
+    }
+    CPU_CRITICAL_EXIT();                                    //开中断
+}
+```
+
+- OSIntQNbrEntries 用于记录中断队列的入队数量，需要加一表示当前有信息记录块入队。 
+- 将要重新提交的内核对象的信息放入到中断队列的信息记录块中，记录的信息有发布的对象类型、发布的内核对象、要发布的消息、要发布的消息大小、要发布的事件、选项、时间戳等信息。 
+- 让中断队列管理任务 OSIntQTask 就绪，更新就绪列表上的优先级 0 的任务数为 1 个。
+- 就绪列表的头尾指针都指向OSIntQTask 任务。
+- 调用 OS_PrioInsert()函数在优先级列表中增加优先级0。
+- 如果当前运行的不是 OS_IntQTask 任务，则需要保存当前任务的优先级。 
+- 如果中断队列已占满，记录一下中断队列溢出数目，返回错误类型为“中断队列已满”的错误代码。 
+
+
+
+OSTaskSemPost() 使用实例：
+
+实现一个串口的 DMA 传输+空闲中断功能，当串口接收完不定长的数据之后产生一个空闲中断，在中断中将信号量传递给任务，任务在收到信号量的时候将串口的数据读取出来并且在串口调试助手中回显，中断服务函数则需要我们自己编写，并且中断被触发的时候（中断服务函数中）通过信号量告知任务。
+
+```c
+/**
+  * @brief  USART 中断服务函数
+  * @param  无
+  * @retval 无
+  */	
+void macUSART_INT_FUN(void)
+{
+    OS_ERR   err;
+    OSIntEnter(); 	                                     //进入中断
+
+    if ( USART_GetITStatus ( macUSARTx, USART_IT_IDLE ) != RESET )
+    {
+        DMA_Cmd(USART_RX_DMA_CHANNEL, DISABLE);   
+
+        USART_ReceiveData ( macUSARTx );  /* 清除标志位 */
+
+        // 清DMA标志位
+        DMA_ClearFlag( DMA1_FLAG_TC5 );          
+        //  重新赋值计数值，必须大于等于最大可能接收到的数据帧数目
+        USART_RX_DMA_CHANNEL->CNDTR = USART_RBUFF_SIZE;    
+        DMA_Cmd(USART_RX_DMA_CHANNEL, ENABLE);     
+
+        //给出信号量 ，发送接收到新数据标志，供前台程序查询
+
+        /* 发送任务信号量到任务 AppTaskKey */
+        OSTaskSemPost((OS_TCB  *)&AppTaskUsartTCB,   //目标任务
+                      (OS_OPT   )OS_OPT_POST_NONE, //没选项要求
+                      (OS_ERR  *)&err);            //返回错误类型		
+
+    }
+    OSIntExit();	                                       //退出中断
+}
+```
+
+
+
+### 中断延迟发布任务OS_IntQTask()
+
+在中断中将消息放入中断队列，那么接下来又怎么样进行发布内核对象呢？uCOS 在中断中只是将要提交的内核对象的信息都暂时保存起来，然后就绪优先级最高的中断延迟发布任务，接着继续执行中断，在退出所有中断嵌套后，第一个执行的任务就是
+延迟发布任务。
+
+OS_IntQTask() 源码：
+
+```c
+void  OS_IntQTask (void  *p_arg)
+{
+    CPU_BOOLEAN  done;
+    CPU_TS       ts_start;
+    CPU_TS       ts_end;
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+                    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+                    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+
+    p_arg = p_arg;                                          
+    while (DEF_ON) {                                        //进入死循环
+        done = DEF_FALSE;
+        while (done == DEF_FALSE) {
+            CPU_CRITICAL_ENTER();                           //关中断
+            if (OSIntQNbrEntries == (OS_OBJ_QTY)0u) {       //如果中断队列里的内核对象发布完毕
+                OSRdyList[0].NbrEntries = (OS_OBJ_QTY)0u;   //从就绪列表移除中断队列管理任务 OS_IntQTask
+                OSRdyList[0].HeadPtr    = (OS_TCB   *)0;
+                OSRdyList[0].TailPtr    = (OS_TCB   *)0;
+                OS_PrioRemove(0u);                          //从优先级表格移除优先级0
+                CPU_CRITICAL_EXIT();                        //开中断
+                OSSched();                                  //任务调度
+                done = DEF_TRUE;                            //退出循环
+            } else {                                        //如果中断队列里还有内核对象
+                CPU_CRITICAL_EXIT();                        //开中断
+                ts_start = OS_TS_GET();                     //获取时间戳
+                OS_IntQRePost();                            //发布中断队列里的内核对象
+                ts_end   = OS_TS_GET() - ts_start;          //计算该次发布时间
+                if (OSIntQTaskTimeMax < ts_end) {           //更新中断队列发布内核对象的最大时间的历史记录
+                    OSIntQTaskTimeMax = ts_end;
+                }
+                CPU_CRITICAL_ENTER();                       //关中断
+                OSIntQOutPtr = OSIntQOutPtr->NextPtr;       //中断队列出口转至下一个
+                OSIntQNbrEntries--;                         //中断队列的成员数目减1
+                CPU_CRITICAL_EXIT();                        //开中断
+            }
+        }
+    }
+}
+```
+
+- 如果中断队列里的内核对象发布完毕（OSIntQNbrEntries 变量的值为 0），从就绪列表移除中断延迟发布任务 OS_IntQTask，这样子的操作相当于挂起OS_IntQTask 任务。 
+- 从优先级表格中移除优先级 0 的任务。
+- 进行一次任务调度，这就保证了从中断出来后如果需要发布会将相应的内核对象全部进行发布直到全部都发布完成，才会进行一次任务调度，然后让其他的任务占用 CPU。 
+- 如果中断队列里还存在未发布的 内核对象，就调用OS_IntQRePost()函数发布中断队列里的内核对象，其实这个函数才是真正的发布操作。
+- 处理下一个要发布的内核对象，直到没有任何要发布的内核对象为止。
+
+
+
+OS_IntQRePost() 源码：
+
+```c
+void  OS_IntQRePost (void)
+{
+    CPU_TS  ts;
+    OS_ERR  err;
+
+
+    switch (OSIntQOutPtr->Type) {   //根据内核对象类型分类处理
+        case OS_OBJ_TYPE_FLAG:      //如果对象类型是事件标志
+#if OS_CFG_FLAG_EN > 0u             //如果使能了事件标志，则发布事件标志
+             (void)OS_FlagPost((OS_FLAG_GRP *) OSIntQOutPtr->ObjPtr,
+                               (OS_FLAGS     ) OSIntQOutPtr->Flags,
+                               (OS_OPT       ) OSIntQOutPtr->Opt,
+                               (CPU_TS       ) OSIntQOutPtr->TS,
+                               (OS_ERR      *)&err);
+#endif
+             break;                 //跳出
+
+        case OS_OBJ_TYPE_Q:         //如果对象类型是消息队列
+#if OS_CFG_Q_EN > 0u                //如果使能了消息队列，则发布消息队列
+             OS_QPost((OS_Q      *) OSIntQOutPtr->ObjPtr,
+                      (void      *) OSIntQOutPtr->MsgPtr,
+                      (OS_MSG_SIZE) OSIntQOutPtr->MsgSize,
+                      (OS_OPT     ) OSIntQOutPtr->Opt,
+                      (CPU_TS     ) OSIntQOutPtr->TS,
+                      (OS_ERR    *)&err);
+#endif
+             break;                 //跳出
+
+        case OS_OBJ_TYPE_SEM:       //如果对象类型是多值信号量
+#if OS_CFG_SEM_EN > 0u              //如果使能了多值信号量，则发布多值信号量
+             (void)OS_SemPost((OS_SEM *) OSIntQOutPtr->ObjPtr,
+                              (OS_OPT  ) OSIntQOutPtr->Opt,
+                              (CPU_TS  ) OSIntQOutPtr->TS,
+                              (OS_ERR *)&err);
+#endif
+             break;                 //跳出
+
+        case OS_OBJ_TYPE_TASK_MSG:  //如果对象类型是任务消息
+#if OS_CFG_TASK_Q_EN > 0u           //如果使能了任务消息，则发布任务消息
+             OS_TaskQPost((OS_TCB    *) OSIntQOutPtr->ObjPtr,
+                          (void      *) OSIntQOutPtr->MsgPtr,
+                          (OS_MSG_SIZE) OSIntQOutPtr->MsgSize,
+                          (OS_OPT     ) OSIntQOutPtr->Opt,
+                          (CPU_TS     ) OSIntQOutPtr->TS,
+                          (OS_ERR    *)&err);
+#endif
+             break;                 //跳出
+
+        case OS_OBJ_TYPE_TASK_RESUME://如果对象类型是恢复任务
+#if OS_CFG_TASK_SUSPEND_EN > 0u      //如果使能了函数OSTaskResume()，恢复该任务
+             (void)OS_TaskResume((OS_TCB *) OSIntQOutPtr->ObjPtr,
+                                 (OS_ERR *)&err);
+#endif
+             break;                  //跳出
+
+        case OS_OBJ_TYPE_TASK_SIGNAL://如果对象类型是任务信号量
+             (void)OS_TaskSemPost((OS_TCB *) OSIntQOutPtr->ObjPtr,//发布任务信号量
+                                  (OS_OPT  ) OSIntQOutPtr->Opt,
+                                  (CPU_TS  ) OSIntQOutPtr->TS,
+                                  (OS_ERR *)&err);
+             break;                  //跳出
+
+        case OS_OBJ_TYPE_TASK_SUSPEND://如果对象类型是挂起任务
+#if OS_CFG_TASK_SUSPEND_EN > 0u       //如果使能了函数 OSTaskSuspend()，挂起该任务
+             (void)OS_TaskSuspend((OS_TCB *) OSIntQOutPtr->ObjPtr,
+                                  (OS_ERR *)&err);
+#endif
+             break;                   //跳出
+
+        case OS_OBJ_TYPE_TICK:       //如果对象类型是时钟节拍
+#if OS_CFG_SCHED_ROUND_ROBIN_EN > 0u //如果使能了时间片轮转调度，
+             OS_SchedRoundRobin(&OSRdyList[OSPrioSaved]); //轮转调度进中断前优先级任务
+#endif
+
+             (void)OS_TaskSemPost((OS_TCB *)&OSTickTaskTCB, //发送信号量给时钟节拍任务
+                                  (OS_OPT  ) OS_OPT_POST_NONE,
+                                  (CPU_TS  ) OSIntQOutPtr->TS,
+                                  (OS_ERR *)&err);
+#if OS_CFG_TMR_EN > 0u               //如果使能了软件定时器，发送信号量给定时器任务
+             OSTmrUpdateCtr--;
+             if (OSTmrUpdateCtr == (OS_CTR)0u) {
+                 OSTmrUpdateCtr = OSTmrUpdateCnt;
+                 ts             = OS_TS_GET();                             
+                 (void)OS_TaskSemPost((OS_TCB *)&OSTmrTaskTCB,             
+                                      (OS_OPT  ) OS_OPT_POST_NONE,
+                                      (CPU_TS  ) ts,
+                                      (OS_ERR *)&err);
+             }
+#endif
+             break;                  //跳出
+
+        default:                     //如果内核对象类型超出预期
+             break;                  //直接跳出
+    }
+}
+```
+
+该函数的整个流程也是非常简单的，首先提取出中断队列中的一个信息块的信息，根据发布的内核对象类型分类处理，在前面我们已经讲解过了全部内核对象发布（释放）的过程，就直接在任务中调用这些发布函数根据对应的内核对象进行发布。值得注意的是时钟节拍类型 OS_OBJ_TYPE_TICK，如果没有使能中断延迟发布的宏定义，那么所有跟时钟节拍相关的，包括时间片轮转调度，定时器，发送消息给时钟节拍任务等都是在中断中执行，而使用延迟提交就把这些工作都放到延迟发布任务中执行。**延迟发布之所以能够减少关中断的时间是因为在这些内核对象发布函数中，进入临界段都是采用锁调度器的方式，如果没有使用延迟发布，提交的整个过程都要关中断**。 
