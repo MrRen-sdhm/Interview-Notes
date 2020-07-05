@@ -1,5 +1,638 @@
 # uCOS-III学习笔记 ✏️⭐️
 
+# 创建任务
+
+这里创建的单个任务使用的栈和任务控制块都使用静态内存，即预先定义好的全局变量，这些预先定义好的全局变量都存在内部的 SRAM 中。
+
+
+
+## 1. 定义任务栈 
+
+若只创建一个任务，当此任务进入延时的时候，因为没有另外就绪的用户任务，那么系统就会进入空闲任务，**空闲任务是 uCOS 系统自己创建并且启动的一个任务，优先级最低。当整个系统都没有就绪任务的时候，系统必须保证有一个任务在运行，空闲任务就是为这个设计的**。当用户任务延时到期，又会从空闲任务切换回用户任务。
+
+在 uCOS 系统中，每一个任务都是独立的，他们的运行环境都单独的保存在他们的栈空间当中。那么在定义好任务函数之后，我们还要为任务定义一个栈，因为目前使用的是静态内存，所以任务栈是一个独立的全局变量。任务的栈占用的是 MCU 内部的 RAM，当任务越多的时候，需要使用的栈空间就越大，即需要使用的 RAM 空间就越多。
+
+定义任务栈及大小
+
+```c
+#define APP_TASK_START_STK_SIZE 128
+static  CPU_STK  AppTaskStartStk[APP_TASK_START_STK_SIZE];
+```
+
+
+
+## 2. 定义任务控制块
+
+定义好任务函数和任务栈之后，还需要为任务定义一个任务控制块，通常称这个任务控制块为任务的身份证。在 C 代码上，任务控制块就是一个**结构体**，里面有非常多的成员，这些成员共同描述了任务的全部信息。
+
+定义任务控制块;
+
+```c
+static OS_TCB AppTaskStartTCB; 
+```
+
+
+
+## 3. 定义任务主体函数
+
+任务实际上就是一个无限循环且不带返回值的 C 函数。下面创建一个这样的任务，让 LED 灯每隔 500ms 翻转一次。
+
+```c
+static void LED_Task (void* parameter)
+{
+    while (1)
+    {
+        LED1_ON;
+        OSTimeDly (500,OS_OPT_TIME_DLY,&err); /* 延时500 个tick */
+
+        LED1_OFF;
+        OSTimeDly (500,OS_OPT_TIME_DLY,&err); /* 延时500 个tick */
+
+    }
+}
+```
+
+**任务必须是一个死循环**，否则任务将通过 LR 返回，如果 LR 指向了 非法的内存 就会 产生 HardFault_Handler ， 而 uCOS 指 向一个任务退出函数 OS_TaskReturn()，它如果支持任务删除的话，则进行任务删除操作，否则就进入死循环中，这样子的任务是不安全的，所以避免这种情况，任务一般都是死循环并且无返回值的，只执行一次的任务在执行完毕要记得及时删除。
+
+**任务里面的延时函数必须使用 uCOS 里面提供的阻塞延时函数**，并不能使用裸机编程中的那种延时。这两种的延时的区别是：
+
+- uCOS 里面的延时是**阻塞延时**，即调用 OSTimeDly() 函数的时候，**当前任务会被挂起，调度器会切换到其它就绪的任务，从而实现多任务**。
+- 如果还是使用裸机编程中的那种延时，那么整个任务就成为了一个**死循环**，如果恰好该任务的优先级是最高的，那么系统永远都是在这个任务中运行，**比它优先级更低的任务无法运行**，根本无法实现多任务，因此任务中必须有能阻塞任务的函数，才能切换到其他任务中。
+
+
+
+## 4. 创建任务
+
+一个任务的三要素是任务主体函数、任务栈和任务控制块，uCOS 提供任务创建函数 OSTaskCreate()，它将任务主体函数，任务栈和任务控制块这三者联系在一起，让任务在创建之后可以随时被系统启动与调度。
+
+创建任务：
+
+```c
+OSTaskCreate((OS_TCB *)&AppTaskStartTCB, 								(1) 
+             (CPU_CHAR *)"App Task Start", 								(2) 
+             (OS_TASK_PTR ) AppTaskStart, 								(3)  
+             (void *) 0, 												(4) 
+             (OS_PRIO ) APP_TASK_START_PRIO, 							(5)  
+             (CPU_STK *)&AppTaskStartStk[0], 							(6) 
+             (CPU_STK_SIZE) APP_TASK_START_STK_SIZE / 10,				(7)  
+             (CPU_STK_SIZE) APP_TASK_START_STK_SIZE,				 	(8) 
+             (OS_MSG_QTY ) 5u,											(9) 
+             (OS_TICK ) 0u, 											(10) 
+             (void *) 0, 												(11) 
+             (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), (12) 
+             (OS_ERR *)&err);           								(13)
+```
+
+(1)：**任务控制块**，由用户自己定义。 
+
+(2)：任务名字，字符串形式，这里任务名字最好要与任务函数入口名字一致，方便进行调试。 
+
+(3)：**任务入口函数**，即任务函数的名称，需要我们自己定义并且实现。
+
+(4)：**任务入口函数形参**，不用的时候配置为 0 或者 NULL 即可，p_arg 是指向可选数据区域的指针，用于将参数传递给任务，因为任务一旦执行，那必须是在一个死循环中，所以传参只在首次执行时有效。 
+
+(5)：**任务的优先级**，由用户自己定义。
+
+(6)：**指向堆栈基址的指针**（即堆栈的起始地址）。
+
+(7)：设置堆栈深度的限制位置。这个值表示任务的堆栈满溢之前剩余的堆栈容量。例如，指定 stk_size 值的 10％表示将达到堆栈限制，当堆栈达到 90％满就表示任务的堆栈已满。 
+
+(8)：**任务堆栈大小**，单位由用户决定，如果 CPU_STK 被设置为CPU_INT08U，则单位为字节，而如果 CPU_STK 被设置为 CPU_INT16U，则单位为半字，同理，如果 CPU_STK 被设置为 CPU_INT32U，单位为字。在 32 位的处理器下（STM32），
+一个字等于4 个字节，那么任务大小就为 APP_TASK_START_STK_SIZE * 4 字节。 
+
+(9)：**设置可以发送到任务的最大消息数**，按需设置即可。
+
+(10)：在任务之间循环时的**时间片的时间量（以滴答为单位）。指定 0 则使用默认值**。 
+
+(11)：是指向用户提供的内存位置的指针，用作 TCB 扩展。例如，该用户存储器可以保存浮点寄存器的内容在上下文切换期间，每个任务执行的时间，次数、任务已经切换等。 
+
+(12)：用户可选的任务特定选项
+
+```c
+#define OS_OPT_TASK_NONE (OS_OPT)(0x0000u)    // 未选择任何选项
+#define OS_OPT_TASK_STK_CHK (OS_OPT)(0x0001u) // 启用任务的堆栈检查
+#define OS_OPT_TASK_STK_CLR (OS_OPT)(0x0002u) // 任务创建时清除堆栈
+#define OS_OPT_TASK_SAVE_FP (OS_OPT)(0x0004u) // 保存任何浮点寄存器的内容，这需要 CPU 硬件的支持，CPU 需要有浮点运算硬件与专门保存浮点类型数据的寄存器。
+#define OS_OPT_TASK_NO_TLS (OS_OPT)(0x0008u)  // 指定任务不需要 TLS 支持
+```
+
+(13)：用于保存返回的错误代码
+
+
+
+## 5. 启动任务
+
+**当任务创建好后，是处于任务就绪，在就绪态的任务可以参与操作系统的调度**。任务调度器只启动一次，之后就不会再次执行了，uCOS 中**启动任务调度器**的函数是 OSStart()，并且启动任务调度器的时候就不会返回，从此任务都由 uCOS 管理，此时才是真正进入实时操作系统中的第一步。
+
+```c
+/* 启动任务，开启调度 */ 
+OSStart(&err);    
+```
+
+
+
+## 6. 代码示例
+
+把任务主体，任务栈，任务控制块这三部分代码统一放到 app.c 中，在app.c 文件中创建一个 AppTaskStart 任务，这个任务是仅是用于测试用户任务，以后为了方便管理，所有的任务创建都统一放在这个任务中，在这个任务中创建成功的任务就可以直接参与任务调度了。
+
+```c
+#include <includes.h>
+
+/*
+*********************************************************************************************************
+*                                            LOCAL DEFINES
+*********************************************************************************************************
+*/
+
+/*
+*********************************************************************************************************
+*                                                 TCB
+*********************************************************************************************************
+*/
+static  OS_TCB   AppTaskStartTCB;
+
+/*
+*********************************************************************************************************
+*                                                STACKS
+*********************************************************************************************************
+*/
+static  CPU_STK  AppTaskStartStk[APP_TASK_START_STK_SIZE];
+
+/*
+*********************************************************************************************************
+*                                         FUNCTION PROTOTYPES
+*********************************************************************************************************
+*/
+static  void  AppTaskStart  (void *p_arg);
+
+/*
+*********************************************************************************************************
+*                                                main()
+*********************************************************************************************************
+*/
+
+int  main (void)
+{
+    OS_ERR  err;
+
+    OSInit(&err);                                               /* Init uC/OS-III.                                      */
+
+    OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,                /* Create the start task                                */
+                 (CPU_CHAR   *)"App Task Start",
+                 (OS_TASK_PTR ) AppTaskStart,
+                 (void       *) 0,
+                 (OS_PRIO     ) APP_TASK_START_PRIO,
+                 (CPU_STK    *)&AppTaskStartStk[0],
+                 (CPU_STK_SIZE) APP_TASK_START_STK_SIZE / 10,
+                 (CPU_STK_SIZE) APP_TASK_START_STK_SIZE,
+                 (OS_MSG_QTY  ) 5u,
+                 (OS_TICK     ) 0u,
+                 (void       *) 0,
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+                 (OS_ERR     *)&err);
+
+    OSStart(&err);                                              /* Start multitasking (i.e. give control to uC/OS-III). */
+}
+
+/*
+*********************************************************************************************************
+*                                          STARTUP TASK
+*********************************************************************************************************
+*/
+static  void  AppTaskStart (void *p_arg)
+{
+    CPU_INT32U  cpu_clk_freq;
+    CPU_INT32U  cnts;
+    OS_ERR      err;
+
+    (void)p_arg;
+
+    BSP_Init();                                                 /* Initialize BSP functions                             */
+    CPU_Init();
+
+    cpu_clk_freq = BSP_CPU_ClkFreq();                           /* Determine SysTick reference freq.                    */
+    cnts = cpu_clk_freq / (CPU_INT32U)OSCfg_TickRate_Hz;        /* Determine nbr SysTick increments                     */
+    OS_CPU_SysTickInit(cnts);                                   /* Init uC/OS periodic time src (SysTick).              */
+
+    Mem_Init();                                                 /* Initialize Memory Management Module                  */
+
+    #if OS_CFG_STAT_TASK_EN > 0u
+    OSStatTaskCPUUsageInit(&err);                               /* Compute CPU capacity with no task running            */
+    #endif
+
+    CPU_IntDisMeasMaxCurReset();
+
+
+    while (DEF_TRUE) {                                          /* Task body, always written as an infinite loop.       */
+        macLED1_TOGGLE ();
+        OSTimeDly ( 5000, OS_OPT_TIME_DLY, & err );
+    }	
+}
+```
+
+
+
+# uCOS-III 启动流程
+
+## 1. 系统初始化
+
+在调用创建任务函数之前，我们必须要对系统进行一次初始化，而系统的初始化是根据我们配置宏定义进行初始化的，有一些则是系统必要的初始化，如空闲任务，时钟节拍任务等。
+
+系统初始化函数 OSInit() 源代码（删减）：
+
+```c
+void OSInit (OS_ERR  *p_err) 
+{ 
+    CPU_STK      *p_stk; 
+    CPU_STK_SIZE  size; 
+
+    if (p_err == (OS_ERR *)0) { 
+        OS_SAFETY_CRITICAL_EXCEPTION(); 
+        return; 
+    }
+
+    OSInitHook(); /*初始化钩子函数相关的代码*/ 
+
+    OSIntNestingCtr= (OS_NESTING_CTR)0; /*清除中断嵌套计数器*/ 
+
+    OSRunning =  OS_STATE_OS_STOPPED;  /*未启动多任务处理*/ 
+
+    OSSchedLockNestingCtr = (OS_NESTING_CTR)0; /* 清除锁定计数器*/ 
+
+    OSTCBCurPtr= (OS_TCB *)0; /* 将OS_TCB 指针初始化为已知状态 */ 
+    OSTCBHighRdyPtr = (OS_TCB *)0; 
+
+    OSPrioCur = (OS_PRIO)0; /*将优先级变量初始化为已知状态*/ 
+    OSPrioHighRdy                   = (OS_PRIO)0; 
+    OSPrioSaved                     = (OS_PRIO)0; 
+
+    if (OSCfg_ISRStkSize > (CPU_STK_SIZE)0) { 
+        p_stk = OSCfg_ISRStkBasePtr; /* 清除异常堆栈以进行堆栈检查 */ 
+        if (p_stk != (CPU_STK *)0) { 
+            size  = OSCfg_ISRStkSize; 
+            while (size > (CPU_STK_SIZE)0) { 
+                size--; 
+                *p_stk = (CPU_STK)0; 
+                p_stk++; 
+            } 
+        } 
+    }
+
+    OS_PrioInit(); /* 初始化优先级位图表 */  
+
+    OS_RdyListInit(); /*初始化就绪列表*/ 
+
+    OS_TaskInit(p_err); /*初始化任务管理器 */  
+    if (*p_err != OS_ERR_NONE) { 
+        return; 
+    }
+
+    OS_IdleTaskInit(p_err); /* ★ 初始化空闲任务 */ (1)  
+    if (*p_err != OS_ERR_NONE) { 
+        return; 
+    }
+
+    OS_TickTaskInit(p_err); /* ★ 初始化时钟节拍任务 */ (2) 
+    if (*p_err != OS_ERR_NONE) { 
+        return; 
+    }
+
+    OSCfg_Init(); 
+}
+```
+
+主要看两个地方，一个是空闲任务的初始化，一个是时钟节拍任务的初始化，这两个任务是必须存在的任务，否则系统无法正常运行。
+
+其实空闲任务初始化就是创建一个空闲任务，空闲任务的相关信息由系统默认指定，用户不能修改。
+
+OS_IdleTaskInit() 源码：
+
+```c
+void  OS_IdleTaskInit (OS_ERR  *p_err)
+{
+#ifdef OS_SAFETY_CRITICAL
+    if (p_err == (OS_ERR *)0) {
+        OS_SAFETY_CRITICAL_EXCEPTION();
+        return;
+    }
+#endif
+
+    OSIdleTaskCtr = (OS_IDLE_CTR)0;
+                                                            /* ---------------- CREATE THE IDLE TASK ---------------- */
+    OSTaskCreate((OS_TCB     *)&OSIdleTaskTCB,
+                 (CPU_CHAR   *)((void *)"uC/OS-III Idle Task"),
+                 (OS_TASK_PTR)OS_IdleTask,
+                 (void       *)0,
+                 (OS_PRIO     )(OS_CFG_PRIO_MAX - 1u),
+                 (CPU_STK    *)OSCfg_IdleTaskStkBasePtr,
+                 (CPU_STK_SIZE)OSCfg_IdleTaskStkLimit,
+                 (CPU_STK_SIZE)OSCfg_IdleTaskStkSize,
+                 (OS_MSG_QTY  )0u,
+                 (OS_TICK     )0u,
+                 (void       *)0,
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_NO_TLS),
+                 (OS_ERR     *)p_err);
+}
+```
+
+- OSIdleTaskCtr 在 os.h 头文件中定义，是一个 32 位无符号整型变量，该变量的作用是统计空闲任务的运行，现在初始化空闲任务，系统就将OSIdleTaskCtr 清零。
+- 系统只是调用了 OSTaskCreate() 函数来创建一个 任 务 ， 这个任务就是空闲任务 ， 任 务优先级为OS_CFG_PRIO_MAX-1 ，
+  OS_CFG_PRIO_MAX 是一个宏，该宏定义表示 uCOS 的任务优先级数值的最大值，在 uCOS 系统中，任务的优先级数值越大，表示任务的优先级越低，所以**空闲任务的优先级是最低的**。空闲任务堆栈大小为 OSCfg_IdleTaskStkSize，它也是一个宏，在os_cfg_app.c 文件中定义，默认为 128，则空闲任务堆栈默认为 128*4=512 字节。 
+
+空闲任务其实就是一个函数，其函数入口是 OS_IdleTask。
+
+OS_IdleTask() 源码：
+
+```c
+void  OS_IdleTask (void  *p_arg)
+{
+    CPU_SR_ALLOC();
+
+    p_arg = p_arg;              /* Prevent compiler warning for not using 'p_arg'         */
+
+    while (DEF_ON) {
+        CPU_CRITICAL_ENTER();
+        OSIdleTaskCtr++;
+#if OS_CFG_STAT_TASK_EN > 0u
+        OSStatTaskCtr++;
+#endif
+        CPU_CRITICAL_EXIT();
+
+        OSIdleTaskHook();       /* Call user definable HOOK                               */
+    }
+}
+```
+
+空闲任务**是一个无限的死循环**，因为其优先级是最低的，所以**任何优先级比它高的任务都能抢占它从而取得 CPU 的使用权**，为什么系统要空闲任务呢？因为 「CPU 是不会停下来的，即使啥也不干，CPU 也不会停下来，此时系统就必须保证有一个随时处于就绪态的任务，而且这个任务不会抢占其他任务」。当且仅当系统的其他任务处于阻塞中，系统才会运行空闲任务，这个任务可以做很多事情，任务统计，钩入用户自定义的钩子函数实现用户自定义的功能等，但是需要注意的是，在钩子函数中用户不允许调用任何可以使空闲任务阻塞的函数接口，**空闲任务是不允许被阻塞的**。 
+
+
+
+OS_TickTaskInit() 函数实际上也是创建一个时钟节拍任务：
+
+```c
+void  OS_TickTaskInit (OS_ERR  *p_err)
+{
+#ifdef OS_SAFETY_CRITICAL
+    if (p_err == (OS_ERR *)0) {
+        OS_SAFETY_CRITICAL_EXCEPTION();
+        return;
+    }
+#endif
+
+    OSTickCtr         = (OS_TICK)0u;   /* Clear the tick counter */
+
+    OSTickTaskTimeMax = (CPU_TS)0u;
+
+
+    OS_TickListInit();                 /* Initialize the tick list data structures */
+
+    /* ---------------- CREATE THE TICK TASK ---------------- */
+    if (OSCfg_TickTaskStkBasePtr == (CPU_STK *)0) {
+       *p_err = OS_ERR_TICK_STK_INVALID;
+        return;
+    }
+
+    if (OSCfg_TickTaskStkSize < OSCfg_StkSizeMin) {
+       *p_err = OS_ERR_TICK_STK_SIZE_INVALID;
+        return;
+    }
+
+    if (OSCfg_TickTaskPrio >= (OS_CFG_PRIO_MAX - 1u)) { /* Only one task at the 'Idle' priority */
+       *p_err = OS_ERR_TICK_PRIO_INVALID;
+        return;
+    }
+
+    OSTaskCreate((OS_TCB     *)&OSTickTaskTCB,
+                 (CPU_CHAR   *)((void *)"uC/OS-III Tick Task"),
+                 (OS_TASK_PTR )OS_TickTask,
+                 (void       *)0,
+                 (OS_PRIO     )OSCfg_TickTaskPrio,
+                 (CPU_STK    *)OSCfg_TickTaskStkBasePtr,
+                 (CPU_STK_SIZE)OSCfg_TickTaskStkLimit,
+                 (CPU_STK_SIZE)OSCfg_TickTaskStkSize,
+                 (OS_MSG_QTY  )0u,
+                 (OS_TICK     )0u,
+                 (void       *)0,
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_NO_TLS),
+                 (OS_ERR     *)p_err);
+}
+```
+
+
+
+## 2. CPU 初始化
+
+在 main() 函数中，除了需要对板级硬件进行初始化，还需要进行一些系统相关的初始化，如 CPU 的初始化，在 uCOS 中，有一个很重要的功能就是**时间戳**，它的精度高达 **ns** 级别，是 CPU 内核的一个资源，所以使用的时候要对 CPU 进行相关的初始化。
+
+CPU初始化函数 CPU_Init() 源码：
+
+```c
+void  CPU_Init (void)
+{
+    /* --------------------- INIT TS ---------------------- */
+    #if ((CPU_CFG_TS_EN == DEF_ENABLED) || \
+ 		(CPU_CFG_TS_TMR_EN == DEF_ENABLED))
+    CPU_TS_Init(); /* 时间戳测量的初始化 */ 
+    #endif
+    
+    /* -------------- INIT INT DIS TIME MEAS -------------- */
+    #ifdef  CPU_CFG_INT_DIS_MEAS_EN
+    CPU_IntDisMeasInit(); /* 最大关中断时间测量初始化 */ 
+    #endif
+
+    /* ------------------ INIT CPU NAME ------------------- */
+    #if (CPU_CFG_NAME_EN == DEF_ENABLED)
+    CPU_NameInit(); //CPU 名字初始化
+    #endif
+}
+```
+
+在 Cortex-M（注意：M0 内核不可用）内核中有一个外设叫 DWT(Data Watchpoint and Trace)，是用于系统调试及跟踪，它有一个 32 位的寄存器叫 CYCCNT，它是一个向上的计数器，记录的是内核时钟运行的个数，内核时钟跳动一次，该计数器就加 1，当 CYCCNT 溢出之后，会清 0 重新开始向上计数。CYCCNT 的精度非常高，其精度取决于内核的频率是多少，如果是 STM32F1 系列，内核时钟是 72M，那精度就是 1/72M = 14ns，而程序的运行时间都是微秒级别的，所以 14ns 的精度是远远够的。
+
+ uCOS 的时间戳的初始化函数 CPU_TS_TmrInit() 源码：
+
+```c
+#define  DWT_CR      *(CPU_REG32 *)0xE0001000
+#define  DWT_CYCCNT  *(CPU_REG32 *)0xE0001004
+#define  DEM_CR      *(CPU_REG32 *)0xE000EDFC
+
+#define  DEM_CR_TRCENA                   (1 << 24) 
+
+#define  DWT_CR_CYCCNTENA                (1 <<  0) 
+
+#if (CPU_CFG_TS_TMR_EN == DEF_ENABLED)
+void  CPU_TS_TmrInit (void)
+{
+    CPU_INT32U  cpu_clk_freq_hz;
+
+    DEM_CR         |= (CPU_INT32U)DEM_CR_TRCENA; /* Enable Cortex-M3's DWT CYCCNT reg.                   */
+    DWT_CYCCNT      = (CPU_INT32U)0u;
+    DWT_CR         |= (CPU_INT32U)DWT_CR_CYCCNTENA;
+
+    cpu_clk_freq_hz = BSP_CPU_ClkFreq();
+    CPU_TS_TmrFreqSet(cpu_clk_freq_hz);
+}
+#endif
+```
+
+
+
+## 3. SysTick 初始化
+
+**时钟节拍的频率表示操作系统每 1 秒钟产生多少个 tick**，tick 即是操作系统节拍的时钟周期，时钟节拍就是系统以固定的频率产生中断（时基中断），并在中断中处理与时间相关的事件，推动所有任务向前运行。时钟节拍需要**依赖于硬件定时器**，在 STM32 裸机程序中经常使用的 SysTick 时钟是 MCU 的内核定时器， 通常都使用该定时器产生操作系统的时钟节拍。用户需要先在 “os_cfg_app.h” 中设定时钟节拍的频率，**频率越高，操作系统检测事件就越频繁，可以增强任务的实时性，但太频繁也会增加操作系统内核的负担**，所以用户需要权衡该频率的设置。默认为 1000 Hz，也就是时钟节拍的周期为 1 ms。
+
+函数 OS_CPU_SysTickInit() 用于初始化时钟节拍中断，初始化中断的优先级，SysTick 中断的使能等等，此函数要根据不同的 CPU 进行编写，并且**在系统任务的第一个任务开始的时候进行调用，如果在此之前进行调用，可能会造成系统奔溃，因为系统还没有初始化好就进入中断，可能在进入和退出中断的时候会调用系统未初始化好的一些模块**。
+
+OS_CPU_SysTickInit() 源码：
+
+```c
+void  OS_CPU_SysTickInit (CPU_INT32U  cnts)
+{
+    CPU_INT32U  prio;
+
+    /* 填写 SysTick 的重载计数值 */
+    CPU_REG_NVIC_ST_RELOAD = cnts - 1u;                //SysTick 以该计数值为周期循环计数定时
+
+    /* 设置 SysTick 中断优先级 */                           
+    prio  = CPU_REG_NVIC_SHPRI3;                            
+    prio &= DEF_BIT_FIELD(24, 0);
+    prio |= DEF_BIT_MASK(OS_CPU_CFG_SYSTICK_PRIO, 24); //设置为默认的最高优先级0，在裸机例程中该优先级默认为最低
+
+    CPU_REG_NVIC_SHPRI3 = prio;
+
+    /* 使能 SysTick 的时钟源和启动计数器 */                   
+    CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_CLKSOURCE |
+                            CPU_REG_NVIC_ST_CTRL_ENABLE;
+    /* 使能 SysTick 的定时中断 */                            
+    CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_TICKINT;
+}
+```
+
+在初始化任务中调用 OS_CPU_SysTickInit() 初始化系统时钟：
+
+```c
+static  void  AppTaskStart (void *p_arg)
+{
+    CPU_INT32U  cpu_clk_freq;
+    CPU_INT32U  cnts;
+    OS_ERR      err;
+
+    (void)p_arg;
+
+    BSP_Init();                                           //板级初始化
+    CPU_Init();                                           //初始化 CPU 组件（时间戳、关中断时间测量和主机名）
+
+    cpu_clk_freq = BSP_CPU_ClkFreq();                     //获取 CPU 内核时钟频率（SysTick 工作时钟）
+    cnts = cpu_clk_freq / (CPU_INT32U)OSCfg_TickRate_Hz;  //根据用户设定的时钟节拍频率计算 SysTick 定时器的计数值
+    OS_CPU_SysTickInit(cnts);                             //★ 调用 SysTick 初始化函数，设置定时器计数值和启动定时器
+
+    ...
+
+    OSTaskDel ( 0, & err );                     //删除起始任务本身，该任务不再运行
+}
+```
+
+
+
+## 4. 内存初始化
+
+内存在嵌入式中是很珍贵的存在，而一个系统它是软件，则必须要有一块内存属于系统所管理的。**uCOS 采 用 一 块 连 续 的 大 数 组 作 为 系 统 管 理 的 内 存 ， CPU_INT08U Mem_Heap[LIB_MEM_CFG_HEAP_SIZE]，在使用之前就需要先将管理的内存进行初始化**。
+
+```c
+static  void  AppTaskStart (void *p_arg)
+{
+    CPU_INT32U  cpu_clk_freq;
+    CPU_INT32U  cnts;
+    OS_ERR      err;
+
+    (void)p_arg;
+
+    BSP_Init();                                           //板级初始化
+    CPU_Init();                                           //初始化 CPU 组件（时间戳、关中断时间测量和主机名）
+
+    cpu_clk_freq = BSP_CPU_ClkFreq();                     //获取 CPU 内核时钟频率（SysTick 工作时钟）
+    cnts = cpu_clk_freq / (CPU_INT32U)OSCfg_TickRate_Hz;  //根据用户设定的时钟节拍频率计算 SysTick 定时器的计数值
+    OS_CPU_SysTickInit(cnts);                             //调用 SysTick 初始化函数，设置定时器计数值和启动定时器
+
+    Mem_Init();                                           //★ 初始化内存管理组件（堆内存池和内存池表）
+    ...
+
+    OSTaskDel ( 0, & err );                     //删除起始任务本身，该任务不再运行
+}
+```
+
+
+
+## 5. OSStart()
+
+在创建完任务的时候，需要开启调度器，因为**创建仅仅是把任务添加到系统中，还没真正调度**。uCOS 提供了一个系统启动的函数接口——OSStart()，使用OSStart() 函数就能让系统开始运行。
+
+```c
+void  OSStart (OS_ERR  *p_err)
+{
+#ifdef OS_SAFETY_CRITICAL
+    if (p_err == (OS_ERR *)0) {
+        OS_SAFETY_CRITICAL_EXCEPTION();
+        return;
+    }
+#endif
+
+    if (OSRunning == OS_STATE_OS_STOPPED) {
+        OSPrioHighRdy   = OS_PrioGetHighest();              /* Find the highest priority                              */
+        OSPrioCur       = OSPrioHighRdy;
+        OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;
+        OSTCBCurPtr     = OSTCBHighRdyPtr;
+        OSRunning       = OS_STATE_OS_RUNNING;
+        OSStartHighRdy();                                   /* Execute target specific code to start task             */
+       *p_err           = OS_ERR_FATAL_RETURN;              /* OSStart() is not supposed to return                    */
+    } else {
+       *p_err           = OS_ERR_OS_RUNNING;                /* OS is already running                                  */
+    }
+}
+```
+
+在主函数中调用 OSStart() 启动系统：
+
+```c
+int  main (void)
+{
+    OS_ERR  err;
+    OSInit(&err);                                          //初始化 uC/OS-III
+
+    /* 创建起始任务 */
+    OSTaskCreate((OS_TCB     *)&AppTaskStartTCB,           //任务控制块地址
+                 (CPU_CHAR   *)"App Task Start",           //任务名称
+                 (OS_TASK_PTR ) AppTaskStart,              //任务函数
+                 (void       *) 0,                         //传递给任务函数（形参p_arg）的实参
+                 (OS_PRIO     ) APP_TASK_START_PRIO,       //任务的优先级
+                 (CPU_STK    *)&AppTaskStartStk[0],        //任务堆栈的基地址
+                 (CPU_STK_SIZE) APP_TASK_START_STK_SIZE / 10,  //任务堆栈空间剩下1/10时限制其增长
+                 (CPU_STK_SIZE) APP_TASK_START_STK_SIZE,       //任务堆栈空间（单位：sizeof(CPU_STK)）
+                 (OS_MSG_QTY  ) 5u,               //任务可接收的最大消息数
+                 (OS_TICK     ) 0u,               //任务的时间片节拍数（0表默认值OSCfg_TickRate_Hz/10）
+                 (void       *) 0,                //任务扩展（0表不扩展）
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR), //任务选项
+                 (OS_ERR     *)&err);                                       //返回错误类型
+
+    OSStart(&err);                     						//★ 启动多任务管理（交由uC/OS-III控制）
+}
+```
+
+
+
+当在 AppTaskStart 中创建的应用任务的优先级比 AppTaskStart 任务的优先级高、低或者相等时候，程序是如何执行的？
+
+- 若在临界区中创建任务，任务只能在退出临界区的时候才执行最高优先级任务。
+- 假如没使用临界区的话，就会分三种情况： 
+
+1. 应用任务的优先级比初始任务的优先级高，那创建完后立马去执行刚刚创建的应用任务，当应用任务被阻塞时，继续回到初始任务被打断的地方继续往下执行，直到所有应用任务创建完成，最后初始任务把自己删除，完成自己的使命；
+2. 应用任务的优先级与初始任务的优先级一样，那创建完后根据任务的时间片来执行，直到所有应用任务创建完成，最后初始任务把自己删除，完成自己的使命；
+3. 应用任务的优先级比初始任务的优先级低，那创建完后任务不会被执行，如果还有应用任务紧接着创建应用任务，如果应用任务的优先级出现了比初始任务高或者相等的情况，请参考 1 和 2 的处理方式，直到所有应用任务创建完成，最后初始任务把自己删除，完成自己的使命。
+
+在调用 OSStart() 函数启动任务调度器的时候，假如启动成功的话，任务就不会有返回了，假如启动没成功，则通过 LR 寄存器指定的地址退出，在创建 AppTaskStart 任务的时候，任务栈对应 LR 寄存器指向是任务退出函数 OS_TaskReturn()，当系统启动没能成功的话，系统就不会运行。 
+
+
+
 # 任务管理
 
 ## 1. 任务的基本概念
@@ -4149,7 +4782,7 @@ if (OSTmrUpdateCtr == (OS_CTR)0u)
 
 # 任务信号量
 
-## 任务信号量的基本概念
+## 1. 任务信号量的基本概念
 
 uCOS 提供任务信号量这个功能，**每个任务都有一个 32 位**（用户可以自定义位宽，我们使用 32 位的 CPU，此处就是 32 位）的**信号量值 SemCtr**，这个信号量值是**「在任务控制块中包含的」**，是任务独有的一个信号量通知值，在大多数情况下，任务信号量可以替代内核对象的二值信号量、计数信号量等。 
 
@@ -4173,7 +4806,7 @@ uCOS 提供任务信号量这个功能，**每个任务都有一个 32 位**（�
 
 
 
-## 任务信号量的函数接口
+## 2. 任务信号量的函数接口
 
 ### 任务信号量释放函数OSTaskSemPost()
 
@@ -4520,7 +5153,7 @@ OSTaskSemPend ((OS_TICK   )0,                     //无期限等待
 
 # 任务消息队列
 
-## 任务消息队列的基本概念
+## 1. 任务消息队列的基本概念
 
 任务消息队列跟任务信号量一样，均**隶属于某一个特定任务，不需单独创建**，任务在则任务消息队列在，**只有该任务才可以获取（接收）这个任务消息队列的消息，其他任务只能给这个任务消息队列发送消息，却不能获取**。任务消息队列与前面讲解的（普通）消息队列极其相似，只是任务消息队列已隶属于一个特定任务，所以它**不具有等待列表**，在操作的过程中省去了等待任务插入和移除列表的动作，所以工作原理相对更简单一点，**效率也比较高一些**。
 
@@ -4555,7 +5188,7 @@ struct  os_msg_q
 
 
 
-## 任务消息队列的函数接口
+## 2. 任务消息队列的函数接口
 
 ### 任务消息队列发送函数OSTaskQPost()
 
@@ -4883,7 +5516,7 @@ pMsg = OSTaskQPend ((OS_TICK        )0,                    //无期限等待
 
 # 内存管理
 
-## 内存管理的基本概念
+## 1. 内存管理的基本概念
 
 在嵌入式系统设计中，内存分配应该是根据所设计系统的特点来决定选择使用动态内存分配还是静态内存分配算法，一些可靠性要求非常高的系统应选择使用静态的，而普通的业务系统可以使用动态来提高内存使用效率。**静态可以保证设备的可靠性但是需要考虑内存上限，内存使用效率低，而动态则是相反**。
 
@@ -4907,7 +5540,7 @@ uCOS 提供的内存分配算法是**「只允许用户分配固定大小的内�
 
 
 
-## 内存管理的运作机制
+## 2. 内存管理的运作机制
 
 内存池（Memory Pool）是一种用于分配大量大小相同的内存对象的技术，它可以极大加快内存分配/释放的速度。 
 
@@ -4943,7 +5576,7 @@ struct os_mem {                                             /* MEMORY CONTROL BL
 
 
 
-## 内存管理的应用场景
+## 3. 内存管理的应用场景
 
 内存管理的主要工作是**「动态划分并管理用户分配好的内存区间」**，主要是**「在用户需要使用大小不等的内存块的场景中使用」**，当用户需要分配内存时，可以通过操作系统的内存申请函数索取指定大小内存块，一旦使用完毕，通过动态内存释放函数归还所占用内存，使之**「可以重复使用」**（heap_1.c 的内存管理除外）。
 
@@ -4957,7 +5590,7 @@ uCOS 将系统静态分配的大数组作为内存池，然后进行内存池的
 
 
 
-## 内存管理函数接口
+## 4. 内存管理函数接口
 
 ### 内存池创建函数OSMemCreate()
 
@@ -5237,7 +5870,7 @@ OSMemPut ((OS_MEM  *)&mem,                        //指向内存管理对象
 
 # 中断管理
 
-## 异常与中断的基本概念
+## 1. 异常与中断的基本概念
 
 异常是**导致处理器脱离正常运行转向执行特殊代码**的任何**事件**，如果不及时进行处理，轻则系统出错，重则会导致系统毁灭性瘫痪。所以正确地处理异常，避免错误的发生是提高软件鲁棒性（稳定性）非常重要的一环，对于实时系统更是如此。 
 
@@ -5298,7 +5931,7 @@ UCOS 的中断管理支持：
 
 
 
-## 中断的运作机制
+## 2. 中断的运作机制
 
 当中断产生时，处理机将按如下的顺序执行： 
 1. 保存当前处理机状态信息 
@@ -5327,7 +5960,7 @@ UCOS 的中断管理支持：
 
 
 
-## 中断延迟的概念
+## 3. 中断延迟的概念
 
 即使操作系统的响应很快了，但对于中断的处理仍然存在着中断延迟响应的问题，我们称之为中断延迟(Interrupt Latency) 。中断延迟是**指从硬件中断发生到开始执行中断处理程序第一条指令之间的这段时间**。也就是：系统接收到中断信号到操作系统作出响应，并完成换到转入中断服务程序的时间也可以简单地理解为：（外部）硬件（设备）发生中断，到系统执行中断服务子程序
 （ISR，interrupt service routine）的第一条指令的时间。 
@@ -5344,13 +5977,13 @@ UCOS 的中断管理支持：
 
 
 
-## 中断的应用场景
+## 4. 中断的应用场景
 
 中断在嵌入式处理器中应用非常之多，没有中断的系统不是一个好系统，**因为有中断，才能启动或者停止某件事情，从而转去做另一间事情**。
 
 
 
-## 中断管理讲解
+## 5.  中断管理讲解
 
 ARM Cortex-M 系列内核的中断是由硬件管理的，而 uCOS 是软件，它并不接管由硬件管理的相关中断（接管简单来说就是，所有的中断都由 RTOS 的软件管理，硬件来了中断时，由软件决定是否响应，可以挂起中断，延迟响应或者不响应），只支持简单的开关中断等，所以 **uCOS 中的中断使用其实跟裸机差不多的，需要我们自己配置中断，并且使能中断，编写中断服务函数**。在中断服务函数中使用内核 IPC 通信机制，一般**建议使用信号量、消息或事件标志组等标志事件的发生，将事件发布给处理任务，等退出中断后再由相关处理任务具体处理中断**，当然 uCOS 为了能让系统更快退出中断，它**支持中断延迟发布**，将中断级的发布变成任务级。 
 
@@ -5362,7 +5995,7 @@ uCOS 在 Cortex-M 系列处理器上也遵循与裸机中断一致的方法，�
 
 
 
-## 中断延迟发布
+## 6. 中断延迟发布
 
 ### 中断延迟发布的概念
 

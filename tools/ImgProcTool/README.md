@@ -1,1 +1,0 @@
-将md文件放到此文件夹下，运行ImgProcBatch.py即可将文件夹下所有md文件中的所有图片，以`<div align="center"> <img src="xxx.png" width="400px" /> </div>`格式居中
