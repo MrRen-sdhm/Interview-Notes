@@ -1,5 +1,194 @@
 # uCOS-III学习笔记 ✏️⭐️
 
+# 裸机系统与多任务系统
+
+裸机系统通常分成轮询系统和前后台系统。
+
+## 1. 裸机系统
+
+### 1.1 轮询系统
+
+轮询系统即是在裸机编程的时候，先初始化好相关的硬件，然后让**主程序在一个死循环里面不断循环，顺序地做各种事情**。轮询系统只适合顺序执行的功能代码，当有外部事件驱动时，实时性就会降低。
+
+轮询系统伪代码：
+
+```c
+int main(void) 
+{ 
+    /* 硬件相关初始化 */ 
+    HardWareInit(); 
+
+    /* 无限循环 */ 
+    for (;;) { 
+        /* 处理事情1 */ 
+        DoSomethin1(); 
+
+        /* 处理事情2 */ 
+        DoSomething2(); 
+
+        /* 处理事情3 */ 
+        DoSomething3(); 
+    } 
+}
+```
+
+
+
+### 1.2 前后台系统
+
+相比轮询系统，前后台系统是在轮询系统的基础上加入了中断。外部事件的**「响应在中断里面完成，事件的处理还是回到轮询系统中完成」**，**中断在这里我们称为前台**，main 函数里面的**无限循环我们称为后台**。
+
+```c
+int flag1 = 0;
+int flag2 = 0; 
+int flag3 = 0; 
+
+int main(void) 
+{ 
+    /* 硬件相关初始化 */ 
+    HardWareInit(); 
+
+    /* 无限循环 */ 
+    for (;;) { 
+        if (flag1) { 
+            /* 处理事情1 */ 
+            DoSomethin1(); 
+        } 
+
+        if (flag2) { 
+            /* 处理事情2 */ 
+            DoSomething2(); 
+        } 
+
+        if (flag3) { 
+            /* 处理事情3 */ 
+            DoSomething3(); 
+        } 
+    } 
+} 
+
+void ISR1(void) 
+{ 
+    /* 置位标志位 */ 
+    flag1 = 1; 
+    /* 如果事件处理时间很短，则在中断里面处理 
+        如果事件处理时间比较长，在回到前台处理 */ 
+    DoSomethin1(); 
+} 
+
+void ISR2(void) 
+{ 
+    /* 置位标志位 */ 
+    flag2 = 1; 
+
+    /* 如果事件处理时间很短，则在中断里面处理 
+        如果事件处理时间比较长，在回到前台处理 */ 
+    DoSomethin2(); 
+} 
+
+void ISR3(void) 
+{ 
+    /* 置位标志位 */ 
+    flag3 = 1; 
+    /* 如果事件处理时间很短，则在中断里面处理 
+        如果事件处理时间比较长，在回到前台处理 */ 
+    DoSomethin3(); 
+}
+```
+
+**在顺序执行后台程序的时候，如果有中断来临，那么中断会打断后台程序的正常执行流，转而去执行中断服务程序，在中断服务程序里面标记事件**。如果事件要处理的事情很简短，则可在中断服务程序里面处理，如果事件要处理的事情比较多，则返回到后台程序里面处理。虽然事件的**响应和处理是分开了，但是事件的处理还是在后台里面顺序执行的**，但**「相比轮询系统，前后台系统确保了事件不会丢失」**，再加上中断具有可嵌套的功能，这可以大大的提高程序的实时响应能力。在大多数的中小型项目中，前后台系统运用的好，堪称有操作系统的效果。 
+
+
+
+## 2. 多任务系统
+
+相比前后台系统，多任务系统的事件响应也是在中断中完成的，但是**事件的处理是在任务中完成的**。在多任务系统中，任务跟中断一样，也具有优先级，优先级高的任务会被优先执行。当一个紧急的事件在中断被标记之后，如果事件对应的任务的优先级足够高，就会立马得到响应。**相比前后台系统，多任务系统的实时性更高**。
+
+```c
+int flag1 = 0; 
+int flag2 = 0; 
+int flag3 = 0; 
+
+int main(void) 
+{ 
+    /* 硬件相关初始化 */ 
+    HardWareInit(); 
+
+    /* OS 初始化 */ 
+    RTOSInit(); 
+
+    /* OS 启动，开始多任务调度，不再返回 */ 
+    RTOSStart(); 
+} 
+
+void ISR1(void) 
+{ 
+    /* 置位标志位 */ 
+    flag1 = 1; 
+} 
+
+void ISR1(void) 
+{ 
+    /* 置位标志位 */ 
+    flag1 = 2; 
+} 
+
+void ISR3(void) 
+{ 
+    /* 置位标志位 */ 
+    flag3 = 1; 
+}
+
+void DoSomethin1(void) 
+{ 
+    /* 无限循环，不能返回 */ 
+    for (;;) { 
+        /* 任务实体 */ 
+        if (flag1) { 
+
+        } 
+    } 
+} 
+
+void DoSomethin2(void) 
+{ 
+    /* 无限循环，不能返回 */ 
+    for (;;) { 
+        /* 任务实体 */ 
+        if (flag2) { 
+
+        } 
+    } 
+} 
+
+void DoSomethin3(void) 
+{ 
+    /* 无限循环，不能返回 */ 
+    for (;;) { 
+        /* 任务实体 */ 
+        if (flag3) { 
+
+        } 
+    } 
+} 
+```
+
+相比前后台系统中后台顺序执行的程序主体，在多任务系统中，根据程序的功能，我们把这个**程序主体分割成一个个独立的，无限循环且不能返回的小程序，这个小程序我们称之为任务**。每个任务都是独立的，互不干扰的，且具备自身的优先级，它由操作系统调度管理。加入操作系统后，我们在编程的时候**不需要精心地去设计程序的执行流**，不用担心每个功能模块之间是否存在干扰。加入了操作系统，**编程变得简单了**。
+
+
+
+## 3. 对比
+
+轮询、前后台和多任务系统软件模型区别：
+
+| 模型       | 事件响应 | 事件处理 | 特点                       |
+| ---------- | -------- | -------- | -------------------------- |
+| 轮询系统   | 主程序   | 主程序   | 轮询响应事件，轮询处理事件 |
+| 前后台系统 | 中断     | 主程序   | 实时响应事件，轮询处理事件 |
+| 多任务系统 | 中断     | 任务     | 实时响应事件，实时处理事件 |
+
+
+
 # 创建任务
 
 这里创建的单个任务使用的栈和任务控制块都使用静态内存，即预先定义好的全局变量，这些预先定义好的全局变量都存在内部的 SRAM 中。
@@ -12,7 +201,9 @@
 
 在 uCOS 系统中，每一个任务都是独立的，他们的运行环境都单独的保存在他们的栈空间当中。那么在定义好任务函数之后，我们还要为任务定义一个栈，因为目前使用的是静态内存，所以任务栈是一个独立的全局变量。任务的栈占用的是 MCU 内部的 RAM，当任务越多的时候，需要使用的栈空间就越大，即需要使用的 RAM 空间就越多。
 
-定义任务栈及大小
+**在多任务系统中，有多少个任务就需要定义多少个任务堆栈。**任务栈其实就是一个预先定义好的全局数据，数据类型为 CPU_STK
+
+定义任务栈及大小：
 
 ```c
 #define APP_TASK_START_STK_SIZE 128
@@ -23,7 +214,8 @@ static  CPU_STK  AppTaskStartStk[APP_TASK_START_STK_SIZE];
 
 ## 2. 定义任务控制块
 
-定义好任务函数和任务栈之后，还需要为任务定义一个任务控制块，通常称这个任务控制块为任务的身份证。在 C 代码上，任务控制块就是一个**结构体**，里面有非常多的成员，这些成员共同描述了任务的全部信息。
+定义好任务函数和任务栈之后，还需要为任务定义一个任务控制块，通常称这个任务控制块为任务的身份证，里面存有任务的所
+有信息，比如任务的堆栈，任务名称，任务的形参等。有了这个任务控制块之后，以后系统对任务的全部操作都可以通过这个 TCB 来实现。在 C 代码上，任务控制块就是一个**结构体**，里面有非常多的成员，这些成员共同描述了任务的全部信息。
 
 定义任务控制块;
 
@@ -33,9 +225,123 @@ static OS_TCB AppTaskStartTCB;
 
 
 
+任务控制块源码：
+
+```c
+struct os_tcb {
+    CPU_STK             *StkPtr;                            /* Pointer to current top of stack                        */
+
+    void                *ExtPtr;                            /* Pointer to user definable data for TCB extension       */
+
+    CPU_STK             *StkLimitPtr;                       /* Pointer used to set stack 'watermark' limit            */
+
+    OS_TCB              *NextPtr;                           /* Pointer to next     TCB in the TCB list                */
+    OS_TCB              *PrevPtr;                           /* Pointer to previous TCB in the TCB list                */
+
+    OS_TCB              *TickNextPtr;
+    OS_TCB              *TickPrevPtr;
+
+    OS_TICK_SPOKE       *TickSpokePtr;                      /* Pointer to tick spoke if task is in the tick list      */
+
+    CPU_CHAR            *NamePtr;                           /* Pointer to task name                                   */
+
+    CPU_STK             *StkBasePtr;                        /* Pointer to base address of stack                       */
+
+#if defined(OS_CFG_TLS_TBL_SIZE) && (OS_CFG_TLS_TBL_SIZE > 0u)
+    OS_TLS               TLS_Tbl[OS_CFG_TLS_TBL_SIZE];
+#endif
+
+    OS_TASK_PTR          TaskEntryAddr;                     /* Pointer to task entry point address                    */
+    void                *TaskEntryArg;                      /* Argument passed to task when it was created            */
+
+    OS_PEND_DATA        *PendDataTblPtr;                    /* Pointer to list containing objects pended on           */
+    OS_STATE             PendOn;                            /* Indicates what task is pending on                      */
+    OS_STATUS            PendStatus;                        /* Pend status                                            */
+
+    OS_STATE             TaskState;                         /* See OS_TASK_STATE_xxx                                  */
+    OS_PRIO              Prio;                              /* Task priority (0 == highest)                           */
+    CPU_STK_SIZE         StkSize;                           /* Size of task stack (in number of stack elements)       */
+    OS_OPT               Opt;                               /* Task options as passed by OSTaskCreate()               */
+
+    OS_OBJ_QTY           PendDataTblEntries;                /* Size of array of objects to pend on                    */
+
+    CPU_TS               TS;                                /* Timestamp                                              */
+
+    OS_SEM_CTR           SemCtr;                            /* Task specific semaphore counter                        */
+
+                                                            /* DELAY / TIMEOUT                                        */
+    OS_TICK              TickCtrPrev;                       /* Previous time when task was            ready           */
+    OS_TICK              TickCtrMatch;                      /* Absolute time when task is going to be ready           */
+    OS_TICK              TickRemain;                        /* Number of ticks remaining for a match (updated at ...  */
+                                                            /* ... run-time by OS_StatTask()                          */
+    OS_TICK              TimeQuanta;
+    OS_TICK              TimeQuantaCtr;
+
+#if OS_MSG_EN > 0u
+    void                *MsgPtr;                            /* Message received                                       */
+    OS_MSG_SIZE          MsgSize;
+#endif
+
+#if OS_CFG_TASK_Q_EN > 0u
+    OS_MSG_Q             MsgQ;                              /* Message queue associated with task                     */
+#if OS_CFG_TASK_PROFILE_EN > 0u
+    CPU_TS               MsgQPendTime;                      /* Time it took for signal to be received                 */
+    CPU_TS               MsgQPendTimeMax;                   /* Max amount of time it took for signal to be received   */
+#endif
+#endif
+
+#if OS_CFG_TASK_REG_TBL_SIZE > 0u
+    OS_REG               RegTbl[OS_CFG_TASK_REG_TBL_SIZE];  /* Task specific registers                                */
+#endif
+
+#if OS_CFG_FLAG_EN > 0u
+    OS_FLAGS             FlagsPend;                         /* Event flag(s) to wait on                               */
+    OS_FLAGS             FlagsRdy;                          /* Event flags that made task ready to run                */
+    OS_OPT               FlagsOpt;                          /* Options (See OS_OPT_FLAG_xxx)                          */
+#endif
+
+#if OS_CFG_TASK_SUSPEND_EN > 0u
+    OS_NESTING_CTR       SuspendCtr;                        /* Nesting counter for OSTaskSuspend()                    */
+#endif
+
+#if OS_CFG_TASK_PROFILE_EN > 0u
+    OS_CPU_USAGE         CPUUsage;                          /* CPU Usage of task (0.00-100.00%)                       */
+    OS_CPU_USAGE         CPUUsageMax;                       /* CPU Usage of task (0.00-100.00%) - Peak                */
+    OS_CTX_SW_CTR        CtxSwCtr;                          /* Number of time the task was switched in                */
+    CPU_TS               CyclesDelta;                       /* value of OS_TS_GET() - .CyclesStart                    */
+    CPU_TS               CyclesStart;                       /* Snapshot of cycle counter at start of task resumption  */
+    OS_CYCLES            CyclesTotal;                       /* Total number of # of cycles the task has been running  */
+    OS_CYCLES            CyclesTotalPrev;                   /* Snapshot of previous # of cycles                       */
+
+    CPU_TS               SemPendTime;                       /* Time it took for signal to be received                 */
+    CPU_TS               SemPendTimeMax;                    /* Max amount of time it took for signal to be received   */
+#endif
+
+#if OS_CFG_STAT_TASK_STK_CHK_EN > 0u
+    CPU_STK_SIZE         StkUsed;                           /* Number of stack elements used from the stack           */
+    CPU_STK_SIZE         StkFree;                           /* Number of stack elements free on   the stack           */
+#endif
+
+#ifdef CPU_CFG_INT_DIS_MEAS_EN
+    CPU_TS               IntDisTimeMax;                     /* Maximum interrupt disable time                         */
+#endif
+#if OS_CFG_SCHED_LOCK_TIME_MEAS_EN > 0u
+    CPU_TS               SchedLockTimeMax;                  /* Maximum scheduler lock time                            */
+#endif
+
+#if OS_CFG_DBG_EN > 0u
+    OS_TCB              *DbgPrevPtr;
+    OS_TCB              *DbgNextPtr;
+    CPU_CHAR            *DbgNamePtr;
+#endif
+};
+```
+
+
+
 ## 3. 定义任务主体函数
 
-任务实际上就是一个无限循环且不带返回值的 C 函数。下面创建一个这样的任务，让 LED 灯每隔 500ms 翻转一次。
+任务实际上就是一个**无限循环且不带返回值（不能返回）**的 C 函数。下面创建一个这样的任务，让 LED 灯每隔 500ms 翻转一次。
 
 ```c
 static void LED_Task (void* parameter)
@@ -117,6 +423,103 @@ OSTaskCreate((OS_TCB *)&AppTaskStartTCB, 								(1)
 ```
 
 (13)：用于保存返回的错误代码
+
+
+
+创建任务函数源码中会调用如下代码，进行任务堆栈的初始化：
+
+```c
+    /* 初始化任务堆栈 */
+    p_sp = OSTaskStkInit(p_task,                            
+                         p_arg,
+                         p_stk_base,
+                         p_stk_limit,
+                         stk_size,
+                         opt);
+```
+
+当任务第一次运行的时候，加载到 CPU 寄存器的参数就放在任务堆栈里面，在任务创建的时候，预先初始化好堆栈。
+
+
+
+OSTaskStkInit() 函数源码：
+
+```c
+CPU_STK  *OSTaskStkInit (OS_TASK_PTR    p_task,
+                         void          *p_arg,
+                         CPU_STK       *p_stk_base,
+                         CPU_STK       *p_stk_limit,
+                         CPU_STK_SIZE   stk_size,
+                         OS_OPT         opt)
+{
+    CPU_STK  *p_stk;
+
+    (void)opt;                                              /* Prevent compiler warning                               */
+
+    p_stk = &p_stk_base[stk_size];                          /* Load stack pointer                                     */
+    /* 异常发生时自动保存的寄存器 */
+    *--p_stk = (CPU_STK)0x01000000u;                        /* xPSR                                                   */
+    *--p_stk = (CPU_STK)p_task;                             /* Entry Point                                            */
+    *--p_stk = (CPU_STK)OS_TaskReturn;                      /* R14 (LR)                                               */
+    *--p_stk = (CPU_STK)0x12121212u;                        /* R12                                                    */
+    *--p_stk = (CPU_STK)0x03030303u;                        /* R3                                                     */
+    *--p_stk = (CPU_STK)0x02020202u;                        /* R2                                                     */
+    *--p_stk = (CPU_STK)p_stk_limit;                        /* R1                                                     */
+    *--p_stk = (CPU_STK)p_arg;                              /* R0 : argument                                          */
+    /* 异常发生时需手动保存的寄存器 */
+    *--p_stk = (CPU_STK)0x11111111u;                        /* R11                                                    */
+    *--p_stk = (CPU_STK)0x10101010u;                        /* R10                                                    */
+    *--p_stk = (CPU_STK)0x09090909u;                        /* R9                                                     */
+    *--p_stk = (CPU_STK)0x08080808u;                        /* R8                                                     */
+    *--p_stk = (CPU_STK)0x07070707u;                        /* R7                                                     */
+    *--p_stk = (CPU_STK)0x06060606u;                        /* R6                                                     */
+    *--p_stk = (CPU_STK)0x05050505u;                        /* R5                                                     */
+    *--p_stk = (CPU_STK)0x04040404u;                        /* R4                                                     */
+
+    return (p_stk);
+}
+```
+
+- p_task 是任务名，指示着任务的入口地址，在任务切换的时候，需要加载到 R15，即 PC 寄存器，这样 CPU 就可以找到要运行的任务。
+- p_arg 是任务的形参，用于传递参数，在任务切换的时候，需要加载到寄存器 R0。R0 寄存器通常用来传递参数。
+- p_stk_base 表示任务堆栈的起始地址。
+- stk_size 表示任务堆栈的大小，数据类型为 CPU_STK_SIZE，在 
+- ARMCM3 处理器的栈是由高地址向低地址生长的。所以初始化栈之前，要获取到栈顶地址，然后栈地址逐一递减即可。Cortex-M3 内核的处理器中等于4 个字节，即一个字。
+- 任务第一次运行的时候，加载到 CPU 寄存器的环境参数我们要预先初始化好。初始化的顺序固定，首先是异常发生时自动保存的 8 个寄存器，即 xPSR、R15、R14、R12、R3、R2、R1 和 R0。其中 xPSR 寄存器的位 24 必须是 1，R15 PC 指针必
+  须存的是任务的入口地址，R0 必须是任务形参，剩下的 R14、R12、R3、R2 和 R1 为了调试方便，填入与寄存器号相对应的 16 进制数。
+- 剩下的是 8 个需要手动加载到 CPU 寄存器的参数，为了调试方便填入与寄存器号相对应的 16 进制数。
+
+
+
+任务创建好之后，需要调用 OS_RdyListInsertTail() 函数把任务添加到一个叫就绪列表的数组里面，表示任务已经就绪，系统随时可以调度：
+
+```c
+void  OS_RdyListInsertTail (OS_TCB  *p_tcb)
+{
+    OS_RDY_LIST  *p_rdy_list;
+    OS_TCB       *p_tcb2;
+
+    p_rdy_list = &OSRdyList[p_tcb->Prio];
+    if (p_rdy_list->NbrEntries == (OS_OBJ_QTY)0) {          /* CASE 0: Insert when there are no entries               */
+        p_rdy_list->NbrEntries  = (OS_OBJ_QTY)1;            /*         This is the first entry                        */
+        p_tcb->NextPtr          = (OS_TCB   *)0;            /*         No other OS_TCBs in the list                   */
+        p_tcb->PrevPtr          = (OS_TCB   *)0;
+        p_rdy_list->HeadPtr     = p_tcb;                    /*         Both list pointers point to this OS_TCB        */
+        p_rdy_list->TailPtr     = p_tcb;
+    } else {                                                /* CASE 1: Insert AFTER the current tail of list          */
+        p_rdy_list->NbrEntries++;                           /*         One more OS_TCB in the list                    */
+        p_tcb->NextPtr          = (OS_TCB   *)0;            /*         Adjust new OS_TCBs links                       */
+        p_tcb2                  = p_rdy_list->TailPtr;
+        p_tcb->PrevPtr          = p_tcb2;
+        p_tcb2->NextPtr         = p_tcb;                    /*         Adjust old tail of list's links                */
+        p_rdy_list->TailPtr     = p_tcb;
+    }
+}
+```
+
+
+
+**在 uC/OS-III 中，将任务添加到就绪列表其实是在 OSTaskCreate() 函数中完成的。每当任务创建好就把任务添加到就绪列表，表示任务已经就绪。**
 
 
 
@@ -234,7 +637,7 @@ static  void  AppTaskStart (void *p_arg)
 
 # uCOS-III 启动流程
 
-## 1. 系统初始化
+## 1. 系统初始化—OSInit()
 
 在调用创建任务函数之前，我们必须要对系统进行一次初始化，而系统的初始化是根据我们配置宏定义进行初始化的，有一些则是系统必要的初始化，如空闲任务，时钟节拍任务等。
 
@@ -302,6 +705,30 @@ void OSInit (OS_ERR  *p_err)
 ```
 
 主要看两个地方，一个是空闲任务的初始化，一个是时钟节拍任务的初始化，这两个任务是必须存在的任务，否则系统无法正常运行。
+
+- 系统用一个全局变量 OSRunning 来**指示系统的运行状态**，刚开始系统初始化的时候，默认为停止状态，即 OS_STATE_OS_STOPPED。
+- 全局变量 OSTCBCurPtr 是系统用于**指向当前正在运行的任务**的 TCB 指针，在任务切换的时候用得到。
+- 全局变量 OSTCBHighRdyPtr 用于**指向就绪任务中优先级最高的任务**的 TCB，在任务切换的时候用得到。
+- OS_RdyListInit() 用于初始化全局变量 OSRdyList[]，即**初始化就绪列表**。OS_RdyListInit() 在os_core.c 文件中定义。
+
+OS_RdyListInit() 源码：
+
+```c
+void  OS_RdyListInit (void)
+{
+    OS_PRIO       i;
+    OS_RDY_LIST  *p_rdy_list;
+	/* Initialize the array of OS_RDY_LIST at each priority */
+    for (i = 0u; i < OS_CFG_PRIO_MAX; i++) {
+        p_rdy_list = &OSRdyList[i];
+        p_rdy_list->NbrEntries = (OS_OBJ_QTY)0;
+        p_rdy_list->HeadPtr    = (OS_TCB   *)0;
+        p_rdy_list->TailPtr    = (OS_TCB   *)0;
+    }
+}
+```
+
+
 
 其实空闲任务初始化就是创建一个空闲任务，空闲任务的相关信息由系统默认指定，用户不能修改。
 
@@ -420,7 +847,7 @@ void  OS_TickTaskInit (OS_ERR  *p_err)
 
 
 
-## 2. CPU 初始化
+## 2. CPU 初始化—CPU_Init()
 
 在 main() 函数中，除了需要对板级硬件进行初始化，还需要进行一些系统相关的初始化，如 CPU 的初始化，在 uCOS 中，有一个很重要的功能就是**时间戳**，它的精度高达 **ns** 级别，是 CPU 内核的一个资源，所以使用的时候要对 CPU 进行相关的初始化。
 
@@ -477,7 +904,7 @@ void  CPU_TS_TmrInit (void)
 
 
 
-## 3. SysTick 初始化
+## 3. SysTick 初始化—OS_CPU_SysTickInit()
 
 **时钟节拍的频率表示操作系统每 1 秒钟产生多少个 tick**，tick 即是操作系统节拍的时钟周期，时钟节拍就是系统以固定的频率产生中断（时基中断），并在中断中处理与时间相关的事件，推动所有任务向前运行。时钟节拍需要**依赖于硬件定时器**，在 STM32 裸机程序中经常使用的 SysTick 时钟是 MCU 的内核定时器， 通常都使用该定时器产生操作系统的时钟节拍。用户需要先在 “os_cfg_app.h” 中设定时钟节拍的频率，**频率越高，操作系统检测事件就越频繁，可以增强任务的实时性，但太频繁也会增加操作系统内核的负担**，所以用户需要权衡该频率的设置。默认为 1000 Hz，也就是时钟节拍的周期为 1 ms。
 
@@ -534,7 +961,7 @@ static  void  AppTaskStart (void *p_arg)
 
 
 
-## 4. 内存初始化
+## 4. 内存初始化—Mem_Init()
 
 内存在嵌入式中是很珍贵的存在，而一个系统它是软件，则必须要有一块内存属于系统所管理的。**uCOS 采 用 一 块 连 续 的 大 数 组 作 为 系 统 管 理 的 内 存 ， CPU_INT08U Mem_Heap[LIB_MEM_CFG_HEAP_SIZE]，在使用之前就需要先将管理的内存进行初始化**。
 
@@ -563,7 +990,7 @@ static  void  AppTaskStart (void *p_arg)
 
 
 
-## 5. OSStart()
+## 5. 启动系统—OSStart()
 
 在创建完任务的时候，需要开启调度器，因为**创建仅仅是把任务添加到系统中，还没真正调度**。uCOS 提供了一个系统启动的函数接口——OSStart()，使用OSStart() 函数就能让系统开始运行。
 
@@ -590,6 +1017,40 @@ void  OSStart (OS_ERR  *p_err)
     }
 }
 ```
+
+- OSTCBHIghRdyPtr 指向第一个要运行的任务的 TCB。
+- OSStartHighRdy() 用于启动任务切换，即配置 PendSV 的优先级为最低，然后触发 PendSV 异常，在 PendSV 异常服务函数中进行任务切换。
+
+
+
+OSStartHighRdy() 函数源码：
+
+```c
+/******************************************************************* 
+                         开始第一次上下文切换 
+  1、配置PendSV 异常的优先级为最低 
+  2、在开始第一次上下文切换之前，设置psp=0 
+  3、触发PendSV 异常，开始上下文切换 
+ *******************************************************************/
+ OSStartHighRdy 
+    LDR     R0, = NVIC_SYSPRI14    	// 设置  PendSV 异常优先级为最低 (1) 
+    LDR     R1, = NVIC_PENDSV_PRI 
+   STRB    R1, [R0] 
+
+ MOVS R0, #0 						// 设置psp 的值为0，开始第一次上下文切换 (2) 
+   MSR     PSP, R0 
+
+ LDR R0, =NVIC_INT_CTRL 			// 触发PendSV 异常 (3) 
+   LDR     R1, =NVIC_PENDSVSET 
+   STR     R1, [R0] 
+
+ CPSIE I 							// 使能总中断，NMI 和HardFault 除外 (4) 
+
+ OSStartHang 
+   B       OSStartHang            	// 程序应永远不会运行到这里
+```
+
+
 
 在主函数中调用 OSStart() 启动系统：
 
@@ -630,6 +1091,85 @@ int  main (void)
 3. 应用任务的优先级比初始任务的优先级低，那创建完后任务不会被执行，如果还有应用任务紧接着创建应用任务，如果应用任务的优先级出现了比初始任务高或者相等的情况，请参考 1 和 2 的处理方式，直到所有应用任务创建完成，最后初始任务把自己删除，完成自己的使命。
 
 在调用 OSStart() 函数启动任务调度器的时候，假如启动成功的话，任务就不会有返回了，假如启动没成功，则通过 LR 寄存器指定的地址退出，在创建 AppTaskStart 任务的时候，任务栈对应 LR 寄存器指向是任务退出函数 OS_TaskReturn()，当系统启动没能成功的话，系统就不会运行。 
+
+
+
+# 任务切换
+
+当调用 OSStartHighRdy() 函数，触发 PendSV 异常后，就需要编写 PendSV 异常服务函数，然后**在 PendSV 异常服务函数里面进行任务切换**。
+
+PendSV 异常服务函数名称必须与启动文件里面向量表中 PendSV 的向量名一致，如果不一致则内核是响应不了用户编写的 PendSV 异常服务函数的，只响应启动文件里面默认的 PendSV 异常服务函数。启动文件里面为每个异常都编写好默认的异常服务函数，函数体都是一个死循环。
+
+```asm
+;*********************************************************************** 
+; PendSVHandler 异常 
+;*********************************************************************** 
+PendSV_Handler 
+; 关中断，NMI 和HardFault 除外，防止上下文切换被中断  
+CPSID   I                                                           (1) 
+
+; 将psp 的值加载到R0 
+MRS     R0, PSP                                                     (2) 
+
+; 判断R0，如果值为0 则跳转到OS_CPU_PendSVHandler_nosave 
+; 进行第一次任务切换的时候，R0 肯定为0 
+CBZ     R0, OS_CPU_PendSVHandler_nosave                             (3) 
+
+;-----------------------一、保存上文----------------------------- 
+; 任务的切换，即把下一个要运行的任务的堆栈内容加载到CPU 寄存器中 
+;--------------------------------------------------------------  
+; 在进入PendSV 异常的时候，当前CPU 的xPSR，PC（任务入口地址）， 
+; R14，R12，R3，R2，R1，R0 会自动存储到当前任务堆栈， 
+; 同时递减PSP 的值，随便通过 代码：MRS R0, PSP 把PSP 的值传给R0 
+
+; 手动存储CPU 寄存器R4-R11 的值到当前任务的堆栈 
+STMDB   R0!, {R4-R11}                                              (15)
+
+; 加载 OSTCBCurPtr 指针的地址到R1，这里LDR 属于伪指令 
+LDR     R1, = OSTCBCurPtr                                          (16) 
+; 加载 OSTCBCurPtr 指针到R1，这里LDR 属于ARM 指令 
+LDR     R1, [R1]                                                   (17) 
+; 存储 R0 的值到 OSTCBCurPtr->OSTCBStkPtr，这个时候 R0 存的是任务空闲栈的栈顶  
+STR     R0, [R1]                                                   (18) 
+
+;-----------------------二、切换下文----------------------------- 
+; 实现 OSTCBCurPtr = OSTCBHighRdyPtr 
+; 把下一个要运行的任务的堆栈内容加载到CPU 寄存器中 
+;-------------------------------------------------------------- 
+OS_CPU_PendSVHandler_nosave                                          (4) 
+
+; 加载 OSTCBCurPtr 指针的地址到R0，这里LDR 属于伪指令 
+LDR     R0, = OSTCBCurPtr                                          (5) 
+; 加载 OSTCBHighRdyPtr 指针的地址到R1，这里LDR 属于伪指令  
+LDR     R1, = OSTCBHighRdyPtr                                      (6) 
+; 加载 OSTCBHighRdyPtr 指针到R2，这里LDR 属于ARM 指令  
+LDR     R2, [R1]                                                   (7) 
+; 存储 OSTCBHighRdyPtr 到 OSTCBCurPtr   
+STR     R2, [R0]                                                   (8) 
+
+; 加载 OSTCBHighRdyPtr 到 R0  
+LDR     R0, [R2]                                                   (9) 
+; 加载需要手动保存的信息到CPU 寄存器R4-R11  
+LDMIA   R0!, {R4-R11}                                              (10) 
+
+; 更新PSP 的值，这个时候PSP 指向下一个要执行的任务的堆栈的栈底 
+;（这个栈底已经加上刚刚手动加载到CPU 寄存器R4-R11 的偏移）  
+MSR     PSP, R0                                                    (11) 
+
+; 确保异常返回使用的堆栈指针是PSP，即LR 寄存器的位2 要为1  
+ORR     LR, LR, #0x04                                              (12)  
+
+; 开中断 
+CPSIE   I                                                          (13) 
+
+; 异常返回，这个时候任务堆栈中的剩下内容将会自动加载到xPSR， 
+; PC（任务入口地址），R14，R12，R3，R2，R1，R0（任务的形参） 
+; 同时PSP 的值也将更新，即指向任务堆栈的栈顶。 
+; 在STM32 中，堆栈是由高地址向低地址生长的。 
+BX      LR
+```
+
+PendSV 异常服务中主要完成两个工作，**一是保存上文，即保存当前正在运行的任务的环境参数；二是切换下文，即把下一个需要运行的任务的环境参数从任务堆栈中加载到 CPU 寄存器，从而实现任务的切换**。
 
 
 
