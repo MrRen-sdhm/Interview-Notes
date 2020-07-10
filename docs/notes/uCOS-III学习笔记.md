@@ -1096,6 +1096,8 @@ int  main (void)
 
 # 任务切换
 
+## 1. 任务切换的实现
+
 当调用 OSStartHighRdy() 函数，触发 PendSV 异常后，就需要编写 PendSV 异常服务函数，然后**在 PendSV 异常服务函数里面进行任务切换**。
 
 PendSV 异常服务函数名称必须与启动文件里面向量表中 PendSV 的向量名一致，如果不一致则内核是响应不了用户编写的 PendSV 异常服务函数的，只响应启动文件里面默认的 PendSV 异常服务函数。启动文件里面为每个异常都编写好默认的异常服务函数，函数体都是一个死循环。
@@ -1170,6 +1172,256 @@ BX      LR
 ```
 
 PendSV 异常服务中主要完成两个工作，**一是保存上文，即保存当前正在运行的任务的环境参数；二是切换下文，即把下一个需要运行的任务的环境参数从任务堆栈中加载到 CPU 寄存器，从而实现任务的切换**。
+
+
+
+在 OSSched() 函数中，**OS_TASK_SW(); 负责触发 PendSV 异常，然后在 PendSV 异常里面实现任务的切换**。OS_TASK_SW()函数其实是一个宏定义，具体是往中断及状态控制寄存器 SCB_ICSR 的位 28（PendSV 异常使能位）写入 1，从而触发 PendSV 异常。
+
+```c
+void  OSSched (void)
+{
+    CPU_SR_ALLOC();
+
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0) {    /* ISRs still nested? */
+        return;                                   /* Yes ... only schedule when no nested ISRs */
+    }
+
+    if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) {   /* Scheduler locked? */
+        return;                                        /* Yes */
+    }
+
+    CPU_INT_DIS();
+    OSPrioHighRdy   = OS_PrioGetHighest();    /* Find the highest priority ready */
+    OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;
+    if (OSTCBHighRdyPtr == OSTCBCurPtr) {     /* Current task is still highest priority task? */
+        CPU_INT_EN();                         /* Yes ... no need to context switch */
+        return;
+    }
+
+#if OS_CFG_TASK_PROFILE_EN > 0u
+    OSTCBHighRdyPtr->CtxSwCtr++;              /* Inc. # of context switches to this task */
+#endif
+    OSTaskCtxSwCtr++;                         /* Increment context switch counter */
+
+#if defined(OS_CFG_TLS_TBL_SIZE) && (OS_CFG_TLS_TBL_SIZE > 0u)
+    OS_TLS_TaskSw();
+#endif
+
+    OS_TASK_SW();                             /* Perform a task level context switch */
+    CPU_INT_EN();
+}
+```
+
+OS_TASK_SW() 宏定义：
+
+```c
+#define  OS_TASK_SW()               NVIC_INT_CTRL = NVIC_PENDSVSET
+```
+
+
+
+## 2. 任务时间片运行
+
+加入 SysTick 中断，**在 SysTick 中断服务函数里面进行任务切换**，即可实现双任务的时间片运行。
+
+### 2.1 SysTick 简介
+
+RTOS 需要一个时基来驱动，系统任务调度的频率等于该时基的频率。通常该时基由一个定时器来提供，也可以从其它周期性的信号源获得。刚好 Cortex-M 内核中有一个系统定时器 SysTick，它内嵌在 NVIC 中，是一个 24 位的递减的计数器，计数器每计数一次的时间为 1/SYSCLK。
+
+
+
+### 2.2 SysTick 初始化
+
+使用 SysTick 非常简单，只需一个初始化函数 OS_CPU_SysTickInit()。
+
+```c
+void  OS_CPU_SysTickInit (CPU_INT32U  cnts)
+{
+    CPU_INT32U  prio;
+
+    /* 填写 SysTick 的重载计数值 */
+    CPU_REG_NVIC_ST_RELOAD = cnts - 1u;             // SysTick 以该计数值为周期循环计数定时
+
+    /* 设置 SysTick 中断优先级 */                           
+    prio  = CPU_REG_NVIC_SHPRI3;                            
+    prio &= DEF_BIT_FIELD(24, 0);
+    prio |= DEF_BIT_MASK(OS_CPU_CFG_SYSTICK_PRIO, 24); //设置为默认的最高优先级0，在裸机例程中该优先级默认为最低
+
+    CPU_REG_NVIC_SHPRI3 = prio;
+
+    /* 使能 SysTick 的时钟源和启动计数器 */                   
+    CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_CLKSOURCE |
+                            CPU_REG_NVIC_ST_CTRL_ENABLE;
+    /* 使能 SysTick 的定时中断 */                            
+    CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_TICKINT;
+}
+```
+
+
+
+### 2.3 SysTick 中断服务函数
+
+OS_CPU_SysTickHandler() 函数源码：
+
+```c
+void  OS_CPU_SysTickHandler (void)
+{
+    CPU_SR_ALLOC();       //分配保存中断状态的局部变量，后面关中断的时候可以保存中断状态
+
+    CPU_CRITICAL_ENTER(); // CPU_CRITICAL_ENTER() 和 CPU_CRITICAL_EXIT() 之间形成临界段，避免期间程序运行时受到干扰
+    OSIntNestingCtr++;    //进入中断时中断嵌套数要加1       
+    CPU_CRITICAL_EXIT();
+
+    OSTimeTick();        //★ 调用 OSTimeTick() 函数                             
+
+    OSIntExit();         //退出中断，里面会将中断嵌套数减1             
+}
+```
+
+
+
+OSTimeTick() 函数源码：
+
+```c
+void  OSTimeTick (void)
+{
+    OS_ERR  err;
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u
+    CPU_TS  ts;
+#endif
+
+    OSTimeTickHook();                                //调用用户可自定义的钩子函数，可在此函数中定义在时钟节拍到来时的事件
+
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u                 //如果使能（默认使能）了中断发送延迟
+
+    ts = OS_TS_GET();                                //获取时间戳     
+    OS_IntQPost((OS_OBJ_TYPE) OS_OBJ_TYPE_TICK,      //任务信号量暂时发送到中断队列，退出中断后由优先级最高的延迟发布任务
+                (void      *)&OSRdyList[OSPrioCur],  //就绪发送给时钟节拍任务 OS_TickTask()，OS_TickTask() 接收到该信号量
+                (void      *) 0,                     //就会继续执行。中断发送延迟可以减少中断时间，将中断级事件转为任务级
+                (OS_MSG_SIZE) 0u,                    //，提高了操作系统的实时性。
+                (OS_FLAGS   ) 0u,
+                (OS_OPT     ) 0u,
+                (CPU_TS     ) ts,
+                (OS_ERR    *)&err);
+
+#else                                                //如果禁用（默认使能）了中断发送延迟
+
+   (void)OSTaskSemPost((OS_TCB *)&OSTickTaskTCB,     //直接发送信号量给时钟节拍任务 OS_TickTask()    
+                       (OS_OPT  ) OS_OPT_POST_NONE,
+                       (OS_ERR *)&err);
+
+
+#if OS_CFG_SCHED_ROUND_ROBIN_EN > 0u                 //如果使能（默认使能）了（同优先级任务）时间片轮转调度
+    OS_SchedRoundRobin(&OSRdyList[OSPrioCur]); // ★ //检查当前任务的时间片是否耗尽，如果耗尽就调用同优先级的其他任务运行
+#endif
+
+#if OS_CFG_TMR_EN > 0u                               //如果使能（默认使能）了软件定时器
+    OSTmrUpdateCtr--;                                //软件定时器计数器自减
+    if (OSTmrUpdateCtr == (OS_CTR)0u) {              //如果软件定时器计数器减至0
+        OSTmrUpdateCtr = OSTmrUpdateCnt;             //重载软件定时器计数器
+        OSTaskSemPost((OS_TCB *)&OSTmrTaskTCB,       //发送信号量给软件定时器任务 OS_TmrTask()
+                      (OS_OPT  ) OS_OPT_POST_NONE,
+                      (OS_ERR *)&err);
+    }
+#endif
+
+#endif
+}
+```
+
+
+
+下图中，两个任务轮流的占有 CPU，享有相同的时间片。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200710101244.png" alt="image-20200710101231690" width="480px" /> </div>
+
+实际上，在这个时间片里面任务运行了非常多次：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200710101346.png" width="400px" /> </div>
+
+
+
+## 3. 时间片算法实现
+
+uCOS 支持同一个优先级下可以有多个任务的功能，这些任务可以分配不同的时间片，**当任务时间片用完的时候，任务会从链表的头部移动到尾部，让下一个任务共享时间片**，以此循环。
+
+任务控制块中有两个参数：
+
+```c
+    OS_TICK              TimeQuanta;
+    OS_TICK              TimeQuantaCtr;
+```
+
+TimeQuanta 表示任务需要多少个时间片，单位为系统时钟周期 Tick。TimeQuantaCtr 表示任务还剩下多少个时间片，每到来一个系统时钟周期，TimeQuantaCtr 会减一，当 TimeQuantaCtr 等于零的时候，表示时间片用完，任务的TCB 会从就绪列表链表的头部移动到尾部，好让下一个任务共享时间片。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200710103235.png" width="600px" /> </div>
+
+上图在一个就绪链表中，有三个任务就绪，其中在优先级 2 下面有两个任务，均分配了两个时间片，其中任务 3 的时间片已用，则位于链表的末尾，任务 2 的时间片还剩一个，则位于链表的头部。当下一个时钟周期到来的时候，任务 2 的时间片将耗完，相应的 TimeQuantaCtr 会递减为 0，任务 2 的 TCB 会被移动到链表的末尾，任务 3 则被成为链表的头部，然后重置任务3 的时间片计数器 TimeQuantaCtr 的值为 2，重新享有时间片。 
+
+OS_SchedRoundRobin() 函数在 OSTimeTick() 函数中被调用
+
+```c
+#if OS_CFG_SCHED_ROUND_ROBIN_EN > 0u
+void  OS_SchedRoundRobin (OS_RDY_LIST  *p_rdy_list)
+{
+    OS_TCB   *p_tcb;
+    CPU_SR_ALLOC();
+
+    if (OSSchedRoundRobinEn != DEF_TRUE) { /* 确保开启了时间片轮转调度 */
+        return;
+    }
+
+    CPU_CRITICAL_ENTER();
+    p_tcb = p_rdy_list->HeadPtr;        
+    if (p_tcb == (OS_TCB *)0) { /* 如果TCB 节点为空，则退出 */
+        CPU_CRITICAL_EXIT();
+        return;
+    }
+
+    if (p_tcb == &OSIdleTaskTCB) { /* 如果是空闲任务，也退出 */
+        CPU_CRITICAL_EXIT();
+        return;
+    }
+
+    if (p_tcb->TimeQuantaCtr > (OS_TICK)0) { /* 时间片自减 */
+        p_tcb->TimeQuantaCtr--;
+    }
+
+    if (p_tcb->TimeQuantaCtr > (OS_TICK)0) { /* 时间片没有用完，则退出 */
+        CPU_CRITICAL_EXIT();
+        return;
+    }
+
+    if (p_rdy_list->NbrEntries < (OS_OBJ_QTY)2) { /* 如果当前优先级只有一个任务，则退出 */
+        CPU_CRITICAL_EXIT();
+        return;
+    }
+
+    if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0) { /* 调度器被锁，退出 */
+        CPU_CRITICAL_EXIT();
+        return;
+    }
+
+    OS_RdyListMoveHeadToTail(p_rdy_list); /* 时间片耗完，将任务放到链表的最后一个节点 */
+    p_tcb = p_rdy_list->HeadPtr; /* 重新获取任务节点 */
+    if (p_tcb->TimeQuanta == (OS_TICK)0) { /* 判断是否要使用默认时间片 */
+        p_tcb->TimeQuantaCtr = OSSchedRoundRobinDfltTimeQuanta;
+    } else {
+        p_tcb->TimeQuantaCtr = p_tcb->TimeQuanta; /* 重载默认的时间片计数值 */
+    }
+    CPU_CRITICAL_EXIT();
+}
+#endif
+```
+
+- 时间片用完，如果该优先级下有两个以上任务，则将刚刚耗完时间片的节点移到链表的末尾，此时位于末尾的任务的 TCB 字段中的 TimeQuantaCtr 是等于 0 的，只有等它下一次运行的时候值才会重置为 TimeQuanta。
+- 重新获取链表的第一个节点，重置时间片计数器 TimeQuantaCtr 的值等于 TimeQuanta，任务重新享有时间片。
+
+
+
+时间片轮转调度波形图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200710104748.png" width="800px" /> </div>
 
 
 
