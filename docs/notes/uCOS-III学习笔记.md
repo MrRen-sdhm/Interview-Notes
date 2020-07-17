@@ -189,6 +189,255 @@ void DoSomethin3(void)
 
 
 
+# 临界段
+
+临界段代码，是一段不可分割的代码。**「如果临界段可能被中断，那么就需要关中断以保护临界段。如果临界段可能被任务级代码打断，那么需要锁调度器保护临界段」**。 临界段用一句话概括就是一段在执行的时候不能被中断的代码段。
+
+什么情况下临界段会被打断？一个是**系统调度**，还有一个就是**外部中断**。
+
+**在 uCOS 的系统调度，最终也是产生 PendSV 中断**，在 PendSV Handler 里面实现任务的切换，所以还是可以归结为中断。既然这样，**「★uCOS 对临界段的保护最终还是回到对中断的开和关的控制★」**。 
+
+uCOS 中定义了一个进入临界段的宏和两个出临界段的宏：
+
+- OS_CRITICAL_ENTER() —— 关中断、锁调度器
+
+  > 通过 OSSchedLockNestingCtr 加 1 为调度器上锁。这个值就是用来决定调度器是否别被上锁，当此值不为 0 时，就表示调度器已经上锁。
+
+- OS_CRITICAL_EXIT() —— 开中断、进行一次调度
+
+  > 使 OSSchedLockNestingCtr 减 1，并且当此值减到 0 时，进行一次调度。
+
+- OS_CRITICAL_EXIT_NO_SCHED() —— 开中断、不进行调度
+
+  > 使 OSSchedLockNestingCtr 减1，但是当此值减到 0 时，不进行调度。
+
+此外还有一个宏，锁定调度器但是开中断：
+
+- OS_CRITICAL_ENTER_CPU_EXIT() —— 锁调度器、开中断
+
+
+
+```c
+#if OS_CFG_ISR_POST_DEFERRED_EN > 0u     /* Deferred ISR Posts ------------------------------ */
+                                              /* Lock the scheduler                         */
+#define  OS_CRITICAL_ENTER()                                       \
+         do {                                                      \
+             CPU_CRITICAL_ENTER();                                 \
+             OSSchedLockNestingCtr++;                              \
+             if (OSSchedLockNestingCtr == 1u) {                    \
+                 OS_SCHED_LOCK_TIME_MEAS_START();                  \
+             }                                                     \
+             CPU_CRITICAL_EXIT();                                  \
+         } while (0)
+                                              /* Lock the scheduler but re-enable interrupts */
+#define  OS_CRITICAL_ENTER_CPU_EXIT()                              \
+         do {                                                      \
+             OSSchedLockNestingCtr++;                              \
+                                                                   \
+             if (OSSchedLockNestingCtr == 1u) {                    \
+                 OS_SCHED_LOCK_TIME_MEAS_START();                  \
+             }                                                     \
+             CPU_CRITICAL_EXIT();                                  \
+         } while (0)
+
+                                              /* Scheduling occurs only if an interrupt occurs */
+#define  OS_CRITICAL_EXIT()                                        \
+         do {                                                      \
+             CPU_CRITICAL_ENTER();                                 \
+             OSSchedLockNestingCtr--;                              \
+             if (OSSchedLockNestingCtr == (OS_NESTING_CTR)0) {     \
+                 OS_SCHED_LOCK_TIME_MEAS_STOP();                   \
+                 if (OSIntQNbrEntries > (OS_OBJ_QTY)0) {           \
+                     CPU_CRITICAL_EXIT();                          \
+                     OS_Sched0();                                  \
+                 } else {                                          \
+                     CPU_CRITICAL_EXIT();                          \
+                 }                                                 \
+             } else {                                              \
+                 CPU_CRITICAL_EXIT();                              \
+             }                                                     \
+         } while (0)
+
+#define  OS_CRITICAL_EXIT_NO_SCHED()                               \
+         do {                                                      \
+             CPU_CRITICAL_ENTER();                                 \
+             OSSchedLockNestingCtr--;                              \
+             if (OSSchedLockNestingCtr == (OS_NESTING_CTR)0) {     \
+                 OS_SCHED_LOCK_TIME_MEAS_STOP();                   \
+             }                                                     \
+             CPU_CRITICAL_EXIT();                                  \
+         } while (0)
+
+
+#else                                     /* Direct ISR Posts -------------------------------- */
+```
+
+
+
+## 1. 快速关中断
+
+为了快速地开关中断， Cortex-M 内核专门设置了一条 CPS 指令，有 4 种用法：
+
+```asm
+CPSID I 	;PRIMASK=1     ;关中断 
+CPSIE I 	;PRIMASK=0     ;开中断 
+CPSID F 	;FAULTMASK=1   ;关异常 
+CPSIE F 	;FAULTMASK=0   ;开异常
+```
+
+在 uCOS 中，对中断的开和关是通过操作 PRIMASK 寄存器来实现的，使用CPSID I 指令就能立即关闭中断。
+
+
+
+## 2. 关中断
+
+uCOS 中关中断的函数在 cpu_a.asm 中定义，无论上层的宏定义是怎么实现的 ，底层操作关中断的函数还是 CPU_SR_Save()：
+
+```asm
+CPU_SR_Save 
+MRS R0, PRIMASK (1)  
+CPSID I (2) 
+BX LR (3)
+```
+
+(1) 通过 MRS 指令将特殊寄存器 PRIMASK 寄存器的值存储到通用寄存器 r0。当在 C 中调用汇编的子程序返回时，会将 r0 作为函数的返回值。所以在 C 中调用 CPU_SR_Save()的时候，需要事先声明一个变量用来存储 CPU_SR_Save()的返回值，即 r0 寄存器的值，也就是 PRIMASK 的值。
+
+(2) 关闭中断，即使用 CPS 指令将 PRIMASK 寄存器的值置 1。
+
+(3) 子程序返回。
+
+
+
+## 3. 开中断
+
+开中断要与关中断配合使用，uCOS 中开中断的函数在 cpu_a.asm 中定义，无论上层的宏定义是怎么实现的 ，底层操作关中断的函数还是 CPU_SR_Restore()：
+
+```asm
+CPU_SR_Restore                                   
+MSR PRIMASK, R0 (1) 
+BX LR (2) 
+```
+
+(1) 通过 MSR 指令将通用寄存器 r0 的值存储到特殊寄存器 PRIMASK。当在 C 中调用汇编的子程序返回时，会将第一个形参传入到通用寄存器 r0。所以在 C 中调用 CPU_SR_Restore()的时候，需要传入一个形参，该形参是进入临界段之前保存的 PRIMASK 的值。
+
+(2) 子程序返回。
+
+
+
+## 4. 临界段代码保护的实现
+
+开关中断的函数的实现和嵌套临界段代码的保护：
+
+```asm
+;//开关中断函数的实现   
+;/* 
+; * void CPU_SR_Save(); 
+; */ 
+CPU_SR_Save 
+MRS     R0, PRIMASK                     
+CPSID   I 
+BX      LR 
+
+;/* 
+; * void CPU_SR_Restore(void); 
+; */ 
+CPU_SR_Restore                                   
+MSR     PRIMASK, R0 
+BX      LR 
+
+PRIMASK = 0; /* PRIMASK 初始值为0,表示没有关中断 */ (1) 
+
+CPU_SR  cpu_sr1 = (CPU_SR)0 
+CPU_SR  cpu_sr2 = (CPU_SR)0 (2) 
+
+/* 临界段代码 */ 
+{ 
+    /* 临界段1 开始 */ 
+    cpu_sr1 = CPU_SR_Save();    /* 关中断,cpu_sr1=0,PRIMASK=1 */ (3) 
+    { 
+        /* 临界段2 */ 
+        cpu_sr2 = CPU_SR_Save();/* 关中断,cpu_sr2=1,PRIMASK=1 */ (4) 
+        { 
+
+        } 
+        CPU_SR_Restore(cpu_sr2); /* 开中断,cpu_sr2=1,PRIMASK=1 */  (5) 
+    } 
+    /* 临界段1 结束 */ 
+    CPU_SR_Restore(cpu_sr1);    /* 开中断,cpu_sr1=0,PRIMASK=0 */(6) 
+} 
+```
+
+(1) 假设 PRIMASK 初始值为 0，表示没有关中断。
+
+(3) 临界段 1 开始，调用关中断函数 CPU_SR_Save()，CPU_SR_Save() 函数先将 PRIMASK 的值存储在通用寄存器 r0，一开始我们假设 PRIMASK 的值等于 0，所以此时 r0 的值即为 0。然后执行汇编指令 CPSID I 关闭中断，即设置 PRIMASK 等于 1，在返回的时候 r0 当做函数的返回值存储在 cpu_sr1，所以 cpu_sr1 等于 r0 等于 0。
+
+(4) 临界段 2 开始，调用关中断函数 CPU_SR_Save()，CPU_SR_Save() 函数先将 PRIMASK 的值存储在通用寄存器 r0，临界段 1 开始的时候我们关闭了中断，即设置 PRIMASK 等于 1，所以此时 r0 的值等于 1。然后执行汇编指令 CPSID I 关闭中断，即设置 PRIMASK 等于 1，在返回的时候 r0 当做函数的返回值存储在 cpu_sr2，所以cpu_sr2 等于 r0 等于 1。
+
+(5) 临界段 2 结束，调用开中断函数 CPU_SR_Restore(cpu_sr2)，cpu_sr2 作为函数的形参传入到通用寄存器 r0，然后执行汇编指令 MSR r0, PRIMASK 恢复PRIMASK 的值。此时 PRIAMSK = r0 = cpu_sr2 = 1。关键点来了，为什么临界段2 结束了，PRIMASK 还是等于 1，按道理应该是等于 0。因为此时临界段 2 是嵌套在临界段 1 中的，还是没有完全离开临界段的范畴，所以不能把中断打开，如果临界段是没有嵌套的，使用当前的开关中断的方法的话，那么 PRIMASK 确实是等于 1。
+
+
+
+**关键点**：在执行 CPSID I 指令前，为何要先把 PRIMASK 的值保存起来？CPU_SR_Restore() 的时候，为何需要传入一个形参？
+
+这样的处理方式**可以实现临界段嵌套时的代码保护，而单纯的开关中断无法处理临界段的嵌套**。
+
+错误示例：
+
+```asm
+;//开关中断函数的实现   
+;/* 
+; * void CPU_SR_Save(); 
+; */ 
+CPU_SR_Save                    
+CPSID   I 
+BX      LR 
+
+;/* 
+; * void CPU_SR_Restore(void); 
+; */ 
+CPU_SR_Restore                                   
+CPSIE   I  
+BX      LR 
+
+PRIMASK = 0; /* PRIMASK 初始值为0,表示没有关中断 */ 
+
+/* 临界段代码 */ 
+{ 
+    /* 临界段1 开始 */ 
+    CPU_SR_Save();           /* 关中断,PRIMASK = 1 */ 
+    { 
+        /* 临界段2 */ 
+        CPU_SR_Save();       /* 关中断,PRIMASK = 1 */ 
+        { 
+
+        } 
+        CPU_SR_Restore();        /* 开中断,PRIMASK = 0 */ (注意，此时不应该开中断，还处于外层临界段中!!!) 
+    } 
+    /* 临界段1 结束 */ 
+    CPU_SR_Restore();            /* 开中断,PRIMASK = 0 */ 
+}
+```
+
+
+
+## 5. 临界段保护代码示例
+
+```c
+void fun() {
+    CPU_SR_ALLOC(); //使用到临界段（在关/开中断时）时必需该宏，该宏声明和
+    //定义一个局部变量，用于保存关中断前的 CPU 状态寄存器
+    // SR（临界段关中断只需保存SR），开中断时将该值还原。
+    
+    OS_CRITICAL_ENTER();                                       //进入临界段，避免串口打印被打断
+
+    printf ( "%c", * pMsg );                                   //打印
+
+    OS_CRITICAL_EXIT();                                        //退出临界段
+}
+```
+
+
+
 # 创建任务
 
 这里创建的单个任务使用的栈和任务控制块都使用静态内存，即预先定义好的全局变量，这些预先定义好的全局变量都存在内部的 SRAM 中。
@@ -1422,6 +1671,198 @@ void  OS_SchedRoundRobin (OS_RDY_LIST  *p_rdy_list)
 时间片轮转调度波形图：
 
 <div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200710104748.png" width="800px" /> </div>
+
+
+
+# 阻塞延时和空闲任务
+
+使用 RTOS 的很大优势就是榨干 CPU 的性能，永远不能让它闲着，任务如果需要延时也就不能再让 CPU 空等（使用软件延时）来实现延时的效果。RTOS 中的延时叫**阻塞延时**，即任务需要延时的时候，任务会**放弃 CPU 的使用权**，CPU 可以去干其它的事情，当任务延时时间到，**重新获取 CPU 使用权**，任务继续运行，这样就充分地利用了 CPU 的资源，而不是干等着。
+
+**如果没有其它任务可以运行**，RTOS 都会为 CPU 创建一个空闲任务，这个时候 CPU 就运行空闲任务。在 uC/OS-III 中，空闲任务是系统在初始化的时候创建的**优先级最低的任务**，空闲任务主体很简单，只是对一个全局变量进行计数。鉴于空闲任务的这种特性，在实际应用中，当系统进入空闲任务的时候，**可在空闲任务中让单片机进入休眠或者低功耗等操作**。
+
+
+
+## 1. 实现空闲任务
+
+### 1.1 定义空闲任务堆栈
+
+在 os_cfg_app.c 中定义任务堆栈：
+
+```c
+CPU_STK        OSCfg_IdleTaskStk   [OS_CFG_IDLE_TASK_STK_SIZE];
+
+/* 空闲任务堆栈起始地址 */
+CPU_STK      * const  OSCfg_IdleTaskStkBasePtr   = (CPU_STK    *)&OSCfg_IdleTaskStk[0];
+CPU_STK_SIZE   const  OSCfg_IdleTaskStkLimit     = (CPU_STK_SIZE)OS_CFG_IDLE_TASK_STK_LIMIT;
+/* 空闲任务堆栈大小 */
+CPU_STK_SIZE   const  OSCfg_IdleTaskStkSize      = (CPU_STK_SIZE)OS_CFG_IDLE_TASK_STK_SIZE;
+CPU_INT32U     const  OSCfg_IdleTaskStkSizeRAM   = (CPU_INT32U  )sizeof(OSCfg_IdleTaskStk);
+```
+
+空闲任务的堆栈是一个定义好的 数组，大小由 OS_CFG_IDLE_TASK_STK_SIZE 这 个 宏 控 制。 OS_CFG_IDLE_TASK_STK_SIZE 在 os_cfg_app.h 这个头文件定义，大小为 128。
+
+```c
+#define  OS_CFG_IDLE_TASK_STK_SIZE       128u
+```
+
+空闲任务的堆栈的起始地址和大小均被定义成一个常量，不能被修改。变量 OSCfg_IdleTaskStkBasePtr 和 OSCfg_IdleTaskStkSize 同时还在 os.h 中声明，这样就具有全局属性，可以在其它文件里面被使用。
+
+
+
+### 1.2 定义空闲任务TCB
+
+任务控制块 TCB 是每一个任务必须的，空闲任务的 TCB 在 os.h 中定义，是一个全局变量。
+
+```c
+OS_EXT    OS_TCB         OSIdleTaskTCB;
+```
+
+
+
+### 1.3  定义空闲任务函数
+
+空闲任务正如其名，空闲任务体里面只是对全局变量 OSIdleTaskCtr ++ 操作：
+
+```c
+void  OS_IdleTask (void  *p_arg)
+{
+    CPU_SR_ALLOC();
+
+    p_arg = p_arg; /* Prevent compiler warning for not using 'p_arg'         */
+
+    while (DEF_ON) {
+        CPU_CRITICAL_ENTER();
+        OSIdleTaskCtr++;
+#if OS_CFG_STAT_TASK_EN > 0u
+        OSStatTaskCtr++;
+#endif
+        CPU_CRITICAL_EXIT();
+
+        OSIdleTaskHook(); /* Call user definable HOOK                               */
+    }
+}
+```
+
+全局变量 OSIdleTaskCtr 在 os.h 中定义：
+
+```c
+OS_EXT            OS_IDLE_CTR               OSIdleTaskCtr;
+```
+
+OS_IDLE_CTR 是在 os_type.h 中重新定义的数据类型：
+
+```c
+typedef   CPU_INT32U      OS_IDLE_CTR; /* Holds the number of times the idle task runs */
+```
+
+
+
+### 1.4  空闲任务初始化
+
+空闲任务的初始化在 OSInit() 中完成，意味着在系统还没有启动之前空闲任务就已经创建好，具体在 os_core.c 定义：
+
+```c
+    OS_IdleTaskInit(p_err);  /* Initialize the Idle Task */
+```
+
+OS_IdleTaskInit() 函数源码，在 os_core.c 中定义：
+
+```c
+void  OS_IdleTaskInit (OS_ERR  *p_err)
+{
+#ifdef OS_SAFETY_CRITICAL
+    if (p_err == (OS_ERR *)0) {
+        OS_SAFETY_CRITICAL_EXCEPTION();
+        return;
+    }
+#endif
+
+    OSIdleTaskCtr = (OS_IDLE_CTR)0; // 初始化空闲任务计数器
+    /* ---------------- 创建空闲任务 ---------------- */
+    OSTaskCreate((OS_TCB     *)&OSIdleTaskTCB,
+                 (CPU_CHAR   *)((void *)"uC/OS-III Idle Task"),
+                 (OS_TASK_PTR)OS_IdleTask,
+                 (void       *)0,
+                 (OS_PRIO     )(OS_CFG_PRIO_MAX - 1u),
+                 (CPU_STK    *)OSCfg_IdleTaskStkBasePtr,
+                 (CPU_STK_SIZE)OSCfg_IdleTaskStkLimit,
+                 (CPU_STK_SIZE)OSCfg_IdleTaskStkSize,
+                 (OS_MSG_QTY  )0u,
+                 (OS_TICK     )0u,
+                 (void       *)0,
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_NO_TLS),
+                 (OS_ERR     *)p_err);
+}
+```
+
+
+
+## 2. 实现阻塞延时—OSTimeDly()
+
+阻塞延时的**阻塞是指任务调用该延时函数后，任务会被剥离 CPU 使用权，然后进入阻塞状态，直到延时结束，任务重新获取 CPU 使用权才可以继续运行**。在任务阻塞的这段时间，**「CPU 可以去执行其它的任务」**，如果其它的任务也在延时状态，那么 CPU 就将运行空闲任务。核心操作在于**「将任务加入节拍列表，然后从就绪列表中移除」**。阻塞延时函数在 os_time.c 中定义：
+
+```c
+void  OSTimeDly (OS_TICK   dly,                        //延时的时钟节拍数
+                 OS_OPT    opt,                        //选项
+                 OS_ERR   *p_err)                      //返回错误类型
+{
+    CPU_SR_ALLOC();                                    //使用到临界段（在关/开中断时）时必需该宏，该宏声明和定义一个局部变
+                                                       //量，用于保存关中断前的 CPU 状态寄存器 SR（临界段关中断只需保存SR）
+                                                       //，开中断时将该值还原。                
+
+#ifdef OS_SAFETY_CRITICAL                              //如果使能（默认禁用）了安全检测
+    if (p_err == (OS_ERR *)0) {                        //如果错误类型实参为空
+        OS_SAFETY_CRITICAL_EXCEPTION();                //执行安全检测异常函数
+        return;                                        //返回，不执行延时操作
+    }
+#endif
+
+#if OS_CFG_CALLED_FROM_ISR_CHK_EN > 0u                 //如果使能（默认使能）了中断中非法调用检测   
+    if (OSIntNestingCtr > (OS_NESTING_CTR)0u) {        //如果该延时函数是在中断中被调用
+       *p_err = OS_ERR_TIME_DLY_ISR;                   //错误类型为“在中断函数中延时”
+        return;                                        //返回，不执行延时操作
+    }
+#endif
+    /* 当调度器被锁时任务不能延时 */
+    if (OSSchedLockNestingCtr > (OS_NESTING_CTR)0u) {  //如果调度器被锁   
+       *p_err = OS_ERR_SCHED_LOCKED;                   //错误类型为“调度器被锁”
+        return;                                        //返回，不执行延时操作
+    }
+
+    switch (opt) {                                     //根据延时选项参数 opt 分类操作
+        case OS_OPT_TIME_DLY:                          //如果选择相对时间（从现在起延时多长时间）
+        case OS_OPT_TIME_TIMEOUT:                      //如果选择超时（实际同上）
+        case OS_OPT_TIME_PERIODIC:                     //如果选择周期性延时
+             if (dly == (OS_TICK)0u) {                 //如果参数 dly 为0（0意味不延时）    
+                *p_err = OS_ERR_TIME_ZERO_DLY;         //错误类型为“0延时”
+                 return;                               //返回，不执行延时操作
+             }
+             break;
+
+        case OS_OPT_TIME_MATCH:                        //如果选择绝对时间（匹配系统开始运行（OSStart()）后的时钟节拍数）       
+             break;
+
+        default:                                       //如果选项超出范围
+            *p_err = OS_ERR_OPT_INVALID;               //错误类型为“选项非法”
+             return;                                   //返回，不执行延时操作
+    }
+
+    OS_CRITICAL_ENTER();                               //进入临界段
+    OSTCBCurPtr->TaskState = OS_TASK_STATE_DLY;        //修改当前任务的任务状态为延时状态
+    OS_TickListInsert(OSTCBCurPtr,                     //★ 将当前任务插入到节拍列表
+                      dly,
+                      opt,
+                      p_err);
+    if (*p_err != OS_ERR_NONE) {                       //如果当前任务插入节拍列表时出现错误
+         OS_CRITICAL_EXIT_NO_SCHED();                  //退出临界段（无调度）
+         return;                                       //返回，不执行延时操作
+    }
+    OS_RdyListRemove(OSTCBCurPtr);                     //★ 从就绪列表移除当前任务  
+    OS_CRITICAL_EXIT_NO_SCHED();                       //退出临界段（无调度）
+    OSSched();                                         //★ 任务切换
+   *p_err = OS_ERR_NONE;                               //错误类型为“无错误”
+}
+```
 
 
 
