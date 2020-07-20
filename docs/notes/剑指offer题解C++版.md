@@ -147,89 +147,37 @@ public:
 
 ### 面试题11 旋转数组的最小数字（核心思想：二分查找）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/9f3231a991af4f55b95579b44b7a01ba?tpId=13&tqId=11159&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个**非递减排序**的数组的一个旋转，输出旋转数组的最小元素。例如数组{3,4,5,1,2}为{1,2,3,4,5}的一个旋转，该数组的最小值为1。NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。
+【[OJ](https://www.nowcoder.com/practice/9f3231a991af4f55b95579b44b7a01ba?tpId=13&tqId=11159&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/20/)】把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个**非递减排序**的数组的一个旋转，输出旋转数组的最小元素。例如数组{3,4,5,1,2}为{1,2,3,4,5}的一个旋转，该数组的最小值为1。NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。数组中**可能存在重复数字**。
 
-**题解**：旋转之后的数组实际上可以划分为两个排序的子数组，而且前面子数组的元素都大于或者等于后面子数组的元素。我们还注意到最小的元素刚好是这两个子数组的分界线。在排序的数组中我们可以用**二分查找**法实现**O(logn)**的查找。
+```
+输入：nums=[2,2,2,0,1]
+输出：0
+```
 
-- 当nums[mid] <= nums[high]) 时中间值比右侧子串最后一个元素小，说明中间值属于右侧子串，其本身可能为最小值，并且其右侧不会有更小值
-- 当nums[mid] > nums[high]) 时中间值比比右侧子串最后一个元素大，说明中间值属于左侧子串，其本身不是最小值，并且其左侧不会有更小值
+**题解**：
 
-如果数组元素允许重复，会出现一个特殊的情况：nums[low] == nums[mid] == nums[high]，此时无法确定解在哪个区间，需要切换到顺序查找。例如对于数组 {1,1,1,0,1}，low、mid 和 high 指向的数都为 1，此时无法知道最小数字 0 在哪个区间。
+旋转之后的数组实际上可以划分为两个排序的子数组，而且前面子数组的元素都大于或者等于后面子数组的元素。注意到最小的元素刚好是这两个子数组的分界线。在排序的数组中我们可以用**二分查找**法实现**O(logn)**的查找。
+
+但是需要考虑一种情况就是，**数组在重复元素区段翻转**，例如[1,2,3,3,4,5]翻转后成为[3,4,5,1,2,3]此时无法使用二分查找，需要将后半段中的重复数字去除后再使用二分查找。
+
+若去重后的数组尾元素大于等于数组尾元素，说明数组单调递增或全部元素相等，直接返回首元素即可，不可再进行二分查找。
 
 ```cpp
-// 标准二分查找的变形
 class Solution {
 public:
     int minNumberInRotateArray(vector<int> nums) {
-        if(nums.empty()) return 0;
+        int n = nums.size() - 1;
+        if(nums.empty()) return -1;
         
-        int low = 0, high = nums.size() - 1, mid;
-        
-        while(low < high) {
-            mid = (low + high) / 2;
-            
-            // 三个下标指向的元素值相等，只能进行顺序查找
-            if(nums[mid] == nums[low] && nums[mid] >= nums[high]) {
-                return minNumber(nums, low, high);
-            }
-            else if(nums[mid] <= nums[high])// 中间值比右侧子串最后一个元素小，说明中间值属于右侧子串，其本身可能为最小值，并且其右侧不会有更小值
-                high = mid;
-            else
-                low = mid + 1;
+        while(n > 0 && nums[n] == nums[0]) n--; // 去除后半部分的重复数字
+        if(nums[n] >= nums[0]) return nums[0]; // 去重后的数组单调递增或元素相同，返回首元素
+        int l = 0, r = n;
+        while(l < r) {
+            int mid = l + r >> 1;
+            if(nums[mid] < nums[0]) r = mid; // 最小元素在左半边
+            else l = mid + 1;
         }
-        
-        return nums[low];
-    }
-    
-    int minNumber(vector<int> nums, int l, int h) {
-        for (int i = l; i < h; ++i)
-            if (nums[i + 1] < nums[i]) // 比前面数小的即为最小值
-                return nums[i + 1];
         return nums[l];
-	}
-};
-    
-// 剑指offer解法，不易理解循环条件
-class Solution {
-public:
-    int minNumberInRotateArray(vector<int> nums) {
-        if(nums.empty()) return 0;
-        
-        int low = 0, high = nums.size() - 1, mid;
-        
-        while(nums[low] >= nums[high]) { // 左侧子串元素应大于右侧
-            if(high - low == 1) { // 找到最小值所在位置
-                mid = high;
-                break;
-            }
-            
-            mid = (low + high) / 2;
-            
-            // 三个下标指向的元素值相等，只能进行顺序查找
-            if(nums[mid] == nums[low] && nums[mid] >= nums[high]) {
-                return MinOrder(nums, low, high);
-            }
-            
-            if(nums[mid] >= nums[low]) // 中间值比左侧子串第一个元素大，说明中间值属于左侧子串，左侧不会有最小值
-                low = mid;
-            else if(nums[mid] <= nums[high])// 中间值比右侧子串最后一个元素小，说明中间值属于右侧子串，右侧不会有最小值
-                high = mid;
-        }
-        
-        return nums[mid];
-    }
-    
-    int MinOrder(vector<int> nums, int low, int high) {
-        int ret = nums[low];
-        
-        // 顺序查找最小元素
-        for(int i = 0; i < nums.size(); i++) {
-            if(nums[i] < ret) {
-                ret = nums[i];
-            }
-        }
-        
-        return ret;
     }
 };
 ```
@@ -238,56 +186,57 @@ public:
 
 ### 面试题21 调整数组顺序使奇数位于偶数前面（核心思想：双指针）⭐️
 
-【[OJ](https://www.nowcoder.com/practice/beb5aa231adc45b2a5dcc5b62c93f593?tpId=13&tqId=11166&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
+【[OJ](https://www.nowcoder.com/practice/beb5aa231adc45b2a5dcc5b62c93f593?tpId=13&tqId=11166&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/30/)】输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
 
-**题解**：若相对位置可变，使用双指针分别从首尾查找偶数和奇数，并交换。时间复杂度约O(n/2)，空间复杂度O(1)
+**题解**：
 
-若相对位置不变，需使用辅助数组并遍历两次，先放入奇数再放入偶数。时间复杂度约O(2*n)，空间复杂度O(n)
+1、若相对位置可变，使用双指针分别从首尾查找偶数和奇数，并交换。时间复杂度约O(n/2)，空间复杂度O(1)
+
+用两个指针分别从首尾开始，往中间扫描。扫描时保证第一个指针前面的数都是奇数，第二个指针后面的数都是偶数。
+
+每次迭代时需要进行的操作：
+
+第一个指针一直往后走，直到遇到第一个偶数为止；
+第二个指针一直往前走，直到遇到第一个奇数为止；
+交换两个指针指向的位置上的数，再进入下一层迭代，直到两个指针相遇为止；
 
 ```cpp
 class Solution {
 public:
     // 使用双指针，不稳定
-    void reOrderArray_(vector<int> &array) { // 类似快排的partition, 不稳定
+    void reOrderArray(vector<int> &array) { // 类似快排的partition, 不稳定
         if(array.empty()) return;
         
-        int pBegin = 0;
-        int pEnd = array.size() - 1;
-        
-        while(pBegin < pEnd) {
-            // 向后移动begin，直到其指向偶数
-            while(pBegin < pEnd && ((array[pBegin] & 0x1) != 0)) {
-                pBegin++;
-            }
-            
-            // 向前移动end，直到其指向奇数
-            while(pBegin < pEnd && ((array[pEnd] & 0x1) == 0)) {
-                pEnd--;
-            }
-            
-            if(pBegin < pEnd) { // begin指向偶数，end指向奇数，交换
-                swap(array[pBegin], array[pEnd]);
-            }
+        int l = 0, r = array.size() - 1;
+        while(l < r) {
+            while(l < r && array[l] % 2 == 1) l++; // 左指针向后移动，直到其指向偶数
+            while(l < r && array[r] % 2 == 0) r--; // 右指针向前移动，直到其指向奇数
+            if(l < r) swap(array[l], array[r]); // 交换奇数和偶数
         }
     }
-    // 使用辅助数组，稳定
+};
+```
+
+
+
+2、若相对位置不变，需使用辅助数组并遍历两次，先放入奇数再放入偶数。时间复杂度约O(2*n)，空间复杂度O(n)
+
+```cpp
+class Solution {
+public:
     void reOrderArray(vector<int> &array) { // 准备辅助数组，依次放入奇数和偶数
         if(array.empty()) return;
         
-        vector<int> result;
-        int num = array.size();
-        
-        for(int i=0; i < num; i++) {
+        vector<int> res;
+        for(int i = 0; i < array.size(); i++) {
             if((array[i] & 0x1) != 0) // 奇数
-                result.push_back(array[i]);
+                res.push_back(array[i]);
         }
-        
-        for(int i=0; i < num; i++) {
+        for(int i = 0; i < array.size(); i++) {
             if((array[i] & 0x1) == 0) // 偶数
-                result.push_back(array[i]);
+                res.push_back(array[i]);
         }
-        
-        array = result;
+        array = res;
     }
 };
 ```
@@ -1641,13 +1590,61 @@ public:
 
 ### 面试题35 复杂链表的复制✏️
 
-【[OJ](https://www.nowcoder.com/practice/f836b2c43afc4b35ad6adc41ec941dba?tpId=13&tqId=11178&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [Leetcode](https://leetcode-cn.com/problems/copy-list-with-random-pointer/)】请实现一个函数可以复制一个复杂链表。在复杂链表中，每个结点除了有一个指针指向下一个结点外，还有一个额外的指针指向链表中的任意结点或者null。
+【[OJ](https://www.nowcoder.com/practice/f836b2c43afc4b35ad6adc41ec941dba?tpId=13&tqId=11178&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/89/) / [Leetcode](https://leetcode-cn.com/problems/copy-list-with-random-pointer/)】请实现一个函数可以复制一个复杂链表。在复杂链表中，每个结点除了有一个指针指向下一个结点外，还有一个额外的指针指向链表中的任意结点或者null。
 
 函数结束后原链表要与输入时保持一致。
 
 **题解**：
 
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720101058.png" alt="image-20200720101055453" style="zoom:67%;" />
+
+第一步是复制原始链表上的每一个结点，并用next节点链接起来；
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720101342.png" style="zoom:67%;" />
+
+第二步将复制出来节点的random指针指向原节点的random节点的复制，即`p->next->random = p->random->next`
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720101406.png" alt="image-20200720101400638" style="zoom:67%;" />
+
+第三步把这个长链表拆分成两个链表：把奇数位置的结点用Next链接起来就是原始链表，偶数数值的则是复制链表。
+
+<img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720101420.png" alt="image-20200720101418895" style="zoom:67%;" />
+
 ```cpp
+class Solution {
+public:
+    ListNode *copyRandomList(ListNode *head) {
+        if(!head) return head;
+        
+        auto p = head;
+        while(p) { // 在原链表各节点后复制新的节点
+            auto np = new ListNode(p->val);
+            auto next = p->next; // 保存下一个原节点，以便修改p的下一指向
+            p->next = np; // 插入新节点
+            np->next = next; // 插入新节点
+            p = next; // p指向下一个原节点
+        }
+        
+        p = head;
+        while(p) { // 将新建节点的random指针指向原节点的random指针所指向节点的复制
+            if(p->random) // 原节点有random节点才需处理
+                p->next->random = p->random->next;
+            p = p->next->next; // 跳到下一个原节点
+        }
+        
+        auto dummy = new ListNode(-1);
+        auto cur = dummy;
+        p = head;
+        while(p) { // 拆分新链表，复原原链表
+            auto pre = p; // 保存前一个原节点位置
+            cur->next = p->next; // 将新节点连接到新链表上
+            cur = cur->next; // 指向新链表下一节点
+            p = p->next->next; // 指向下一个要拆出的节点的原节点
+            pre->next = p; // 复原原链表
+        }
+        return dummy->next;
+    }
+};
 
 ```
 
@@ -1655,80 +1652,56 @@ public:
 
 ### 面试题52 两个链表的第一个公共节点
 
-【[OJ](https://www.nowcoder.com/practice/6ab1d9a29e88450685099d45c9e31e46?tpId=13&tqId=11189&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】输入两个链表，找出它们的第一个公共结点。
+【[OJ](https://www.nowcoder.com/practice/6ab1d9a29e88450685099d45c9e31e46?tpId=13&tqId=11189&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/62/)】输入两个链表，找出它们的第一个公共结点。
 
-**题解**：
+```
+给出两个链表如下所示：
+A：        a1 → a2
+                   ↘
+                     c1 → c2 → c3
+                   ↗            
+B:     b1 → b2 → b3
 
-方法1：
-
-可以先遍历一次得到两链表的长度差dist，第二次先在长的链表上走dist步，接下来同时遍历两个链表，直到找到它们第一个相同的节点，即为结果。
-
-```cpp
-class Solution {
-public:
-    ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
-        ListNode* pLong = pHead1;
-        ListNode* pShort = pHead2;
-        unsigned int len1 = getListLen(pHead1);
-        unsigned int len2 = getListLen(pHead2);
-        unsigned int dist = len1 - len2;
-        if(len1 < len2) {
-            pLong = pHead1;
-            pShort = pHead2;
-            dist = len2 - len1;
-        }
-        
-        for(int i = 0; i < dist; ++i) {
-            pLong = pLong->next;
-        }
-        
-        while(pLong && pShort) {
-            if(pLong == pShort)
-                return pLong;
-            else {
-                pLong = pLong->next;
-                pShort = pShort->next;
-            }
-        }
-        
-        return pLong;
-    }
-    
-    int getListLen(ListNode* pHead) {
-        unsigned int len = 0;
-        ListNode* pNode = pHead;
-        while(pNode) {
-            pNode = pNode->next;
-            ++len;
-        }
-        
-        return len;
-    }
-};
+输出第一个公共节点c1
 ```
 
-
-
-方法2：
+**题解**：
 
 设 A 的长度为 a + c，B 的长度为 b + c，其中 c 为尾部公共部分长度，可知 a + c + b = b + c + a。
 
 当访问链表 A 的指针访问到链表尾部时，令它从链表 B 的头部重新开始访问链表 B；同样地，当访问链表 B 的指针访问到链表尾部时，令它从链表 A 的头部重新开始访问链表 A。这样就能控制访问 A 和 B 两个链表的指针能同时访问到交点。
 
+while循环的退出条件为 p1 != p2，因为：
+
+- 若两链表相交，则最终两指针均指向相交节点
+- 若两链表不相交，则最终两指针均指向空(NULL)
+
 ```cpp
+// 写法1
 class Solution {
 public:
-    // 此方法循环次数过多，未通过oj，但最简洁
-    ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
-        ListNode* pNode1;
-        ListNode* pNode2;
-        
-        while(pNode1 != pNode2) {
-            pNode1 = (pNode1 == nullptr) ? pHead2 : pNode1->next;
-            pNode2 = (pNode2 == nullptr) ? pHead1 : pNode2->next;
+    ListNode *findFirstCommonNode(ListNode *headA, ListNode *headB) {
+        auto p1 = headA, p2 = headB;
+        while(p1 != p2) { // 同时移动两指针，直到两指针相等
+            if(p1) p1 = p1->next;
+            else p1 = headB; // p1指向空，则转向链表B
+            
+            if(p2) p2 = p2->next;
+            else p2 = headA; // p2指向空，则转向链表A
         }
-        
-        return pNode1;
+    }
+};
+
+// 写法2
+class Solution {
+public:
+    ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
+        auto p1 = pHead1, p2 = pHead2;
+        while(p1 != p2) {
+            p1 = (p1) ? p1->next : pHead2;
+            p2 = (p2) ? p2->next : pHead1;
+        }
+        return p1;
     }
 };
 ```
@@ -1856,9 +1829,9 @@ public:
 
 **题解**：窗口向右滑动的过程实际上就是将处于窗口的第一个数字删除，同时在窗口的末尾添加一个新的数字，这就可以用双向队列来模拟，**每次把尾部的数字弹出，再把新的数字压入到头部**，然后找队列中最大的元素即可。
 
-为了更快地找到最大的元素，我们可以在队列中只保留那些可能成为窗口最大元素的数字，去掉那些不可能成为窗口中最大元素的数字。考虑这样一个情况，如果队列中进来一个较大的数字，那么队列中比这个数更小的数字就不可能再成为窗口中最大的元素了，因为这个大的数字是后进来的，一定会比之前早进入窗口的小的数字要晚离开窗口，那么那些早进入且比较小的数字就“永无出头之日”，所以就可以弹出队列。
+为了更快地找到最大的元素，我们可以在队列中**只保留那些可能成为窗口最大元素的数字**，去掉那些不可能成为窗口中最大元素的数字。考虑这样一个情况，如果队列中进来一个较大的数字，那么队列中比这个数更小的数字就不可能再成为窗口中最大的元素了，因为这个大的数字是后进来的，一定会比之前早进入窗口的小的数字要晚离开窗口，那么那些早进入且比较小的数字就“永无出头之日”，所以就可以弹出队列。
 
-于是我们维护一个双向单调队列，**队列放的是可能最大的元素的下标**。我们假设该双端队列的队头是整个队列的最大元素所在下标，至队尾下标代表的元素值依次降低。初始时单调队列为空。随着对数组的遍历过程中，每次插入元素前，首先需要看队头是否还能留在队列中，如果队头下标距离i超过了k，则应该出队。同时需要维护队列的单调性，如果nums[i]大于或等于队尾元素下标所对应的值，则当前队尾再也不可能充当某个滑动窗口的最大值了，故需要队尾出队。始终保持队中元素从队头到队尾单调递减。依次遍历一遍数组，每次队头就是每个滑动窗口的最大值所在下标。
+于是我们维护一个双向单调队列，**队列放的是可能最大的元素的下标**。我们假设该双端队列的队头是整个队列的最大元素所在下标，至队尾下标代表的元素值依次降低。初始时单调队列为空。随着对数组的遍历过程中，每次插入元素前，首先需要看队头是否还能留在队列中，如果队头下标距离 i 超过了k，则应该出队。同时需要维护队列的单调性，如果nums[i]大于或等于队尾元素下标所对应的值，则当前队尾再也不可能充当某个滑动窗口的最大值了，故需要队尾出队。始终保持队中元素从队头到队尾单调递减。依次遍历一遍数组，每次队头就是每个滑动窗口的最大值所在下标。
 
 时间复杂度分析：每个元素最多入队出队一次，复杂度为O(n)
 
@@ -1867,13 +1840,15 @@ class Solution {
 public:
     vector<int> maxInWindows(vector<int>& nums, int k) {
         if(nums.empty()) return vector<int>();
+        
         vector<int> res;
         deque<int> q;
+        
         for(int i = 0; i < nums.size(); i++) {
-            while(q.size() && q.front() <= i - k) q.pop_front(); // 判断队头是否需要出队
-            while(q.size() && nums[q.back()] <= nums[i]) q.pop_back(); // 维护队列单调性
+            while(q.size() && q.front() <= i - k) q.pop_front(); // 若队头已不在窗口中，队头出队
+            while(q.size() && nums[q.back()] <= nums[i]) q.pop_back(); // 维护队列单调性，队尾元素小于当前元素，不可能是最大值，弹出
             q.push_back(i);
-            if(i >= k - 1) res.push_back(nums[q.front()]); // 取队头作为窗口最大元素
+            if(i >= k - 1) res.push_back(nums[q.front()]); // 窗口中有k个元素时开始，取队头作为窗口最大元素
         }
         return res;
     }
@@ -1886,9 +1861,11 @@ public:
 
 【[OJ](https://www.nowcoder.com/practice/9be0172896bd43948f8a32fb954e1be1?tpId=13&tqId=11216&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/88/)】如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
 
-**题解**：使用大顶堆维护左半边数组，使用小顶堆维护右半边数组。
+**题解**：使用大顶堆维护左半边数组，使用小顶堆维护右半边数组。即大顶堆存放较小的一般元素，小顶堆存放较大的一般元素。
 
 C++中使用堆，可利用STL中的[priority_queue](http://c.biancheng.net/view/480.html)
+
+方法1：
 
 ```cpp
 class Solution {
@@ -1917,6 +1894,42 @@ public:
     double GetMedian(){
       // 偶数个元素时，两堆元素相等，中位数为两堆顶取平均；奇数个元素时，大顶堆比小顶堆多一个元素，中位数为大顶堆堆顶
       return max.size() == min.size() ? (max.top() + min.top()) / 2.0 : max.top();
+    }
+};
+```
+
+
+
+🥇方法2：
+
+- 先将数字插入大根堆
+- 大根堆中的元素应小于小根堆中的元素，当大根堆的堆顶大于小根堆的堆顶时，交换堆顶
+- 若大根堆中元素比小根堆中元素多两个，则把大根堆的堆顶移到小根堆中
+
+```c
+class Solution {
+public:
+    priority_queue<int> max_heap;
+    priority_queue<int, vector<int>, greater<int>> min_heap;
+
+    void insert(int num){
+        max_heap.push(num); // 插入大根堆
+        if(min_heap.size() && min_heap.top() < max_heap.top()) // 逆序，应交换
+        {
+            auto minv = min_heap.top(), maxv = max_heap.top();
+            min_heap.pop(), max_heap.pop();
+            max_heap.push(minv), min_heap.push(maxv);
+        }
+        if(max_heap.size() > min_heap.size() + 1) // 大顶堆元素过多，把大顶堆堆顶放入小顶堆
+        {
+            min_heap.push(max_heap.top());
+            max_heap.pop();
+        }
+    }
+
+    double getMedian(){
+        if (max_heap.size() + min_heap.size() & 1) return max_heap.top(); // 奇数个元素，返回大顶堆堆顶
+        return (max_heap.top() + min_heap.top()) / 2.0; // 偶数个元素，返回平均值
     }
 };
 ```
@@ -3777,61 +3790,87 @@ public:
 
 ## 回溯
 
-### 面试题12 矩阵中的路径
+### 面试题12 矩阵中的路径（核心思想：DFS&回溯）
 
-【[OJ](https://www.nowcoder.com/practice/c61c6999eecb4b8f88a98f66b273a3cc?tpId=13&tqId=11218&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/c61c6999eecb4b8f88a98f66b273a3cc?tpId=13&tqId=11218&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/21/)】请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。如果一条路径经过了矩阵中的某一个格子，则之后不能再次进入这个格子。
+
+```
+matrix=
+[
+  ["A","B","C","E"],
+  ["S","F","C","S"],
+  ["A","D","E","E"]
+]
+
+str="BCCE" , return "true" 
+
+str="ASAE" , return "false"
+```
+
+题解：
+
+先枚举单词的起点，然后依次枚举单词的每个字母。过程中需要将已经使用过的字母改成一个特殊字母，以避免重复使用字符。
 
 ```cpp
+// AcWing版答案
+class Solution {
+public:
+    bool hasPath(vector<vector<char>>& matrix, string &str) {
+        for(int i = 0; i < matrix.size(); i++) {
+            for(int j = 0; j < matrix[0].size(); j++) {
+                if(dfs(matrix, str, i, j, 0)) return true;
+            }
+        }
+        return false;
+    }
+    
+    bool dfs(vector<vector<char>>& matrix, string &str, int x, int y, int u) {
+        if(matrix[x][y] != str[u]) return false; // 必须先判断当前字符是否匹配
+        if(u == str.size() - 1) return true; // 判断是否匹配所有字符
+        
+        char tmp = matrix[x][y];
+        matrix[x][y] = '*';
+        int dx[] = {-1,0,1,0}, dy[] = {0,1,0,-1};
+        for(int i = 0; i < 4; i++) {
+            int a = x + dx[i], b = y + dy[i];
+            if(a < 0 || a >= matrix.size() || b < 0 || b >= matrix[0].size()) continue;
+            if(matrix[a][b] == '*') continue; // 不可重复进入相同的格子
+            if(dfs(matrix, str, a, b, u + 1)) return true;
+        }
+        matrix[x][y] = tmp;
+        return false;
+    }
+};
+
+// 牛客网版答案
 class Solution {
 public:
     bool hasPath(char* matrix, int rows, int cols, char* str)
     {
-        if(matrix == nullptr || str == nullptr || rows < 1 || cols < 1)
-            return false;
-        
-        bool *visited = new bool[rows*cols];
-        memset(visited, 0, rows*cols);
-        int pathLen = 0;
-        
-        for(int row = 0; row < rows; ++row) {
-            for(int col = 0; col < cols; ++col) {
-                if(hasPathCore(matrix, rows, cols, row, col, str, visited, pathLen)){
-                    return true;
-                }
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < cols; j++) {
+                if(dfs(matrix, rows, cols, str, i, j, 0)) return true;
             }
         }
-        
-        delete[] visited;
-        
         return false;
     }
 
-    bool hasPathCore(char* matrix, int rows, int cols, int row, int col, char* str, bool* visited, int& pathLen) {
-        if(str[pathLen] == '\0')
-            return true;
+    bool dfs(char* matrix, int rows, int cols, char* str, int x, int y, int u) {
+        if(matrix[cols*x + y] != str[u]) return false; // 必须先判断当前字符是否匹配
+        if(u == strlen(str) - 1) return true; // 判断是否匹配所有字符
         
-        bool hasPath = false;
-        if(row >= 0 && row < rows && col >= 0 && col < cols && matrix[row*cols + col] == str[pathLen] 
-                    && !visited[row*cols + col]) {
-            ++pathLen;
-            
-            visited[row*cols + col] = true;
-            
-            hasPath = hasPathCore(matrix, rows, cols, row, col - 1, str, visited, pathLen) ||
-                      hasPathCore(matrix, rows, cols, row - 1, col, str, visited, pathLen) ||
-                      hasPathCore(matrix, rows, cols, row, col + 1, str, visited, pathLen) ||
-                      hasPathCore(matrix, rows, cols, row + 1, col, str, visited, pathLen);
-            
-            if(!hasPath) {
-                --pathLen;
-                visited[row*cols + col] = false;
-            }
-
+        char tmp = matrix[cols*x + y];
+        matrix[cols*x + y] = '*';
+        int dx[] = {-1,0,1,0}, dy[] = {0,1,0,-1};
+        for(int i = 0; i < 4; i++) {
+            int a = x + dx[i], b = y + dy[i];
+            if(a < 0 || a >= rows || b < 0 || b >= cols) continue;
+            if(matrix[cols*a + b] == '*') continue; // 不可重复进入相同的格子
+            if(dfs(matrix, rows, cols, str, a, b, u + 1)) return true;
         }
-        
-        return hasPath;
+        matrix[cols*x + y] = tmp;
+        return false;
     }
-
 };
 ```
 
@@ -3982,62 +4021,66 @@ public:
 
 ## 动态规划和贪心
 
-### 面试题14 剪绳子（核心思想：贪心）
+### 面试题14 剪绳子（核心思想：贪心&DP）
 
-【[OJ](https://www.nowcoder.com/practice/57d85990ba5b440ab888fc72b0751bf8?tpId=13&tqId=33257&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/57d85990ba5b440ab888fc72b0751bf8?tpId=13&tqId=33257&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/description/24/)】给你一根长度为n的绳子，请把绳子剪成整数长的m段（m、n都是整数，n>1并且m>1，m<=n），每段绳子的长度记为k[1],...,k[m]。请问k[1]x...xk[m]可能的最大乘积是多少？例如，当绳子的长度是8时，我们把它剪成长度分别为2、3、3的三段，此时得到的最大乘积是18。
+
+```
+输入：8
+输出：18
+```
+
+**题解：**
+
+方法1：贪心，时间复杂度$O(n)$
+
+首先把一个正整数 $N$ 拆分成若干正整数只有有限种拆法，所以存在最大乘积。假设 $N = n_1 + n_2 + ... + n_k$，并且 $n_1 \times n_2 \times ... \times n_k$ 是最大乘积。
+
+1. 显然1不会出现在其中；
+2. 如果对于某个 $i$ 有 $n_i \ge 5$，那么把 $n_i$ 拆分成 $3 + (n_i - 3)$，我们有 $3(n_i - 3) = 3n_i - 9 \gt n_i$；
+3. 如果 $n_i = 4$，拆成 $2 + 2$乘积不变，所以不妨假设没有4；
+4. 如果有三个以上的2，那么 $3 \times 3 \gt 2 \times 2 \times 2$，所以替换成3乘积更大；
+
+综上，选用尽量多的3，直到剩下2或者4时，用2。
+时间复杂度分析：当 $n$ 比较大时，$n$ 会被拆分成 $\lceil n / 3 \rceil$ 个数，我们需要计算这么多次减法和乘法，所以时间复杂度是 $O(n)$。
+
+```c
+class Solution {
+public:
+    int cutRope(int n) {
+        if (n <= 3) return 1 * (n - 1); // 因为至少拆成两段，小于3则拆出1和n-1
+        int res = 1;
+        if (n % 3 == 1) res = 4, n -= 4; // 余1则拆出两个2
+        else if (n % 3 == 2) res = 2, n -= 2; // 余2则拆出一个2
+        while(n) res *= 3, n -= 3; // 可被3整除，将n拆成3的和
+        return res;
+    }
+};
+```
+
+
+
+方法2：DP，时间复杂度$O(n^2)$
+
+状态定义：dp[i] 表示表示把长度为 i 的绳子剪成若干段之后各段长度乘积的最大值。
+
+状态转移方程：dp[i] = max(dp[i], dp[j] * dp[i-j])，其中 0<i<n。若不剪长度为 i 的绳子则最大值为 dp[i]，若将长度为 i 的绳子剪成长度为 j 和长度为 i-j 的两段，则最大值为dp[j] * dp[i-j]。长度为 i 时的最大值为这两种情况中的最大值。
+
+初始值：当长度小于3则必须拆出1和length-1两段，当长度大于等于4时，为了计算出dp数组后面的值，需要根据状态定义得到 dp[1],dp[2],dp[3] 的值，为了套用状态转移方程以求得dp[3]之后的值，dp[1],dp[2],dp[3] 值应初始化为不剪绳子时的乘积，即dp[1] = 1, dp[2] = 2, dp[3] = 3; 这个地方比较难理解。
 
 ```cpp
 class Solution {
 public:
-    // 动态规划
-    int cutRope(int number) {
-        if(number < 2)
-            return 0;
-        if(number == 2)
-            return 1;
-        if(number == 3)
-            return 2;
-        
-        int *dp = new int[number + 1];
-        dp[0] = 0;
-        dp[1] = 1;
-        dp[2] = 2;
-        dp[3] = 3;
-        
-        int max = 0;
-        
-        for(int i = 4; i <= number; ++i) {
-            max = 0;
-            for(int j = 1; j <= i/2; ++j) {
-                dp[i] = dp[j] * dp[i - j];
-                if(dp[i] > max)
-                    max = dp[i];
+    int cutRope(int n) {
+        if (n <= 3) return 1 * (n - 1); // 因为至少拆成两段，小于3则拆出1和n-1
+        vector<int> dp(n + 1, 0);
+        dp[1] = 1, dp[2] = 2, dp[3] = 3;
+        for (int i = 4; i <= n; i++) {
+            for (int j = 1; j <= i / 2; j++) {
+                dp[i] = max(dp[i], dp[j] * dp[i - j]);
             }
         }
-        
-        max = dp[number];
-        delete[] dp;
-        
-        return max;
-    }
-    
-    // 贪心
-    int cutRope_greedy(int number) {
-        if(number < 2)
-            return 0;
-        if(number == 2)
-            return 1;
-        if(number == 3)
-            return 2;
-        
-        int timesOf3 = number / 3;
-        
-        if(number - timesOf3 * 3 == 1)
-            timesOf3 -= 1;
-        
-        int timesOf2 = (number - timesOf3 * 3) / 2;
-        
-        return (int)(pow(3, timesOf3)) * (int)(pow(2, timesOf2));
+        return dp[n];
     }
 };
 ```
@@ -4131,6 +4174,78 @@ public:
 
 
 
+### 面试题60 n个骰子的点数（核心思想：DP/DFS）
+
+【[AcWing](https://www.acwing.com/problem/content/76/)】将一个骰子投掷n次，获得的总点数为s，s的可能范围为n\~6n。掷出某一点数，可能有多种掷法，例如投掷2次，掷出3点，共有[1,2],[2,1]两种掷法。请求出投掷n次，掷出n~6n点分别有多少种掷法。
+
+```
+输入：n=1
+输出：[1, 1, 1, 1, 1, 1]
+解释：投掷1次，可能出现的点数为1-6，共计6种。每种点数都只有1种掷法。所以输出[1, 1, 1, 1, 1, 1]。
+
+输入：n=2
+输出：[1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
+解释：投掷2次，可能出现的点数为2-12，共计11种。每种点数可能掷法数目分别为1,2,3,4,5,6,5,4,3,2,1。
+     所以输出[1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]。
+```
+
+**题解**：
+
+方法1：DP，时间复杂度O(n^2^)
+
+状态表示：`dp[i][j]`表示前 i 个骰子扔出和为 j 的方案数
+
+状态计算：根据最后一次的点数，划分为6个集合，因为第i个骰子可能扔出1-6的点数，则`dp[i][j]=dp[i-1][j-1]+dp[i-1][j-2]+dp[i-1][j-3]+dp[i-1][j-4]+dp[i-1][j-5]+dp[i-1][j-6]`。最后一次的点数为 k 时的方案数为`dp[i-1][j-k]`，因而状态转移方程为`dp[i][j] = dp[i-1][j-1]+ ... + dp[i-1][j-6]` 
+
+边界条件： 用一个骰子扔出和为0-6的可能数为1，即`dp[1][j] = 1 | j=[1,6]`
+
+```cpp
+class Solution {
+public:
+    vector<int> numberOfDice(int n) {
+        vector<vector<int>> dp(n + 1, vector<int>(6 * n + 1, 0)); // dp[i][j]表示前i个骰子扔出和为j的方案数
+        for(int j = 1; j <= 6; j++) // 用一个骰子扔出和为0-6的可能数为1
+            dp[1][j] = 1;
+        
+        for (int i = 2; i <= n; i++) // i从2开始
+            for (int j = 1; j <= i * 6; j++)
+                for (int k = 1; k <= 6; k++)
+                    if (j >= k) dp[i][j] += dp[i - 1][j - k];
+                        
+        return vector<int>(dp[n].begin() + n, dp[n].end());
+    }
+};
+
+```
+
+方法2：DFS
+
+指数级时间复杂度
+
+dfs(n, sum) 表示前 n 个骰子点数和为 sum 时的方案数
+
+```cpp
+class Solution {
+public:
+    vector<int> numberOfDice(int n) {
+        vector<int>res;
+        for(int i = n; i <= n * 6; i ++) res.push_back(dfs(n,i));
+        return res;
+    }
+    int dfs(int n, int sum){
+        if(sum < 0) return 0; // 和不可能小于0
+        if(n == 0) return !sum; // n=0时，sum不为0则为一合法方案，返回1
+        int res;
+        for(int i = 1; i <= 6; ++i){
+            res += dfs(n-1, sum-i)
+        }
+        return res;
+    }
+};
+```
+
+
+
 ### 面试题63 股票的最大利润（核心思想：贪心）
 
 【[AcWing](https://www.acwing.com/problem/content/79/)】假设把某股票的价格按照时间先后顺序存储在数组中，请问买卖 **一次** 该股票可能获得的利润是多少？
@@ -4169,37 +4284,34 @@ public:
 
 ### 面试题61 扑克牌中的顺子
 
-【[OJ](https://www.nowcoder.com/practice/762836f4d43d43ca9deb273b3de8e1f4?tpId=13&tqId=11198&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking)】
+【[OJ](https://www.nowcoder.com/practice/762836f4d43d43ca9deb273b3de8e1f4?tpId=13&tqId=11198&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/77/)】从扑克牌中随机抽5张牌，判断是不是一个顺子，即这5张牌是不是连续的。2～10为数字本身，A为1，J为11，Q为12，K为13，大小王可以看做任意数字。为了方便，大小王均以0来表示，并且假设这副牌中大小王均有两张。
 
-先排序，再统计0的个数；求0后面各对数字的差，差以0补上，若0不够用则不是顺子；若一对数字相等，不是顺子。
+```
+输入：[8,9,10,11,12]
+输出：true
+
+输入：[0,8,9,11,12]
+输出：true
+```
+
+**题解**：
+
+先排序，再判断除0以外是否有重复，有重复则不可能是顺子，最后判断除0外最大数与组小数的差是否小于等于4，等于4时不需要用0补，小于4时需要用0补，大于4则不可能是顺子。
 
 ```cpp
 class Solution {
 public:
-    bool IsContinuous( vector<int> numbers ) {
-        if(numbers.empty())
-            return false;
-        
-        sort(numbers.begin(), numbers.end()); // 排序
-        
-        int zeroCnt = 0;
-        for(int number : numbers) { // 统计0的个数
-            if(number == 0)
-                zeroCnt++;
+    bool isContinuous( vector<int> nums ) {
+        if(nums.empty()) return false;
+        sort(nums.begin(), nums.end()); // 先排序
+        for(int i = 1; i < nums.size(); i++) { // 判断除0以外的数是否有重复
+            if(nums[i] && nums[i] == nums[i-1])
+                return false; // 有重复则不可能是顺子
         }
         
-        for(int i = zeroCnt; i < numbers.size(); ++i) {
-            int diff = numbers[i+1] - numbers[i] - 1;
-            if(diff == -1) { // 两数相等
-                return false;
-            } else{
-                zeroCnt -= diff; // 使用0来填补空缺
-                if(zeroCnt < 0) // 0不够用了
-                    return false;
-            }
+        for(auto x :nums) { // 判断除0以外最小的数与最大的数的差值是否小于等于4
+            if(x) return nums.back() - x <= 4; // 差值小于等于4则肯定是顺子
         }
-        
-        return true;
     }
 };
 ```
@@ -4208,7 +4320,7 @@ public:
 
 ### 面试题64 求1+2+3+...+n
 
-【[OJ](https://www.nowcoder.com/practice/7a0da8fc483247ff8800059e12d7caf1?tpId=13&tqId=11200&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/description/80/)】
+【[OJ](https://www.nowcoder.com/practice/7a0da8fc483247ff8800059e12d7caf1?tpId=13&tqId=11200&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWing](https://www.acwing.com/problem/content/description/80/)】求1+2+…+n,要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
 
 ```
 输入：10
@@ -4251,7 +4363,14 @@ public:
 
 ### 面试题65 不用加减乘除做加法
 
-【[OJ](https://www.nowcoder.com/practice/59ac416b4b944300b617d4f7f111b215?tpId=13&tqId=11201&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWIng](https://www.acwing.com/problem/content/description/81/)】
+【[OJ](https://www.nowcoder.com/practice/59ac416b4b944300b617d4f7f111b215?tpId=13&tqId=11201&tPage=1&rp=1&ru=/ta/coding-interviews&qru=/ta/coding-interviews/question-ranking) / [AcWIng](https://www.acwing.com/problem/content/description/81/)】写一个函数，求两个整数之和，要求在函数体内不得使用＋、－、×、÷ 四则运算符号。
+
+```
+输入：num1 = 1 , num2 = 2
+输出：3
+```
+
+**题解**：
 
 首先看十进制是如何做的： 5+7=12，三步走 
 
