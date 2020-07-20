@@ -1105,7 +1105,7 @@ void  OS_RdyListInit (void)
 
 
 
-### OS_RdyListInsertHead() 函数
+#### OS_RdyListInsertHead() 函数
 
 OS_RdyListInsertHead() 用于在链表头部插入一个 TCB 节点，插入的时候分两种情况，第一种是链表是空链表，第二种是链表中已有节点。
 
@@ -1282,6 +1282,873 @@ void  OS_RdyListRemove (OS_TCB  *p_tcb)
 }
 ```
 
+
+
+# 任务时基列表
+
+时基列表是跟时间相关的，**处于延时的任务和等待事件有超时限制的任务都会从就绪列表中移除，然后插入到时基列表**。时基列表在 OSTimeTick 中更新，**如果任务的延时时间结束或者超时到期，就会让任务就绪，从时基列表移除，插入到就绪列表**。
+
+
+
+## 1. 实现时基列表
+
+### 1.1  定义时基列表变量
+
+时基列表在代码层面上由全局数组 OSCfg_TickWheel[] 和全局变量 OSTickCtr 构成，一个空的时基列表如下图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720163436.png" width="650px" /> </div>
+
+时基列表定义：
+
+```c
+/* 时基列表大小，在os_cfg_app.h 定义 */ 
+#define  OS_CFG_TICK_WHEEL_SIZE           17u 
+
+/* 在os_cfg_app.c 定义 */ 
+/* 时基列表 */ 
+	(1)                                  (2) 
+OS_TICK_SPOKE  OSCfg_TickWheel[OS_CFG_TICK_WHEEL_SIZE]; 
+/* 时基列表大小 */ 
+OS_OBJ_QTY const OSCfg_TickWheelSize = (OS_OBJ_QTY  )OS_CFG_TICK_WHEEL_SIZE; 
+
+/* 在os.h 中声明 */ 
+/* 时基列表 */ 
+extern  OS_TICK_SPOKE  OSCfg_TickWheel[]; 
+/* 时基列表大小 */ 
+extern  OS_OBJ_QTY    const OSCfg_TickWheelSize; 
+
+/* Tick 计数器，在os.h 中定义 */ 
+OS_EXT            OS_TICK                OSTickCtr;        (3)
+```
+
+- OS_TICK_SPOKE 为时基列表数组 OSCfg_TickWheel[] 的数据类型，在 os.h 文件定义。
+- OS_CFG_TICK_WHEEL_SIZE 是一个宏，在 os_cfg_app.h 中定义，用于控制时基列表的大小。OS_CFG_TICK_WHEEL_SIZE 的推荐值为任务数/4，不推荐使用偶数，如果算出来是偶数，则加1 变成质数，实际上质数是一个很好的选择。
+- OSTickCtr 为 SysTick 周期计数器，记录系统启动到现在或者从上一次复位到现在经过了多少个 SysTick 周期。
+
+os_tick_spoke 定义：
+
+```c
+typedef  struct  os_tick_spoke       OS_TICK_SPOKE;      (1) 
+
+struct  os_tick_spoke { 
+    OS_TCB              *FirstPtr;                       (2) 
+    OS_OBJ_QTY           NbrEntries;                     (3) 
+    OS_OBJ_QTY           NbrEntriesMax;                  (4) 
+};
+```
+
+- 时基列表 OSCfg_TickWheel[]的每个成员都包含一条单向链表，被插入到该条链表的 TCB 会按照延时时间做**升序排列**。**FirstPtr 用于指向这条单向链表的第一个节点**。
+- 时基列表 OSCfg_TickWheel[]的每个成员都包含一条单向链表，NbrEntries 表示该条单向链表当前有多少个节点。
+- NbrEntriesMax 记录该条单向链表最多的时候有多少个节点，在增加节点的时候会刷新，在删除节点的时候不刷新。
+
+
+
+### 1.2 修改任务控制块TCB
+
+时基列表 OSCfg_TickWheel[] 的每个成员都包含一条单向链表，被插入到该条链表的 TCB 会按照延时时间做升序排列，为了 TCB 能按照延时时间从小到大串接在一起，需要在TCB 中加入几个成员。
+
+```c
+struct os_tcb { 
+    ...
+
+    /* 任务延时周期个数 */ 
+    OS_TICK         TaskDelayTicks; 
+
+    /* 任务优先级 */ 
+    OS_PRIO         Prio; 
+
+    /* 就绪列表双向链表的下一个指针 */ 
+    OS_TCB          *NextPtr;
+    /* 就绪列表双向链表的前一个指针 */ 
+    OS_TCB          *PrevPtr; 
+
+    /*时基列表相关字段*/ 
+    OS_TCB          *TickNextPtr;              (1) 
+    OS_TCB          *TickPrevPtr;              (2) 
+    OS_TICK_SPOKE   *TickSpokePtr;             (5) 
+
+    OS_TICK         TickCtrMatch;              (4) 
+    OS_TICK         TickRemain;                (3) 
+    ...
+};
+```
+
+- TickNextPtr 用于指向链表中的下一个 TCB 节点。
+- TickPrevPtr 用于指向链表中的上一个 TCB 节点。
+- TickRemain 用于设置任务还需要等待多少个时钟周期，每到来一个时钟周期，该值会递减。
+- TickCtrMatch 的值等于时基计数器 OSTickCtr 的值加上 TickRemain 的值，当 TickCtrMatch 的值等于 OSTickCtr 的值的时候，表示等待到期，TCB 会从链表中删除。
+- 每个被插入到链表的 TCB 都包含一个字段 TickSpokePtr，用于回指到链表的根部。
+
+
+
+在时基列表 OSCfg_TickWheel[] 索引 11 这条链表里面插入了两个 TCB，一个需要延时 1 个时钟周期，另外一个需要延时 13 个时钟周期：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720164443.png" width="650px" /> </div>
+
+
+
+### 1.3 实现时基列表相关函数
+
+时基列表相关函数在 os_tick.c 实现，在 os.h 中声明。
+
+
+
+#### OS_TickListInit() 函数
+
+OS_TickListInit()函数用于初始化时基列表，即将全局变量 OSCfg_TickWheel[] 的数据域全部初始化为 0，一个初始化为 0 的的时基列表见下图：
+
+```c
+void  OS_TickListInit (void)
+{
+    OS_TICK_SPOKE_IX   i;
+    OS_TICK_SPOKE     *p_spoke;
+
+    for (i = 0u; i < OSCfg_TickWheelSize; i++) {
+        p_spoke                = (OS_TICK_SPOKE *)&OSCfg_TickWheel[i];
+        p_spoke->FirstPtr      = (OS_TCB        *)0;
+        p_spoke->NbrEntries    = (OS_OBJ_QTY     )0u;
+        p_spoke->NbrEntriesMax = (OS_OBJ_QTY     )0u;
+    }
+}
+```
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720173529.png" width="650px" /> </div>
+
+
+
+#### OS_TickListInsert() 函数
+
+OS_TickListInsert() 函数用于往时基列表中插入一个任务 TCB：
+
+```c
+void  OS_TickListInsert (OS_TCB   *p_tcb, //任务控制块
+                         OS_TICK   time,  //时间
+                         OS_OPT    opt,   //选项
+                         OS_ERR   *p_err) //返回错误类型
+{
+    OS_TICK            tick_delta;
+    OS_TICK            tick_next;
+    OS_TICK_SPOKE     *p_spoke;
+    OS_TCB            *p_tcb0;
+    OS_TCB            *p_tcb1;
+    OS_TICK_SPOKE_IX   spoke;
+
+    if (opt == OS_OPT_TIME_MATCH) {                                //如果 time 是个绝对时间
+        tick_delta = time - OSTickCtr - 1u;                        //计算离到期还有多长时间
+        if (tick_delta > OS_TICK_TH_RDY) {                         //如果延时时间超过了门限
+            p_tcb->TickCtrMatch = (OS_TICK        )0u;             //将任务的时钟节拍的匹配变量置0
+            p_tcb->TickRemain   = (OS_TICK        )0u;             //将任务的延时还需时钟节拍数置0
+            p_tcb->TickSpokePtr = (OS_TICK_SPOKE *)0;              //该任务不插入节拍列表
+           *p_err               =  OS_ERR_TIME_ZERO_DLY;           //错误类型相当于“0延时”
+            return;                                                //返回，不将任务插入节拍列表
+        }
+        p_tcb->TickCtrMatch = time;                                //任务等待的匹配点为 OSTickCtr = time
+        p_tcb->TickRemain   = tick_delta + 1u;                     //计算任务离到期还有多长时间
+
+    } else if (time > (OS_TICK)0u) {                               //如果 time > 0
+        if (opt == OS_OPT_TIME_PERIODIC) {                         //如果 time 是周期性时间 
+            tick_next  = p_tcb->TickCtrPrev + time;                //计算任务接下来要匹配的时钟节拍总计数
+            tick_delta = tick_next - OSTickCtr - 1u;               //计算任务离匹配还有个多长时间
+            if (tick_delta < time) {                               //如果 p_tcb->TickCtrPrev < OSTickCtr + 1 
+                p_tcb->TickCtrMatch = tick_next;                   //将 p_tcb->TickCtrPrev + time 设为时钟节拍匹配点
+            } else {                                               //如果 p_tcb->TickCtrPrev >= OSTickCtr + 1 
+                p_tcb->TickCtrMatch = OSTickCtr + time;            //将 OSTickCtr + time 设为时钟节拍匹配点
+            }
+            p_tcb->TickRemain   = p_tcb->TickCtrMatch - OSTickCtr; //计算任务离到期还有多长时间
+            p_tcb->TickCtrPrev  = p_tcb->TickCtrMatch;             //保存当前匹配值为下一周期延时用
+
+        } else {                                                   //如果 time 是相对时间
+            p_tcb->TickCtrMatch = OSTickCtr + time;                //任务等待的匹配点为 OSTickCtr + time
+            p_tcb->TickRemain   = time;                            //计算任务离到期的时间就是 time
+        }
+
+    } else {                                                       //如果 time = 0
+        p_tcb->TickCtrMatch = (OS_TICK        )0u;                 //将任务的时钟节拍的匹配变量置0
+        p_tcb->TickRemain   = (OS_TICK        )0u;                 //将任务的延时还需时钟节拍数置0
+        p_tcb->TickSpokePtr = (OS_TICK_SPOKE *)0;                  //该任务不插入节拍列表
+       *p_err               =  OS_ERR_TIME_ZERO_DLY;               //错误类型为“0延时”
+        return;                                                    //返回，不将任务插入节拍列表
+    }
+
+
+    spoke   = (OS_TICK_SPOKE_IX)(p_tcb->TickCtrMatch % OSCfg_TickWheelSize); //使用哈希算法（取余）来决定任务存于数组 
+    p_spoke = &OSCfg_TickWheel[spoke];                                       //OSCfg_TickWheel的哪个元素（组织一个节拍列表），
+                                                                             //与更新节拍列表相对应，可方便查找到期任务。
+    if (p_spoke->NbrEntries == (OS_OBJ_QTY)0u) {                 //如果当前节拍列表为空
+        p_tcb->TickNextPtr   = (OS_TCB   *)0;                    //任务中指向节拍列表中下一个任务的指针置空
+        p_tcb->TickPrevPtr   = (OS_TCB   *)0;                    //任务中指向节拍列表中前一个任务的指针置空
+        p_spoke->FirstPtr    =  p_tcb;                           //当前任务被列为该节拍列表的第一个任务
+        p_spoke->NbrEntries  = (OS_OBJ_QTY)1u;                   //节拍列表中的元素数目为1
+    } else {                                                     //如果当前节拍列表非空
+        p_tcb1     = p_spoke->FirstPtr;                          //获取列表中的第一个任务 
+        while (p_tcb1 != (OS_TCB *)0) {                          //如果该任务存在
+            p_tcb1->TickRemain = p_tcb1->TickCtrMatch            //计算该任务的剩余等待时间
+                               - OSTickCtr;
+            if (p_tcb->TickRemain > p_tcb1->TickRemain) {        //如果当前任务的剩余等待时间大于该任务的
+                if (p_tcb1->TickNextPtr != (OS_TCB *)0) {        //如果该任务不是列表的最后一个元素
+                    p_tcb1               =  p_tcb1->TickNextPtr; //让当前任务继续与该任务的下一个任务作比较
+                } else {                                         //如果该任务是列表的最后一个元素
+                    p_tcb->TickNextPtr   = (OS_TCB *)0;          //当前任务为列表的最后一个元素
+                    p_tcb->TickPrevPtr   =  p_tcb1;              //该任务是当前任务的前一个元素
+                    p_tcb1->TickNextPtr  =  p_tcb;               //当前任务是该任务的后一个元素
+                    p_tcb1               = (OS_TCB *)0;          //插入完成，退出 while 循环
+                }
+            } else {                                             //如果当前任务的剩余等待时间不大于该任务的
+                if (p_tcb1->TickPrevPtr == (OS_TCB *)0) {        //如果该任务是列表的第一个元素
+                    p_tcb->TickPrevPtr   = (OS_TCB *)0;          //当前任务就作为列表的第一个元素
+                    p_tcb->TickNextPtr   =  p_tcb1;              //该任务是当前任务的后一个元素
+                    p_tcb1->TickPrevPtr  =  p_tcb;               //当前任务是该任务的前一个元素
+                    p_spoke->FirstPtr    =  p_tcb;               //当前任务是列表的第一个元素
+                } else {                                         //如果该任务也不是是列表的第一个元素
+                    p_tcb0               =  p_tcb1->TickPrevPtr; // p_tcb0 暂存该任务的前一个任务
+                    p_tcb->TickPrevPtr   =  p_tcb0;              //该任务的前一个任务作为当前任务的前一个任务
+                    p_tcb->TickNextPtr   =  p_tcb1;              //该任务作为当前任务的后一个任务
+                    p_tcb0->TickNextPtr  =  p_tcb;               // p_tcb0 暂存的任务的下一个任务改为当前任务
+                    p_tcb1->TickPrevPtr  =  p_tcb;               // 该任务的前一个任务也改为当前任务
+                }
+                p_tcb1 = (OS_TCB *)0;                            //插入完成，退出 while 循环
+            }
+        }
+        p_spoke->NbrEntries++;                                   //节拍列表中的元素数目加1
+    }
+    if (p_spoke->NbrEntriesMax < p_spoke->NbrEntries) {          //更新节拍列表的元素数目的最大记录
+        p_spoke->NbrEntriesMax = p_spoke->NbrEntries;
+    }
+    p_tcb->TickSpokePtr = p_spoke;                               //记录当前任务存放于哪个节拍列表
+   *p_err               = OS_ERR_NONE;                           //错误类型为“无错误”
+}
+```
+
+时基列表有 3 个 TCB 时的示意图：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720173723.png" width="800px" /> </div>
+
+- TickCtrMatch 的值等于当前时基计数器的值 OSTickCtr 加上任务要延时的时间 time，time 由函数形参传进来。OSTickCtr 是一个全局变量，记录的是系统自启动以来或者自上次复位以来经过了多少个 SysTick 周期。OSTickCtr 的值每经过一个 SysTick 周期其值就加一，当 TickCtrMatch 的值与其相等时，就表示任务等待时间到期。
+- 将任务需要延时的时间 time 保存到 TCB 的 TickRemain，它表示任务还需要延时多少个 SysTick 周期，每到来一个 SysTick 周期，TickRemain 会减一。
+- 由任务的 TickCtrMatch 对时基列表的大小 OSCfg_TickWheelSize 进行求余操作，得出的值 spoke 作为 时基列表 OSCfg_TickWheel[] 的索引。只要是任务的TickCtrMatch 对 OSCfg_TickWheelSize 求余后得到的值 spoke 相等，那么任务的 TCB 就会被插入到 OSCfg_TickWheel[spoke]下的单向链表中，节点按照任务的 TickCtrMatch 值做升序排列。
+  - 在上图中，时基列表 OSCfg_TickWheel[] 的大小 OSCfg_TickWheelSize 等于 12，当前时基计数器 OSTickCtr 的值为 10，有三个任务分别需要延时 TickRemain=1、TickRemain=23 和 TickRemain=25 个时钟周期，三个任务的 TickRemain 加上 OSTickCtr 可分别得出它们的 TickCtrMatch 等于 11 、23 和 35 ，这三个任务的 TickCtrMatch 对OSCfg_TickWheelSize 求余操作后的值 spoke 都等于 11，所以这三个任务的 TCB 会被插入到 OSCfg_TickWheel[11] 下的同一条链表，节点顺序根据 TickCtrMatch 的值做升序排列。
+- 根据刚刚算出的索引值 spoke，获取到该索引值下的成员的地址，也叫根指针，因为该索引下对应的成员OSCfg_TickWheel[spoke] 会维护一条双向的链表。
+- 将 TCB 插入到链表中分两种情况，第一是当前链表是空的，插入的节点将成为第一个节点，这个处理非常简单；第二是当前链表已经有节点。
+- 当前的链表中已经有节点，插入的时候则根据 TickCtrMatch 的值做升序排列，插入的时候分三种情况，第一是在最后一个节点之间插入，第二是在第一个节点插入，第三是在两个节点之间插入。
+- 节点成功插入 p_tcb1 指针，跳出 while 循环。
+- 节点成功插入，记录当前链表节点个数的计数器NbrEntries 加一。
+- 刷新 NbrEntriesMax 的值, NbrEntriesMax 用于记录当前链表曾经最多有多少个节点，只有在增加节点的时候才刷新，在删除节点的时候是不刷新的。 
+- 任务 TCB 被成功插入到链表，TCB 中的 TickSpokePtr 回指所在链表的根指针。
+
+
+
+#### OS_TickListRemove() 函数
+
+OS_TickListRemove() 用于从时基列表删除一个指定的 TCB 节点：
+
+```c
+void  OS_TickListRemove (OS_TCB  *p_tcb)                      //把任务从节拍列表移除
+{
+    OS_TICK_SPOKE  *p_spoke;
+    OS_TCB         *p_tcb1;
+    OS_TCB         *p_tcb2;
+
+
+
+    p_spoke = p_tcb->TickSpokePtr;                            //获取任务位于哪个节拍列表
+    if (p_spoke != (OS_TICK_SPOKE *)0) {                      //如果任务的确在节拍列表中
+        p_tcb->TickRemain = (OS_TICK)0u;                      //将任务的延时还需时钟节拍数置0            
+        if (p_spoke->FirstPtr == p_tcb) {                     //如果任务为节拍列表的第一个任务
+            p_tcb1            = (OS_TCB *)p_tcb->TickNextPtr; //获取任务的后一个任务为 p_tcb1
+            p_spoke->FirstPtr = p_tcb1;                       //把 p_tcb1 作为节拍列表的第一个任务
+            if (p_tcb1 != (OS_TCB *)0) {                      //如果 p_tcb1 非空
+                p_tcb1->TickPrevPtr = (OS_TCB *)0;            //p_tcb1 前面已不存在任务
+            }
+        } else {                                              //如果任务不为节拍列表的第一个任务
+            p_tcb1              = p_tcb->TickPrevPtr;         //获取任务的前一个任务为 p_tcb1
+            p_tcb2              = p_tcb->TickNextPtr;         //获取任务的后一个任务为 p_tcb2
+            p_tcb1->TickNextPtr = p_tcb2;                     //将 p_tcb2 作为 p_tcb1 的后一个任务
+            if (p_tcb2 != (OS_TCB *)0) {                      //如果 p_tcb2 非空
+                p_tcb2->TickPrevPtr = p_tcb1;                 //把 p_tcb1 作为 p_tcb2 的前一个任务
+            }
+        }
+        p_tcb->TickNextPtr  = (OS_TCB        *)0;             //清空任务的后一个任务
+        p_tcb->TickPrevPtr  = (OS_TCB        *)0;             //清空任务的前一个任务
+        p_tcb->TickSpokePtr = (OS_TICK_SPOKE *)0;             //任务不再属于任何节拍列表
+        p_tcb->TickCtrMatch = (OS_TICK        )0u;            //将任务的时钟节拍的匹配变量置0
+        p_spoke->NbrEntries--;                                //节拍列表中的元素数目减1
+    }
+}
+```
+
+- 要删除的节点是链表的第一个节点，这个操作很好处理，只需更新下第一个节点即可。 
+
+- 要删除的节点不是链表的第一个节点，则先保存要删除的节点的前后节点，然后把这前后两个节点相连即可。 
+- 复位任务 TCB 中时基列表相关的字段成员。
+- 节点删除成功，链表中的节点计数器 NbrEntries 减一。
+
+
+
+#### OS_TickListUpdate() 函数
+
+OS_TickListUpdate() 在每个 SysTick 周期到来时在 OSTimeTick()被调用，用于更新时基计数器OSTickCtr，扫描时基列表中的任务延时是否到期：
+
+```c
+void  OS_TickListUpdate (void)
+{
+    CPU_BOOLEAN        done;
+    OS_TICK_SPOKE     *p_spoke;
+    OS_TCB            *p_tcb;
+    OS_TCB            *p_tcb_next;
+    OS_TICK_SPOKE_IX   spoke;
+    CPU_TS             ts_start;
+    CPU_TS             ts_end;
+    CPU_SR_ALLOC();                                                   //使用到临界段（在关/开中断时）时必需该宏，该宏声明和定义一个局部变
+                                                                      //量，用于保存关中断前的 CPU 状态寄存器 SR（临界段关中断只需保存SR）
+                                                                      //，开中断时将该值还原。
+    OS_CRITICAL_ENTER();                                              //进入临界段
+    ts_start = OS_TS_GET();                                           //获取 OS_TickTask() 任务的起始时间戳
+    OSTickCtr++;                                                      //时钟节拍数自加
+    spoke    = (OS_TICK_SPOKE_IX)(OSTickCtr % OSCfg_TickWheelSize);   //使用哈希算法（取余）缩小查找到期任务位于 OSCfg_TickWheel 数组的
+    p_spoke  = &OSCfg_TickWheel[spoke];                               //哪个元素（一个节拍列表），与任务插入数组时对应，下面只操作该列表。
+    p_tcb    = p_spoke->FirstPtr;                                     //获取节拍列表的首个任务控制块的地址
+    done     = DEF_FALSE;                                             //使下面 while 体得到运行
+    while (done == DEF_FALSE) {
+        if (p_tcb != (OS_TCB *)0) {                                   //如果该任务不空（存在）
+            p_tcb_next = p_tcb->TickNextPtr;                          //获取该列表中紧邻该任务的下一个任务控制块的地址  
+            switch (p_tcb->TaskState) {                               //根据该任务的任务状态处理
+                case OS_TASK_STATE_RDY:                               //如果任务状态均是与时间事件无关，就无需理会
+                case OS_TASK_STATE_PEND:
+                case OS_TASK_STATE_SUSPENDED:
+                case OS_TASK_STATE_PEND_SUSPENDED:
+                     break;
+
+                case OS_TASK_STATE_DLY:                               //如果是延时状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算延时的的剩余时间 
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满 
+                         p_tcb->TaskState = OS_TASK_STATE_RDY;        //修改任务状态量为就绪状态
+                         OS_TaskRdy(p_tcb);                           //让任务就绪
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done             = DEF_TRUE;                 //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                case OS_TASK_STATE_PEND_TIMEOUT:                      //如果是有期限等待状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算期限的的剩余时间
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满 
+#if (OS_MSG_EN > 0u)                                                  //如果使能了消息队列（普通消息队列或任务消息队列）
+                         p_tcb->MsgPtr     = (void      *)0;          //把任务保存接收到消息的地址的成员清空
+                         p_tcb->MsgSize    = (OS_MSG_SIZE)0u;         //把任务保存接收到消息的长度的成员清零
+#endif
+                         p_tcb->TS         = OS_TS_GET();             //记录任务结束等待的时间戳
+                         OS_PendListRemove(p_tcb);                    //从等待列表移除该任务
+                         OS_TaskRdy(p_tcb);                           //让任务就绪
+                         p_tcb->TaskState  = OS_TASK_STATE_RDY;       //修改任务状态量为就绪状态
+                         p_tcb->PendStatus = OS_STATUS_PEND_TIMEOUT;  //记录等待状态为超时
+                         p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING; //记录等待内核对象变量为空
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done              = DEF_TRUE;                //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                case OS_TASK_STATE_DLY_SUSPENDED:                     //如果是延时中被挂起状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算延时的的剩余时间 
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满
+                         p_tcb->TaskState  = OS_TASK_STATE_SUSPENDED; //修改任务状态量为被挂起状态
+                         OS_TickListRemove(p_tcb);                    //从节拍列表移除该任务
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done              = DEF_TRUE;                //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:            //如果是有期限等待中被挂起状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算期限的的剩余时间
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满 
+#if (OS_MSG_EN > 0u)                                                  //如果使能了消息队列（普通消息队列或任务消息队列）
+                         p_tcb->MsgPtr     = (void      *)0;          //把任务保存接收到消息的地址的成员清空
+                         p_tcb->MsgSize    = (OS_MSG_SIZE)0u;         //把任务保存接收到消息的长度的成员清零
+#endif
+                         p_tcb->TS         = OS_TS_GET();             //记录任务结束等待的时间戳
+                         OS_PendListRemove(p_tcb);                    //从等待列表移除该任务
+                         OS_TickListRemove(p_tcb);                    //从节拍列表移除该任务
+                         p_tcb->TaskState  = OS_TASK_STATE_SUSPENDED; //修改任务状态量为被挂起状态
+                         p_tcb->PendStatus = OS_STATUS_PEND_TIMEOUT;  //记录等待状态为超时
+                         p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING; //记录等待内核对象变量为空
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done              = DEF_TRUE;                //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                default:
+                     break;
+            }
+            p_tcb = p_tcb_next;                                       //遍历节拍列表的下一个任务
+        } else {                                                      //如果该任务为空（节拍列表后面肯定也都是空的）
+            done  = DEF_TRUE;                                         //不再遍历该列表，退出 while 循环
+        }
+    }
+    ts_end = OS_TS_GET() - ts_start;                                  //获取 OS_TickTask() 任务的结束时间戳，并计算其执行时间
+    if (OSTickTaskTimeMax < ts_end) {                                 //更新 OS_TickTask() 任务的最大运行时间
+        OSTickTaskTimeMax = ts_end;
+    }
+    OS_CRITICAL_EXIT();                                               //退出临界段
+}
+```
+
+- 每到来一个 SysTick 时钟周期，时基计数器 OSTickCtr 都要加一操作。
+- 计算要扫描的时基列表的索引，每次只扫描一条链表。时基列表里面有可能有多条链表，为啥只扫描其中一条链表就可以？因为任务在插入到时基列表的时候，插入的索引值 spoke_insert 是通过 TickCtrMatch 对 OSCfg_TickWheelSize 求余得出，
+  现在需要扫描的索引值 spoke_update 是通过 OSTickCtr 对 OSCfg_TickWheelSize 求余得出，TickCtrMatch 的值等于 OSTickCt 加上 TickRemain，只有在经过 TickRemain 个时钟周期后，spoke_update 的值才有可能等于 spoke_insert。如果算出的 spoke_update 小于 spoke_insert，且 OSCfg_TickWheel[spoke_update]下的链表的任务没有到期，那后面的肯定都没有到期，不用继续扫描。 
+  - 如下图所示，时基列表 OSCfg_TickWheel[]的大小 OSCfg_TickWheelSize 等于 12，当前时基计数器 OSTickCtr 的值为 7 ，有三个任务分别需要延时 TickTemain=16 、TickTemain=28 和 TickTemain=40 个时钟周期，三个任务的 TickRemain 加上 OSTickCtr 可分别得出它们的 TickCtrMatch 等于 23 、35 和 47 ，这三个任务的 TickCtrMatch 对OSCfg_TickWheelSize 求余操作后的值 spoke 都等于 11，所以这三个任务的 TCB 会被插入到 OSCfg_TickWheel[11]下的同一条链表，节点顺序根据 TickCtrMatch 的值做升序排列。当下一个 SysTick 时钟周期到来的时候，会调用 OS_TickListUpdate()函数，这时 OSTickCtr加一操作后等于 8，对 OSCfg_TickWheelSize（等于 12）求余算得要扫描更新的索引值spoke_update 等 8，则对 OSCfg_TickWheel[8]下面的链表进行扫描，从图中可以得知，8这个索引下没有节点，则直接退出，刚刚插入的三个 TCB 是在 OSCfg_TickWheel[11]下的链表，根本不用扫描，因为时间只是刚刚过了 1 个时钟周期而已，远远没有达到他们需要的延时时间。
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720175305.png" width="800px" /> </div>
+
+- 判断第一个节点的延时时间是否到，如果到期，让任务就绪，即将任务从时基列表删除，插入就绪列表，这两步由函数 OS_TaskRdy() 来完成，该函数在 os_core.c 中定义：
+
+```c
+void  OS_TaskRdy (OS_TCB  *p_tcb)
+{
+    OS_TickListRemove(p_tcb); /* 从时基列表删除 */
+    if ((p_tcb->TaskState & OS_TASK_STATE_BIT_SUSPENDED) == (OS_STATE)0) {
+        OS_RdyListInsert(p_tcb); /* 插入就绪列表 */
+    }
+}
+```
+
+- 如果第一个节点延时期未满，则退出 while 循环，因为链表是根据升序排列的，第一个节点延时期未满，那后面的肯定未满。
+- 如果第一个节点延时到期，则继续判断下一个节点延时是否到期。
+- 链表为空，退出扫描，因为其它还没到期。
+
+
+
+## 2. 修改 OSTimeDly() 函数
+
+加入时基列表之后，OSTimeDly() 函数需要修改，先将任务插入时基列表，再从就绪列表中移除：
+
+```c
+void  OSTimeDly (OS_TICK   dly,                        //延时的时钟节拍数
+                 OS_OPT    opt,                        //选项
+                 OS_ERR   *p_err)                      //返回错误类型
+{   
+    ...
+	OS_CRITICAL_ENTER();                               //进入临界段
+    OSTCBCurPtr->TaskState = OS_TASK_STATE_DLY;        //修改当前任务的任务状态为延时状态
+    OS_TickListInsert(OSTCBCurPtr,                     //将当前任务插入到时基列表
+                      dly,
+                      opt,
+                      p_err);
+    if (*p_err != OS_ERR_NONE) {                       //如果当前任务插入时基列表时出现错误
+         OS_CRITICAL_EXIT_NO_SCHED();                  //退出临界段（无调度）
+         return;                                       //返回，不执行延时操作
+    }
+    OS_RdyListRemove(OSTCBCurPtr);                     //从就绪列表移除当前任务  
+    OS_CRITICAL_EXIT_NO_SCHED();                       //退出临界段（无调度）
+    ...
+}
+```
+
+
+
+# 任务支持多优先级
+
+## 1. 定义优先级相关全局变量
+
+```c
+OS_EXT   OS_PRIO       OSPrioCur;       /* 当前优先级 */
+OS_EXT   OS_PRIO       OSPrioHighRdy;   /* 最高优先级 */
+```
+
+
+
+## 2. 修改OSInit() 函数
+
+优先级相关的全部变量，需要在 OSInit() 函数中进行初始化：
+
+```c
+void OSInit (OS_ERR *p_err) 
+{ 
+ 	...
+    /* 初始化优先级变量 */ 
+    OSPrioCur                       = (OS_PRIO)0; 
+    OSPrioHighRdy                   = (OS_PRIO)0;
+    ...
+}
+```
+
+
+
+## 3. 修改任务控制块TCB
+
+在任务控制块中，加入优先级字段 Prio，优先级Prio 的数据类型为 OS_PRIO，宏展开后是8 位的整型，所以只支持 255 个优先级。
+
+```c
+struct os_tcb {
+    ...
+    /* 任务优先级 */ 
+    OS_PRIO         Prio;
+    ...
+}
+```
+
+
+
+## 4. 修改OSTaskCreate() 函数
+
+修改 OSTaskCreate()函数，在里面加入优先级相关的处理：
+
+```c
+void OSTaskCreate (OS_TCB        *p_tcb, 
+                   OS_TASK_PTR   p_task, 
+                   void          *p_arg, 
+                   OS_PRIO       prio, // 优先级字段
+                   CPU_STK       *p_stk_base, 
+                   CPU_STK_SIZE  stk_size, 
+                   OS_ERR        *p_err) 
+{
+    ...
+    p_tcb->Prio = prio;
+    
+    /* 进入临界段 */ 
+    OS_CRITICAL_ENTER(); 
+
+    /* 将任务添加到就绪列表 */
+    OS_PrioInsert(p_tcb->Prio); 
+    OS_RdyListInsertTail(p_tcb);                                 
+
+    /* 退出临界段 */ 
+    OS_CRITICAL_EXIT(); 
+    ...
+}
+```
+
+- 在函数形参中，加入优先级字段。任务的优先级由用户在创建任务的时候通过形参 Prio 传进来。 
+- 将形参传进来的优先级存到任务控制块 TCB 的优先级字段。
+- 将任务添加到就绪列表这段代码属于临界短代码，需要关中断。
+- 将任务插入到就绪列表，这里需要分成两步来实现：1、根据优先级置位优先级表中的相应位置；2、将任务 TCB 放到 OSRdyList[优先级] 中，如果同一个优先级有多个任务，那么这些任务的 TCB 就会被放到 OSRdyList[优先级] 串成一个双向链表。
+
+
+
+## 5. 修改OS_IdleTaskInit() 函数
+
+修改 OS_IdleTaskInit() 函数，是因为该函数调用了任务创建函数 OSTaskCreate()，OSTaskCreate() 加入了优先级，所以这里要给空闲任务分配一个优先级。
+
+```c
+void  OS_IdleTaskInit (OS_ERR  *p_err)
+{
+#ifdef OS_SAFETY_CRITICAL
+    if (p_err == (OS_ERR *)0) {
+        OS_SAFETY_CRITICAL_EXCEPTION();
+        return;
+    }
+#endif
+
+    OSIdleTaskCtr = (OS_IDLE_CTR)0;
+    /* ---------------- CREATE THE IDLE TASK ---------------- */
+    OSTaskCreate((OS_TCB     *)&OSIdleTaskTCB,
+                 (CPU_CHAR   *)((void *)"uC/OS-III Idle Task"),
+                 (OS_TASK_PTR)OS_IdleTask,
+                 (void       *)0,
+                 (OS_PRIO     )(OS_CFG_PRIO_MAX - 1u), // 设置空闲任务优先级为最低
+                 (CPU_STK    *)OSCfg_IdleTaskStkBasePtr,
+                 (CPU_STK_SIZE)OSCfg_IdleTaskStkLimit,
+                 (CPU_STK_SIZE)OSCfg_IdleTaskStkSize,
+                 (OS_MSG_QTY  )0u,
+                 (OS_TICK     )0u,
+                 (void       *)0,
+                 (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR | OS_OPT_TASK_NO_TLS),
+                 (OS_ERR     *)p_err);
+}
+```
+
+在系统没有任何用户任务运行的情况下，空闲任务就会被运行，优先级最低，即等于 OS_CFG_PRIO_MAX - 1u。
+
+
+
+## 6. 修改OSStart() 函数
+
+加入优先级之后，OSStart() 函数需要修改，具体哪一个任务最先运行，由优先级决定：
+
+```c
+void OSStart (OS_ERR *p_err)
+{
+    ...
+    /* 寻找最高的优先级 */ 
+    OSPrioHighRdy   = OS_PrioGetHighest();                  (1) 
+    OSPrioCur       = OSPrioHighRdy; 
+
+    /* 找到最高优先级的TCB */ 
+    OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr;     (2) 
+    OSTCBCurPtr     = OSTCBHighRdyPtr; 
+    ...
+}
+```
+
+- 调取 OS_PrioGetHighest()函数从全局变量优先级表 OSPrioTbl[] 获取最高的优先级，放到 OSPrioHighRdy 这个全局变量中，然后把 OSPrioHighRdy 的值再赋给当前优先级 OSPrioCur 这个全局变量。在任务切换的时候需要用到 OSPrioHighRdy 和 OSPrioCur 这两个全局变量。 
+- 根据 OSPrioHighRdy 的值，作为全局变量 OSRdyList[] 的下标索引找到最高优先级任务的 TCB ，传给全局变量 OSTCBHighRdyPtr，然后再将 OSTCBHighRdyPtr 赋值给 OSTCBCurPtr 。 在任务切换的时候需要使用到 OSTCBHighRdyPtr 和 OSTCBCurPtr 这两个全局变量。
+
+
+
+## 7. 修改PendSV_Handler() 函数
+
+```asm
+OS_CPU_PendSVHandler_nosave
+...
+; OSPrioCur   = OSPrioHighRdy 
+LDR     R0, =OSPrioCur 
+LDR     R1, =OSPrioHighRdy 
+LDRB    R2, [R1] 
+STRB    R2, [R0]
+...
+```
+
+
+
+## 8. 修改OSTimeDly() 函数
+
+任务调用 OSTimeDly() 函数之后，任务就处于阻塞态，需要将任务从就绪列表中移除：
+
+```c
+void  OSTimeDly(OS_TICK dly) {
+    ...
+    CPU_SR_ALLOC();
+    /* 进入临界区 */ 
+    OS_CRITICAL_ENTER();
+    
+    /* 设置延时时间 */ 
+    OSTCBCurPtr->TaskDelayTicks = dly;
+    /* 从就绪列表中移除 */ 
+    OS_RdyListRemove(OSTCBCurPtr); 
+
+    /* 退出临界区 */ 
+    OS_CRITICAL_EXIT();
+    ...
+}
+```
+
+- 将任务从就绪列表移除这段代码属于临界短代码，需要关中断。 
+- 将任务从就绪列表移除。
+
+
+
+## 9. 修改OSSched() 函数
+
+任务调度函数 OSSched() 需要根据优先级来调度：
+
+```c
+void OSSched(void) {
+    ...
+    CPU_SR_ALLOC();                                           (1) 
+
+    /* 进入临界区 */ 
+    OS_CRITICAL_ENTER();                                      (2) 
+
+    /* 查找最高优先级的任务 */                                   (3) 
+    OSPrioHighRdy   = OS_PrioGetHighest(); 
+    OSTCBHighRdyPtr = OSRdyList[OSPrioHighRdy].HeadPtr; 
+
+    /* 如果最高优先级的任务是当前任务则直接返回，不进行任务切换 */     (4) 
+    if (OSTCBHighRdyPtr == OSTCBCurPtr) { 
+        /* 退出临界区 */ 
+        OS_CRITICAL_EXIT(); 
+        return; 
+    } 
+    /* 退出临界区 */ 
+    OS_CRITICAL_EXIT();                                       (5) 
+    ...
+}
+```
+
+- 查找最高优先级这段代码属于临界短代码，需要关中断。 
+- 查找最高优先级任务。
+- 判断最高优先级任务是不是当前任务，如果是则直接返回，否则将继续往下执行，最后执行任务切换。 
+
+
+
+## 10. 修改OSTimeTick() 函数
+
+OSTimeTick() 函数在 SysTick 中断服务函数中被调用，是一个周期函数，在此函数中会发送信号量给 OSTickTask 任务，在 OS_TickTask() 函数中会获取信号量，如获取成功，则会调用 OS_TickListUpdate() 函数更新时基列表，**OS_TickListUpdate() 函数用于扫描就绪列表 OSRdyList[]，判断任务的延时时间是否到期**，若任务时间到期则会调用 OS_TaskRdy() 函数，首先调用OS_TickListRemove() 函数将任务从时基列表中移除，再调用 OS_RdyListInsert() 函数将任务插入就绪列表。
+
+- OS_RdyListInsert() 函数会调用 OS_PrioInsert() 函数将任务在优先级表中对应的位置位，然后调用 OS_RdyListInsertTail() 或 OS_RdyListInsertHead() 函数将任务插入就绪列表。若待插入任务的优先级与当前运行任务的优先级相同，则插入就绪列表尾部，否则插入头部。
+
+```c
+void  OSTimeTick (void) 
+{
+    ...
+    (void)OSTaskSemPost((OS_TCB *)&OSTickTaskTCB,     //直接发送信号量给时钟节拍任务 OS_TickTask()    
+                        (OS_OPT  ) OS_OPT_POST_NONE,
+                        (OS_ERR *)&err);
+    ...
+}
+```
+
+
+
+```c
+void  OS_TickTask (void  *p_arg)
+{
+    OS_ERR  err;
+    CPU_TS  ts;
+
+
+    p_arg = p_arg;                                           //预防编译警告，没有实际意义
+
+    while (DEF_ON) {                                         //循环运行
+        (void)OSTaskSemPend((OS_TICK  )0,                    //等待来自时基中断的信号量，接收到信号量后继续运行
+                            (OS_OPT   )OS_OPT_PEND_BLOCKING,
+                            (CPU_TS  *)&ts,
+                            (OS_ERR  *)&err);            
+        if (err == OS_ERR_NONE) {                            //如果上面接受的信号量没有错误
+            if (OSRunning == OS_STATE_OS_RUNNING) {          //如果操作系统正在运行
+                OS_TickListUpdate();                         //更新所有任务的时间等待时间（如延时、超时等）
+            }
+        }
+    }
+}
+```
+
+
+
+```c
+void  OS_TickListUpdate (void)
+{
+    CPU_BOOLEAN        done;
+    OS_TICK_SPOKE     *p_spoke;
+    OS_TCB            *p_tcb;
+    OS_TCB            *p_tcb_next;
+    OS_TICK_SPOKE_IX   spoke;
+    CPU_TS             ts_start;
+    CPU_TS             ts_end;
+    CPU_SR_ALLOC();                                                   //使用到临界段（在关/开中断时）时必需该宏，该宏声明和定义一个局部变
+                                                                      //量，用于保存关中断前的 CPU 状态寄存器 SR（临界段关中断只需保存SR）
+                                                                      //，开中断时将该值还原。
+    OS_CRITICAL_ENTER();                                              //进入临界段
+    ts_start = OS_TS_GET();                                           //获取 OS_TickTask() 任务的起始时间戳
+    OSTickCtr++;                                                      //时钟节拍数自加
+    spoke    = (OS_TICK_SPOKE_IX)(OSTickCtr % OSCfg_TickWheelSize);   //使用哈希算法（取余）缩小查找到期任务位于 OSCfg_TickWheel 数组的
+    p_spoke  = &OSCfg_TickWheel[spoke];                               //哪个元素（一个节拍列表），与任务插入数组时对应，下面只操作该列表。
+    p_tcb    = p_spoke->FirstPtr;                                     //获取节拍列表的首个任务控制块的地址
+    done     = DEF_FALSE;                                             //使下面 while 体得到运行
+    while (done == DEF_FALSE) {
+        if (p_tcb != (OS_TCB *)0) {                                   //如果该任务不空（存在）
+            p_tcb_next = p_tcb->TickNextPtr;                          //获取该列表中紧邻该任务的下一个任务控制块的地址  
+            switch (p_tcb->TaskState) {                               //根据该任务的任务状态处理
+                case OS_TASK_STATE_RDY:                               //如果任务状态均是与时间事件无关，就无需理会
+                case OS_TASK_STATE_PEND:
+                case OS_TASK_STATE_SUSPENDED:
+                case OS_TASK_STATE_PEND_SUSPENDED:
+                     break;
+
+                case OS_TASK_STATE_DLY:                               //如果是延时状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算延时的的剩余时间 
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满 
+                         p_tcb->TaskState = OS_TASK_STATE_RDY;        //修改任务状态量为就绪状态
+                         OS_TaskRdy(p_tcb);                           //让任务就绪
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done             = DEF_TRUE;                 //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                case OS_TASK_STATE_PEND_TIMEOUT:                      //如果是有期限等待状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算期限的的剩余时间
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满 
+#if (OS_MSG_EN > 0u)                                                  //如果使能了消息队列（普通消息队列或任务消息队列）
+                         p_tcb->MsgPtr     = (void      *)0;          //把任务保存接收到消息的地址的成员清空
+                         p_tcb->MsgSize    = (OS_MSG_SIZE)0u;         //把任务保存接收到消息的长度的成员清零
+#endif
+                         p_tcb->TS         = OS_TS_GET();             //记录任务结束等待的时间戳
+                         OS_PendListRemove(p_tcb);                    //从等待列表移除该任务
+                         OS_TaskRdy(p_tcb);                           //让任务就绪
+                         p_tcb->TaskState  = OS_TASK_STATE_RDY;       //修改任务状态量为就绪状态
+                         p_tcb->PendStatus = OS_STATUS_PEND_TIMEOUT;  //记录等待状态为超时
+                         p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING; //记录等待内核对象变量为空
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done              = DEF_TRUE;                //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                case OS_TASK_STATE_DLY_SUSPENDED:                     //如果是延时中被挂起状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算延时的的剩余时间 
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满
+                         p_tcb->TaskState  = OS_TASK_STATE_SUSPENDED; //修改任务状态量为被挂起状态
+                         OS_TickListRemove(p_tcb);                    //从节拍列表移除该任务
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done              = DEF_TRUE;                //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                case OS_TASK_STATE_PEND_TIMEOUT_SUSPENDED:            //如果是有期限等待中被挂起状态
+                     p_tcb->TickRemain = p_tcb->TickCtrMatch          //计算期限的的剩余时间
+                                       - OSTickCtr;
+                     if (OSTickCtr == p_tcb->TickCtrMatch) {          //如果任务期满 
+#if (OS_MSG_EN > 0u)                                                  //如果使能了消息队列（普通消息队列或任务消息队列）
+                         p_tcb->MsgPtr     = (void      *)0;          //把任务保存接收到消息的地址的成员清空
+                         p_tcb->MsgSize    = (OS_MSG_SIZE)0u;         //把任务保存接收到消息的长度的成员清零
+#endif
+                         p_tcb->TS         = OS_TS_GET();             //记录任务结束等待的时间戳
+                         OS_PendListRemove(p_tcb);                    //从等待列表移除该任务
+                         OS_TickListRemove(p_tcb);                    //从节拍列表移除该任务
+                         p_tcb->TaskState  = OS_TASK_STATE_SUSPENDED; //修改任务状态量为被挂起状态
+                         p_tcb->PendStatus = OS_STATUS_PEND_TIMEOUT;  //记录等待状态为超时
+                         p_tcb->PendOn     = OS_TASK_PEND_ON_NOTHING; //记录等待内核对象变量为空
+                     } else {                                         //如果任务未期满（由于升序排列，该列表后面的任务肯定也未期满）
+                         done              = DEF_TRUE;                //不再遍历该列表，退出 while 循环
+                     }
+                     break;
+
+                default:
+                     break;
+            }
+            p_tcb = p_tcb_next;                                       //遍历节拍列表的下一个任务
+        } else {                                                      //如果该任务为空（节拍列表后面肯定也都是空的）
+            done  = DEF_TRUE;                                         //不再遍历该列表，退出 while 循环
+        }
+    }
+    ts_end = OS_TS_GET() - ts_start;                                  //获取 OS_TickTask() 任务的结束时间戳，并计算其执行时间
+    if (OSTickTaskTimeMax < ts_end) {                                 //更新 OS_TickTask() 任务的最大运行时间
+        OSTickTaskTimeMax = ts_end;
+    }
+    OS_CRITICAL_EXIT();                                               //退出临界段
+}
+```
+
+
+
+```c
+void  OS_TaskRdy (OS_TCB  *p_tcb)
+{
+    OS_TickListRemove(p_tcb); /* Remove from tick list */
+    if ((p_tcb->TaskState & OS_TASK_STATE_BIT_SUSPENDED) == (OS_STATE)0) {
+        OS_RdyListInsert(p_tcb); /* Insert the task in the ready list */
+    }
+}
+```
+
+
+
+```c
+void  OS_RdyListInsert (OS_TCB  *p_tcb)
+{
+    OS_PrioInsert(p_tcb->Prio); 	/* 将优先级插入到优先级表 */
+    if (p_tcb->Prio == OSPrioCur) { /* 如果是当前优先级则插入到链表尾部 */
+        OS_RdyListInsertTail(p_tcb);
+    } else { 						/* 否则插入到链表头部 */
+        OS_RdyListInsertHead(p_tcb);
+    }
+}
+```
+
+
+
+## 11. 多优先级实验现象
+
+加入多优先级后，从逻辑分析仪中可以看到三个任务（任务优先级1>2>3）的波形是完全同步，就好像 CPU 在同时干三件事情：
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720160731.png" width="600px" /> </div>
+
+下图是任务 1、2 和 3 刚开始启动时的软件仿真波形图，系统从启动到任务 1 开始运行前花的时间为 TIME1，等于 0.26MS。任务 1 开始运行，然后调用 OSTimeDly(1)进入延时，随后进行任务切换，切换到任务 2 开始运行，从任务 1 切换到任务 2 花费的时间等于 TIME2-TIME1，等于 0.01MS。任务 2 开始运行，然后调用 OSTimeDly(1)进入延时，随后进行任务切换，切换到任务 3 开始运行，从任务 2 切换到任务 3 花费的时间等于 TIME3-TIME1，等于 0.01MS。任务 3 开始运行，然后调用 OSTimeDly(1)进入延时，随后进行任务切换，这个时候我们创建的 3 个任务都处于延时状态，那么系统就切换到空闲任务，在三个任务延时未到期之前，系统一直都是在运行空闲任务。当第一个 SysTick 中断产生，中断服务函数会调用 OSTimeTick() 函数扫描每个任务的延时是否到期，因为是延时 1 个SysTick 周期，所以第一个 SysTick 中断产生就意味着延时都到期，任务 1、2 和 3 依次进入就绪态，再次回到任务本身接着运行，将自身的 Flag 清 0，然后任务 1、2 和 3 又依次调用 OSTimeDly(1)进入延时状态，直到下一个 SysTick 中断产生前，系统都处在空闲任务中，一直这样循环下去。 
+
+<div align="center"> <img src="https://gitee.com//MrRen-sdhm/Images/raw/master/img/20200720160808.png" width="600px" /> </div>
 
 
 # uCOS-III 启动流程
