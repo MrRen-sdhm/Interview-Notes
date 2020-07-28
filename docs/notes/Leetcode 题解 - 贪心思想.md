@@ -1,3 +1,5 @@
+# 贪心思想✏️🥇⭐️❌
+
 贪心思想：保证每次操作都是局部最优的，并且最后得到的结果是全局最优的。
 
 
@@ -15,8 +17,10 @@ Output: 2
 
 题目描述：每个孩子都有一个满足度 grid，每个饼干都有一个大小 size，只有饼干的大小大于等于一个孩子的满足度，该孩子才会获得满足。求解最多可以获得满足的孩子数量。
 
-1. 给一个孩子的饼干应当尽量小并且又能满足该孩子，这样大饼干才能拿来给满足度比较大的孩子。
-2. 因为满足度最小的孩子最容易得到满足，所以先满足满足度最小的孩子。
+**题解**：
+
+1. 给一个孩子的饼干应当**尽量小**并且又能满足该孩子，这样大饼干才能拿来给满足度比较大的孩子。
+2. 因为满足度最小的孩子最容易得到满足，所以**先满足满足度最小的孩子**。
 
 在以上的解法中，我们只在每次分配时饼干时选择一种看起来是当前最优的分配方法，但无法保证这种局部最优的分配方法最后能得到全局最优解。我们假设能得到全局最优解，并使用反证法进行证明，即假设存在一种比我们使用的贪心策略更优的最优策略。如果不存在这种最优策略，表示贪心策略就是最优策略，得到的解也就是全局最优解。
 
@@ -24,21 +28,26 @@ Output: 2
 
 <div align="center"> <img src="https://cs-notes-1256109796.cos.ap-guangzhou.myqcloud.com/e69537d2-a016-4676-b169-9ea17eeb9037.gif" width="430px"> </div><br>
 
-```java
-public int findContentChildren(int[] grid, int[] size) {
-    if (grid == null || size == null) return 0;
-    Arrays.sort(grid);
-    Arrays.sort(size);
-    int gi = 0, si = 0;
-    while (gi < grid.length && si < size.length) {
-        if (grid[gi] <= size[si]) {
-            gi++;
+```cpp
+class Solution {
+public:
+    int findContentChildren(vector<int>& g, vector<int>& s) {
+        if(g.empty() || s.empty()) return 0;
+        int gi = 0, si = 0;
+        sort(g.begin(), g.end());
+        sort(s.begin(), s.end());
+        while(gi < g.size() && si < s.size()) {
+            if(g[gi] <= s[si]) { // 若这个较小的饼干能够满足该孩子
+                gi++; // 将饼干分给该孩子
+            }
+            si++;
         }
-        si++;
+        return gi;
     }
-    return gi;
-}
+};
 ```
+
+
 
 # 2. 不重叠的区间个数
 
@@ -64,41 +73,34 @@ Explanation: You don't need to remove any of the intervals since they're already
 
 题目描述：计算让一组区间不重叠所需要移除的区间个数。
 
+**题解**：
+
 先计算最多能组成的不重叠区间个数，然后用区间总个数减去不重叠区间的个数。
 
 在每次选择中，区间的结尾最为重要，选择的区间结尾越小，留给后面的区间的空间越大，那么后面能够选择的区间个数也就越大。
 
-按区间的结尾进行排序，每次选择结尾最小，并且和前一个区间不重叠的区间。
+**按区间的结尾进行排序，每次选择结尾最小，并且和前一个区间不重叠的区间。**
 
-```java
-public int eraseOverlapIntervals(int[][] intervals) {
-    if (intervals.length == 0) {
-        return 0;
-    }
-    Arrays.sort(intervals, Comparator.comparingInt(o -> o[1]));
-    int cnt = 1;
-    int end = intervals[0][1];
-    for (int i = 1; i < intervals.length; i++) {
-        if (intervals[i][0] < end) {
-            continue;
+```cpp
+class Solution {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        if(intervals.empty()) return 0;
+        sort(intervals.begin(), intervals.end(), // 按区间结尾从小到大排序 
+            [](vector<int> &a, vector<int> &b) {return a[1] < b[1];});
+        int cnt = 1; // 不重叠区间的个数
+        int end = intervals[0][1]; // 区间结尾
+        for(int i = 1; i < intervals.size(); i++) {
+            if(intervals[i][0] < end) continue; // 跳过与当前区间重叠的区间
+            end = intervals[i][1]; // 更新区间结尾
+            cnt++; // 不重叠区间数加1
         }
-        end = intervals[i][1];
-        cnt++;
+        return intervals.size() - cnt; // 区间总数减不重叠区间数即为要移除的区间数
     }
-    return intervals.length - cnt;
-}
+};
 ```
 
-使用 lambda 表示式创建 Comparator 会导致算法运行时间过长，如果注重运行时间，可以修改为普通创建 Comparator 语句：
 
-```java
-Arrays.sort(intervals, new Comparator<int[]>() {
-    @Override
-    public int compare(int[] o1, int[] o2) {
-        return o1[1] - o2[1];
-    }
-});
-```
 
 # 3. 投飞镖刺破气球
 
@@ -116,25 +118,30 @@ Output:
 
 题目描述：气球在一个水平数轴上摆放，可以重叠，飞镖垂直投向坐标轴，使得路径上的气球都被刺破。求解最小的投飞镖次数使所有气球都被刺破。
 
+**题解**：
+
 也是计算不重叠的区间个数，不过和 Non-overlapping Intervals 的区别在于，[1, 2] 和 [2, 3] 在本题中算是重叠区间。
 
-```java
-public int findMinArrowShots(int[][] points) {
-    if (points.length == 0) {
-        return 0;
-    }
-    Arrays.sort(points, Comparator.comparingInt(o -> o[1]));
-    int cnt = 1, end = points[0][1];
-    for (int i = 1; i < points.length; i++) {
-        if (points[i][0] <= end) {
-            continue;
+```cpp
+class Solution {
+public:
+    int findMinArrowShots(vector<vector<int>>& points) {
+        if(points.empty()) return 0;
+        sort(points.begin(), points.end(), // 按区间结尾从小到大排序 
+            [](vector<int> &a, vector<int> &b) {return a[1] < b[1];});
+        int cnt = 1; // 不重叠区间的个数
+        int end = points[0][1]; // 区间结尾
+        for(int i = 1; i < points.size(); i++) {
+            if(points[i][0] <= end) continue; // 跳过与当前区间重叠的区间
+            end = points[i][1]; // 更新区间结尾
+            cnt++;
         }
-        cnt++;
-        end = points[i][1];
+        return cnt;
     }
-    return cnt;
-}
+};
 ```
+
+
 
 # 4. 根据身高和序号重组队列
 
@@ -152,25 +159,64 @@ Output:
 
 题目描述：一个学生用两个分量 (h, k) 描述，h 表示身高，k 表示排在前面的有 k 个学生的身高比他高或者和他一样高。
 
+**题解**：
+
 为了使插入操作不影响后续的操作，身高较高的学生应该先做插入操作，否则身高较小的学生原先正确插入的第 k 个位置可能会变成第 k+1 个位置。
 
-身高 h 降序、个数 k 值升序，然后将某个学生插入队列的第 k 个位置中。
+身高 h 降序，若身高相同则按个数 k 值升序，然后将某个学生插入队列的第 k 个位置中。
 
-```java
-public int[][] reconstructQueue(int[][] people) {
-    if (people == null || people.length == 0 || people[0].length == 0) {
-        return new int[0][0];
+C++中 insert 函数每次在迭代器所在位置之前插入新的元素，可实现按照学生个数组织队列。
+
+
+
+方法1：使用额外空间
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
+        if(people.empty()) return {};
+        //按身高降序排序，身高相同则按个数升序排序
+        sort(people.begin(), people.end(), [](vector<int> &a, vector<int> &b) {
+                return a[0] == b[0] ? a[1] < b[1] : b[0] < a[0];
+            });
+        vector<vector<int>> res;
+        for (auto i : people) { // 将某个学生插入队列的第k个位置前
+            res.insert(res.begin() + i[1], i);
+        }
+        return res;
     }
-    Arrays.sort(people, (a, b) -> (a[0] == b[0] ? a[1] - b[1] : b[0] - a[0]));
-    List<int[]> queue = new ArrayList<>();
-    for (int[] p : people) {
-        queue.add(p[1], p);
-    }
-    return queue.toArray(new int[queue.size()][]);
-}
+};
 ```
 
-# 5. 买卖股票最大的收益
+
+
+方法2：不使用额外空间，直接把位置不对的元素从原数组中删除，并加入到正确的位置上去。
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> reconstructQueue(vector<vector<int>>& people) {
+        if(people.empty()) return {};
+        //按身高降序排序，身高相同则按个数升序排序
+        sort(people.begin(), people.end(), [](vector<int> &a, vector<int> &b) {
+                return a[0] == b[0] ? a[1] < b[1] : b[0] < a[0];
+            });
+        for (int i = 0; i < people.size(); i++) {
+            auto p = people[i];
+            if (p[1] != i) { // 若位置不对
+                people.erase(people.begin() + i); // 从原数组删除
+                people.insert(people.begin() + p[1], p); // 插入正确的位置
+            }
+        }
+        return people;
+    }
+};
+```
+
+
+
+# 5. 买卖股票最大的收益✏️
 
 121\. Best Time to Buy and Sell Stock (Easy)
 
@@ -195,6 +241,7 @@ public int maxProfit(int[] prices) {
 ```
 
 
+
 # 6. 买卖股票的最大收益 II
 
 122\. Best Time to Buy and Sell Stock II (Easy)
@@ -216,6 +263,7 @@ public int maxProfit(int[] prices) {
     return profit;
 }
 ```
+
 
 
 # 7. 种植花朵
@@ -250,6 +298,8 @@ public boolean canPlaceFlowers(int[] flowerbed, int n) {
 }
 ```
 
+
+
 # 8. 判断是否为子序列
 
 392\. Is Subsequence (Medium)
@@ -273,6 +323,8 @@ public boolean isSubsequence(String s, String t) {
     return true;
 }
 ```
+
+
 
 # 9. 修改一个数成为非递减数组
 
@@ -335,6 +387,8 @@ public int maxSubArray(int[] nums) {
     return maxSum;
 }
 ```
+
+
 
 # 11. 分隔字符串使同种字符出现在一起
 
