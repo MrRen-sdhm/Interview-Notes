@@ -37,20 +37,18 @@
 - [MySQL](notes/MySQL.md) </br>
 - [Redis](notes/Redis.md)
 
-## 💡 系统设计
-
-- [系统设计基础](notes/系统设计基础.md) </br>
-- [分布式](notes/分布式.md) </br>
-- [集群](notes/集群.md) </br>
-- [攻击技术](notes/攻击技术.md) </br>
-- [缓存](notes/缓存.md) </br>
-- [消息队列](notes/消息队列.md)
-
 ## 🔧 工具
 
 - [Git](notes/Git.md) </br>
+
+- [Cmake](notes/Cmake.md) </br>
+
+- [GDB](notes/GDB.md) </br>
+
 - [Docker](notes/Docker.md) </br>
-- [正则表达式](notes/正则表达式.md) </br>
-- [构建工具](notes/构建工具.md)
+
+- [正则表达式](notes/正则表达式.md) 
+
+  
 
 
