@@ -4,15 +4,18 @@
 
 ## 启动 GDB
 
+```
 gdb object                # 正常启动，加载可执行
 gdb object core           # 对可执行 + core 文件进行调试
 gdb object pid            # 对正在执行的进程进行调试
 gdb                       # 正常启动，启动后需要 file 命令手动加载
 gdb -tui                  # 启用 gdb 的文本界面（或 ctrl-x ctrl-a 更换 CLI/TUI）
+```
 
 
 
 ## 帮助信息
+```
 help                      # 列出命令分类
 help running              # 查看某个类别的帮助信息
 help run                  # 查看命令 run 的帮助
@@ -20,10 +23,12 @@ help info                 # 列出查看程序运行状态相关的命令
 help info line            # 列出具体的一个运行状态命令的帮助
 help show                 # 列出 GDB 状态相关的命令
 help show commands        # 列出 show 命令的帮助
+```
 
 
 
 ## 断点
+```
 break main                # 对函数 main 设置一个断点，可简写为 b main
 break 101                 # 对源代码的行号设置断点，可简写为 b 101
 break basic.c:101         # 对源代码和行号设置断点
@@ -46,10 +51,12 @@ condition {id} {expr}     # 条件断点，只有在条件生效时才发生
 condition 2 i == 20       # 2号断点只有在 i == 20 条件为真时才生效
 watch {expr}              # 对变量设置监视点
 info watchpoints          # 显示所有观察点
+```
 
 
 
 ## 运行程序
+```
 run                       # 运行程序
 run {args}                # 以某参数运行程序
 run < file                # 以某文件为标准输入运行程序
@@ -69,21 +76,25 @@ finish                    # 结束当前函数的运行
 until                     # 持续执行直到代码行号大于当前行号（跳出循环）
 until {line}              # 持续执行直到执行到某行
 kill                      # 杀死当前运行的函数
+```
 
 
 
 ## 栈帧
+```
 bt                        # 打印 backtrace 
 frame                     # 显示当前运行的栈帧
 up                        # 向上移动栈帧（向着 main 函数）
 down                      # 向下移动栈帧（远离 main 函数）
 info locals               # 打印帧内的相关变量
 info args                 # 打印函数的参数
+```
 
 
 
 ## 代码浏览
 
+```
 list 101                  # 显示第 101 行周围 10行代码
 list 1,10                 # 显示 1 到 10 行代码
 list main                 # 显示函数周围代码
@@ -97,17 +108,19 @@ reverse-search {regexp}   # 向后进行正则搜索
 dir {dirname}             # 增加源代码搜索路径
 dir                       # 复位源代码搜索路径（清空）
 show directories          # 显示源代码路径
+```
 
 
 
 ## 浏览数据
 
+```
 print {expression}        # 打印表达式，并且增加到打印历史
 print /x {expression}     # 十六进制输出，print 可以简写为 p
 print array[i]@count      # 打印数组范围
 print \$                   # 打印之前的变量
 print *$->next            # 打印 list
-print ​\$1                  # 输出打印历史里第一条
+print \$1                  # 输出打印历史里第一条
 print ::gx                # 将变量可视范围（scope）设置为全局
 print 'basic.c'::gx       # 打印某源代码里的全局变量，(gdb 4.6)
 print /x &main            # 打印函数地址
@@ -129,21 +142,25 @@ undisplay                 # 删除单步后对某些值的监控
 info display              # 显示监视的表达式
 show values               # 查看记录到打印历史中的变量的值 (gdb 4.0)
 info history              # 查看打印历史的帮助 (gdb 3.5)
+```
 
 
 
 ## 目标文件操作
 
+```
 file {object}             # 加载新的可执行文件供调试
 file                      # 放弃可执行和符号表信息
 symbol-file {object}      # 仅加载符号表
 exec-file {object}        # 指定用于调试的可执行文件（非符号表）
 core-file {core}          # 加载 core 用于分析
+```
 
 
 
 ## 信号控制
 
+```
 info signals              # 打印信号设置
 handle {signo} {actions}  # 设置信号的调试行为
 handle INT print          # 信号发生时打印信息
@@ -154,10 +171,12 @@ handle INT pass           # 调试器接获信号，不让程序知道
 handle INT nopass         # 调试起不接获信号
 signal signo              # 继续并将信号转移给程序
 signal 0                  # 继续但不把信号给程序
+```
 
 
 
 ## 线程调试
+```
 info threads              # 查看当前线程和 id
 thread {id}               # 切换当前调试线程为指定 id 的线程
 break {line} thread all   # 所有线程在指定行号处设置断点
@@ -167,33 +186,39 @@ set schedule-locking ?    # 调试一个线程时，其他线程是否执行，o
 set non-stop on/off       # 调试一个线程时，其他线程是否运行
 set pagination on/off     # 调试一个线程时，分页是否停止
 set target-async on/off   # 同步或者异步调试，是否等待线程中止的信息
+```
 
 
 
 ## 进程调试
+```
 info inferiors                       # 查看当前进程和 id
 inferior {id}                        # 切换某个进程
 kill inferior {id...}                # 杀死某个进程
 set detach-on-fork on/off            # 设置当进程调用fork时gdb是否同时调试父子进程
 set follow-fork-mode parent/child    # 设置当进程调用fork时是否进入子进程
+```
 
 
 
 ## 汇编调试
+```
 info registers            # 打印普通寄存器
 info all-registers        # 打印所有寄存器
 print/x $pc               # 打印单个寄存器
 stepi                     # 指令级别单步进入，可以简写为 si
 nexti                     # 指令级别单步跳过，可以简写为 ni
-display/i ​\$pc             # 监控寄存器（每条单步完以后会自动打印值）
+display/i \$pc             # 监控寄存器（每条单步完以后会自动打印值）
 x/x &gx                   # 十六进制打印变量
 info line 22              # 打印行号为 22 的内存地址信息
 info line *0x2c4e         # 打印给定内存地址对应的源代码和行号信息
 disassemble {addr}        # 对地址进行反汇编，比如 disassemble 0x2c4e
+```
 
 
 
 ## 历史信息
+```
 show commands             # 显示历史命令 (gdb 4.0)
 info editing              # 显示历史命令 (gdb 3.5)
 ESC-CTRL-J                # 切换到 Vi 命令行编辑模式
@@ -203,22 +228,28 @@ list class:member         # 显示类成员代码
 ptype class               # 查看类包含的成员
 print *this               # 查看 this 指针
 rbreak {regexpr}          # 匹配正则的函数前断点，如 ex_* 将断点 ex_ 开头的函数
+```
 
 
 
 ## 其他命令
+```
 define command ... end    # 定义用户命令
 <return>                  # 直接按回车执行上一条指令
 shell {command} [args]    # 执行 shell 命令
 source {file}             # 从文件加载 gdb 命令
 quit                      # 退出 gdb
+```
 
 
 
 ## GDB 前端
 gdb-tui                   使用 gdb -tui 启动（或 ctrl-x ctrl-a 更换 CLI/TUI）
+
 cgdb                      http://cgdb.github.io/
+
 emacs                     http://gnu.org/software/emacs
+
 gdbgui                    https://github.com/cs01/gdbgui
 
 GDB 图形化前端评测        http://www.skywind.me/blog/archives/2036
@@ -227,7 +258,11 @@ GDB 图形化前端评测        http://www.skywind.me/blog/archives/2036
 
 ## References
 https://sourceware.org/gdb/current/onlinedocs/gdb/
+
 https://kapeli.com/cheat_sheets/GDB.docset/Contents/Resources/Documents/index
+
 http://www.yolinux.com/TUTORIALS/GDB-Commands.html
+
 https://gist.github.com/rkubik/b96c23bd8ed58333de37f2b8cd052c30
+
 http://security.cs.pub.ro/hexcellents/wiki/kb/toolset/gdb

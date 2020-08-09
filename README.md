@@ -46,7 +46,7 @@
 ## :wrench: 工具
 
 - [Git](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/Git.md)
-- [Cmake](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/Cmake.md)
+- [CMake](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/CMake.md)
 - [GDB](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/GDB.md)
 - [Docker](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/Docker.md)
 - [正则表达式](https://github.com/CyC2018/CS-Notes/blob/master/notes/正则表达式.md)

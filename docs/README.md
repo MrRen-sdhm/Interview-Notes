@@ -41,7 +41,7 @@
 
 - [Git](notes/Git.md) </br>
 
-- [Cmake](notes/Cmake.md) </br>
+- [CMake](notes/CMake.md) </br>
 
 - [GDB](notes/GDB.md) </br>
 

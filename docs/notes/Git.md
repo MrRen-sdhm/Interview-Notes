@@ -150,11 +150,11 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 
 
 
-# [常用Git命令手册](https://juejin.im/post/5a4de5d8f265da432c2444b9)⭐️
+# 常用Git命令手册⭐️
 
-此文只是对Git有一定基础的人当记忆使用，比较简略，初级学员强烈推荐廖雪峰老师的Git系列教程，通俗易懂，[戳此处即可开始学习](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
+[常用Git命令手册](https://juejin.im/post/6844903544856772621)：此文只是对Git有一定基础的人当记忆使用，比较简略，初级学员强烈推荐廖雪峰老师的Git系列教程，通俗易懂，[戳此处即可开始学习](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000)
 
-### 1.安装Git
+## 1.安装Git
 
 - Linux
 
@@ -164,20 +164,20 @@ sudo apt-get install git
 
 - Window:到Git官网下载安装：https://git-scm.com/downloads
 
-### 2.配置全局用户Name和E-mail
+## 2.配置全局用户Name和E-mail
 
 ```bash
 $ git config --global user.name "Your Name"
 $ git config --global user.email "email@example.com"
 ```
 
-### 3.初始化仓库
+## 3.初始化仓库
 
 ```bash
 git init
 ```
 
-### 4.添加文件到Git仓库
+## 4.添加文件到Git仓库
 
 ```bash
 git add <file>
@@ -185,7 +185,7 @@ git add <file>
 
 提示：可反复多次使用，添加多个文件；
 
-### 5.提交添加的文件到Git仓库
+## 5.提交添加的文件到Git仓库
 
 ```bash
 git commit
@@ -199,19 +199,19 @@ git commit
 git commit -m "提交说明"
 ```
 
-### 6.查看仓库当前的状态
+## 6.查看仓库当前的状态
 
 ```bash
 git status
 ```
 
-### 7.比较当前文件的修改
+## 7.比较当前文件的修改
 
 ```bash
 $ git diff <file>
 ```
 
-### 8.查看历史提交记录⭐️
+## 8.查看历史提交记录⭐️
 
 ```bash
 git log
@@ -223,7 +223,7 @@ git log
 $ git log --pretty=oneline
 ```
 
-### 9.回退版本⭐️
+## 9.回退版本⭐️
 
 ```bash
 $ git reset --hard HEAD^
@@ -243,7 +243,7 @@ $ git reset --hard + commit id
 
 在Git中，版本回退速度非常快，因为Git在内部有个指向当前版本的HEAD指针，当你回退版本的时候，Git仅仅是把HEAD从指向回退的版本，然后顺便刷新工作区文件；
 
-### 10.查看操作的历史命令记录
+## 10.查看操作的历史命令记录
 
 ```bash
 $ git reflog
@@ -251,7 +251,7 @@ $ git reflog
 
 结果会将你之前的操作的commit id和具体的操作类型及相关的信息打印出来，这个命令还有一个作用就是，当你过了几天，你想回退之前的某次提交，但是你不知道commit id了，通过这个你可查找出commit id,就可以轻松回退了，用一句话总结：穿越未来，回到过去，so easy！
 
-### 11.diff文件
+## 11.diff文件
 
 ```bash
 git diff HEAD -- <file>
@@ -259,7 +259,7 @@ git diff HEAD -- <file>
 
 说明：查看工作区和版本库里面最新版本文件的区别，也可以不加HEAD参数；
 
-### 12.丢弃工作区的修改⭐️
+## 12.丢弃工作区的修改⭐️
 
 ```bash
 $ git checkout -- <file>
@@ -267,7 +267,7 @@ $ git checkout -- <file>
 
 说明：适用于工作区修改没有add的文件
 
-### 13.丢弃暂存区的文件⭐️
+## 13.丢弃暂存区的文件⭐️
 
 ```bash
 $ git reset HEAD <file>
@@ -275,7 +275,7 @@ $ git reset HEAD <file>
 
 说明：适用于暂存区已经add的文件，注意执行完此命令，他会将暂存区的修改放回到工作区中，如果要想工作区的修改也丢弃，就执行第12条命令即可；
 
-### 14.删除文件
+## 14.删除文件
 
 ```bash
 $ rm <file>
@@ -289,7 +289,7 @@ $ rm <file>
 $ git checkout -- <file>
 ```
 
-### 15.创建SSH key
+## 15.创建SSH key
 
 ```bash
 $ ssh-keygen -t rsa -C "youremail@example.com"
@@ -297,7 +297,7 @@ $ ssh-keygen -t rsa -C "youremail@example.com"
 
 一般本地Git仓库和远程Git仓库之间的传输是通过SSH加密的，所以我们可以将其生成的公钥添加到Git服务端的设置中即可，这样Git就可以知道是你提交的了；
 
-### 16.与远程仓库协作⭐️
+## 16.与远程仓库协作⭐️
 
 ```bash
 $ git remote add origin git@github.com:xinpengfei520/IM.git
@@ -339,7 +339,7 @@ $ git push github master
 $ git push gitee master
 ```
 
-### 17.推送到远程仓库
+## 17.推送到远程仓库
 
 ```bash
 $ git push -u origin master
@@ -347,13 +347,13 @@ $ git push -u origin master
 
 注意：第一次提交需要加一个参数-u,以后不需要
 
-### 18.克隆一个远程库
+## 18.克隆一个远程库
 
 ```bash
 $ git clone git@github.com:xinpengfei520/IM.git
 ```
 
-### 19.Git分支管理⭐️
+## 19.Git分支管理⭐️
 
 创建一个分支branch1
 
@@ -393,7 +393,7 @@ $ git merge branch1
 $ git branch -d branch1
 ```
 
-### 20.查看提交的历史记录
+## 20.查看提交的历史记录
 
 ```bash
 $ git log
@@ -405,7 +405,7 @@ $ git log
 git log --graph
 ```
 
-### 21.合并分支
+## 21.合并分支
 
 禁用Fast forward模式合并分支
 
@@ -421,7 +421,7 @@ $ git merge --no-ff -m "merge" branch1
 - 我们可以新开一个dev分支，也就是说dev分支是不稳定的，到版本发布时，再把dev分支合并到master上，在master分支发布新版本；
 - 你和你的协作者平时都在dev分支上提交，每个人都有自己的分支，时不时地往dev分支上合并就可以了；
 
-### 22.保存工作现场⭐️
+## 22.保存工作现场⭐️
 
 ```bash
 $ git stash
@@ -461,7 +461,7 @@ $ git stash apply stash@{0}
 
 说明：其中stash@{0}为`git stash list`中的一种编号
 
-### 23.丢弃一个没有被合并过的分支
+## 23.丢弃一个没有被合并过的分支
 
 强行删除即可：
 
@@ -471,7 +471,7 @@ $ git branch -D <name>
 
 作用：实际开发中，添加一个新feature，最好新建一个分支，如果要丢弃这个没有被合并过的分支，可以通过上面的命令强行删除；
 
-### 24.查看远程库的信息
+## 24.查看远程库的信息
 
 ```bash
 $ git remote
@@ -483,7 +483,7 @@ $ git remote
 $ git remote -v
 ```
 
-### 25.推送分支
+## 25.推送分支
 
 推送master到远程库
 
@@ -497,7 +497,7 @@ $ git push origin master
 $ git push origin branch1
 ```
 
-### 26.创建本地分支
+## 26.创建本地分支
 
 ```bash
 $ git checkout -b branch1 origin/branch1
@@ -505,7 +505,7 @@ $ git checkout -b branch1 origin/branch1
 
 说明：如果远程库中有分支，clone之后默认只有master分支的，所以需要执行如上命令来创建本地分支才能与远程的分支关联起来；
 
-### 27.指定本地branch1分支与远程origin/branch1分支的链接
+## 27.指定本地branch1分支与远程origin/branch1分支的链接
 
 ```bash
 $ git branch --set-upstream branch1 origin/branch1
@@ -513,7 +513,7 @@ $ git branch --set-upstream branch1 origin/branch1
 
 作用：如果你本地新建的branch1分支，远程库中也有一个branch1分支(别人创建的)，而刚好你也没有提交过到这个分支，即没有关联过，会报一个`no tracking information`信息，通过上面命令关联即可；
 
-### 28.创建标签⭐️
+## 28.创建标签⭐️
 
 ```bash
 $ git tag <name>
@@ -587,7 +587,7 @@ $ git push origin <tagname>
 $ git push origin --tags
 ```
 
-### 29.自定义Git设置
+## 29.自定义Git设置
 
 Git显示颜色，会让命令输出看起来更清晰、醒目：
 
@@ -618,7 +618,7 @@ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Crese
 
 其他说明：配置的时候加上--global是针对当前用户起作用的，如果不加只对当前的仓库起作用；每个仓库的Git配置文件都放在 **.git/config** 文件中，我们可以打开对其中的配置作修改，可以删除设置的别名；而当前用户的Git配置文件放在用户主目录下的一个隐藏文件.gitconfig中，我们也可以对其进行配置和修改。
 
-### 30.忽略文件规则
+## 30.忽略文件规则
 
 原则：
 
@@ -665,7 +665,7 @@ $ git rm -r --cached .idea
 
 ![这里写图片描述](https://user-gold-cdn.xitu.io/2018/1/4/160c049ccf1e2bd9?imageslim)
 
-### git命令大全
+## git命令大全
 
 ```bash
 git init                                                  # 初始化本地git仓库（创建新仓库）
