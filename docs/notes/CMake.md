@@ -21,7 +21,7 @@ aux_source_directory(. SRC_LIST)
 
 ## 3. add_library
 
-#### 3.1 添加一个库
+### 3.1 添加一个库
 
 ```css
 add_library(<name> [STATIC | SHARED | MODULE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
@@ -32,7 +32,7 @@ add_library(<name> [STATIC | SHARED | MODULE] [EXCLUDE_FROM_ALL] source1 source2
 - `[EXCLUDE_FROM_ALL]`, 如果指定了这一属性，对应的一些属性会在目标被创建时被设置(**指明此目录和子目录中所有的目标，是否应当从默认构建中排除, 子目录的IDE工程文件/Makefile将从顶级IDE工程文件/Makefile中排除**)
 - `source1 source2 ... sourceN`用来指定源文件
 
-#### 3.2 导入已有的库
+### 3.2 导入已有的库
 
 ```css
 add_library(<name> [STATIC | SHARED | MODULE | UNKNOWN] IMPORTED)
