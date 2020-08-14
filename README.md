@@ -41,7 +41,6 @@
 - [MySQL](https://github.com/CyC2018/CS-Notes/blob/master/notes/MySQL.md)
 - [Redis](https://github.com/CyC2018/CS-Notes/blob/master/notes/Redis.md)
 
-- https://github.com/CyC2018/CS-Notes/blob/master/notes/消息队列.md)
 
 ## :wrench: 工具
 
