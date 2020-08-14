@@ -55,12 +55,12 @@
 - [代码可读性](https://github.com/CyC2018/CS-Notes/blob/master/notes/代码可读性.md)
 - [代码风格规范](https://github.com/CyC2018/CS-Notes/blob/master/notes/代码风格规范.md)
 
+&nbsp;
 
-
-
+&nbsp;
 
 **排版工具**
 
-文档站点生成器：[docsify](https://docsify.js.org/#/)
+- 文档站点生成器：[docsify](https://docsify.js.org/#/)
 
-LaTeX公式支持：[docsify-katex](https://github.com/upupming/docsify-katex)
+- LaTeX公式支持：[docsify-katex](https://github.com/upupming/docsify-katex)
