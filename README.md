@@ -1,6 +1,6 @@
-| &nbsp;算法&nbsp; | 操作系统 | &nbsp;网络&nbsp;|面向对象| &nbsp;&nbsp;数据库&nbsp;&nbsp;|系统设计| &nbsp;&nbsp;&nbsp;工具&nbsp;&nbsp;&nbsp; |编码实践|
+| &nbsp;算法&nbsp; | 操作系统 | &nbsp;计算机网络&nbsp; |面向对象| &nbsp;&nbsp;嵌入式&nbsp;&nbsp; |数据库| &nbsp;&nbsp;&nbsp;工具&nbsp;&nbsp;&nbsp; |编码实践|
 | :---: | :----: | :---: | :----: | :----: | :----: | :----: | :----: |
-| [:pencil2:](#pencil2-算法) | [:computer:](#computer-操作系统) | [:cloud:](#cloud-网络) | [:art:](#art-面向对象) | [:floppy_disk:](#floppy_disk-数据库) | [:bulb:](#bulb-系统设计) |[:wrench:](#wrench-工具)| [:watermelon:](#watermelon-编码实践) |
+| [:pencil2:](#pencil2-算法) | [:computer:](#computer-操作系统) | [:cloud:](#cloud-网络) | [:art:](#art-面向对象) | [:dart:](#dart-嵌入式) | [:floppy_disk:](#floppy_disk-数据库) |[:wrench:](#wrench-工具)| [:watermelon:](#watermelon-编码实践) |
 
 <br>
 
@@ -29,7 +29,7 @@
 - [面向对象思想](https://github.com/CyC2018/CS-Notes/blob/master/notes/面向对象思想.md)
 - [C++设计模式](https://github.com/CyC2018/CS-Notes/blob/master/notes/设计模式.md)
 
-## 🎯  嵌入式
+## :dart: 嵌入式
 
 - [uCOS-III](https://github.com/MrRen-sdhm/Interview-Notes/tree/master/docs/notes/uCOS-III学习笔记.md)
 
