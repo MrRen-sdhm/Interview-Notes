@@ -1,0 +1,4 @@
+﻿  leanrInterview.cpp
+H:\SourceCode\Interview-Notes\leanrInterview\leanrInterview.cpp(21,23): warning C4018: “<”: 有符号/无符号不匹配
+H:\SourceCode\Interview-Notes\leanrInterview\leanrInterview.cpp(42,23): warning C4018: “<”: 有符号/无符号不匹配
+  leanrInterview.vcxproj -> H:\SourceCode\Interview-Notes\leanrInterview\Debug\leanrInterview.exe
